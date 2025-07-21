@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Online Voting System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Custom styles that can't be done with Tailwind */
+        .gradient-bg {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+        }
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        .vote-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        #confetti-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1000;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans">
+    <!-- Confetti canvas (hidden by default) -->
+    <canvas id="confetti-canvas" class="hidden"></canvas>
+
+    <!-- Header/Navigation -->
+    <header class="gradient-bg text-white shadow-lg">
+        <div class="container mx-auto px-4 py-4">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-vote-yea text-2xl"></i>
+                    <h1 class="text-2xl font-bold">VoteEasy</h1>
+                </div>
+                <nav class="hidden md:flex space-x-6">
+                    <a href="#" class="hover:text-purple-200 transition">Home</a>
+                    <a href="#" class="hover:text-purple-200 transition">Elections</a>
+                    <a href="#" class="hover:text-purple-200 transition">Results</a>
+                    <a href="#" class="hover:text-purple-200 transition">About</a>
+                </nav>
+                <div class="flex items-center space-x-4">
+                    <button id="login-btn" class="bg-white text-purple-600 px-4 py-2 rounded-full font-medium hover:bg-purple-100 transition">
+                        Login
+                    </button>
+                    <button class="md:hidden text-2xl" id="mobile-menu-btn">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Mobile menu (hidden by default) -->
+        <div id="mobile-menu" class="hidden md:hidden bg-purple-800 px-4 py-2">
+            <a href="#" class="block py-2 hover:text-purple-200 transition">Home</a>
+            <a href="#" class="block py-2 hover:text-purple-200 transition">Elections</a>
+            <a href="#" class="block py-2 hover:text-purple-200 transition">Results</a>
+            <a href="#" class="block py-2 hover:text-purple-200 transition">About</a>
+        </div>
+    </header>
+
+    <!-- Login Modal (hidden by default) -->
+    <div id="login-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-md">
+            <div class="flex justify-between items-center border-b px-6 py-4">
+                <h3 class="text-xl font-bold">Login to Vote</h3>
+                <button id="close-login-modal" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="p-6">
+                <form id="login-form">
+                    <div class="mb-4">
+                        <label for="email" class="block text-gray-700 mb-2">Email</label>
+                        <input type="email" id="email" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="your@email.com" required>
+                    </div>
+                    <div class="mb-6">
+                        <label for="password" class="block text-gray-700 mb-2">Password</label>
+                        <input type="password" id="password" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="••••••••" required>
+                    </div>
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center">
+                            <input type="checkbox" id="remember" class="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded">
+                            <label for="remember" class="ml-2 block text-sm text-gray-700">Remember me</label>
+                        </div>
+                        <a href="#" class="text-sm text-purple-600 hover:text-purple-800">Forgot password?</a>
+                    </div>
+                    <button type="submit" class="w-full gradient-bg text-white py-2 px-4 rounded-lg hover:opacity-90 transition font-medium">
+                        Login
+                    </button>
+                </form>
+                <div class="mt-4 text-center">
+                    <p class="text-gray-600">Don't have an account? <a href="#" class="text-purple-600 hover:text-purple-800">Register</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8">
+        <!-- Hero Section -->
+        <section class="gradient-bg text-white rounded-xl p-8 mb-10 shadow-lg">
+            <div class="max-w-3xl mx-auto text-center">
+                <h2 class="text-3xl md:text-4xl font-bold mb-4">Make Your Voice Heard</h2>
+                <p class="text-lg md:text-xl mb-6">Participate in our secure online voting system. Your vote matters in shaping the future.</p>
+                <div class="flex flex-col sm:flex-row justify-center gap-4">
+                    <button class="bg-white text-purple-600 px-6 py-3 rounded-full font-medium hover:bg-purple-100 transition">
+                        View Current Elections
+                    </button>
+                    <button class="border-2 border-white text-white px-6 py-3 rounded-full font-medium hover:bg-white hover:text-purple-600 transition">
+                        How It Works
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Active Election Section -->
+        <section class="mb-12">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-800">Active Elections</h2>
+                <a href="#" class="text-purple-600 hover:text-purple-800 flex items-center">
+                    View all <i class="fas fa-chevron-right ml-1"></i>
+                </a>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Election Card 1 -->
+                <div class="bg-white rounded-xl shadow-md overflow-hidden transition duration-300 card-hover">
+                    <div class="p-6">
+                        <div class="flex justify-between items-start mb-4">
+                            <div>
+                                <span class="inline-block bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full uppercase font-semibold">Active</span>
+                                <span class="inline-block bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded-full uppercase font-semibold ml-2">National</span>
+                            </div>
+                            <div class="text-gray-500 text-sm">
+                                <i class="fas fa-clock mr-1"></i> 2 days left
+                            </div>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">Student Union Election 2025</h3>
+                        <p class="text-gray-600 mb-4">Elect your student representatives for the academic year 2025-2026.</p>
+                        
+                        <div class="mb-4">
+                            <div class="flex justify-between text-sm text-gray-500 mb-1">
+                                <span>Start Date</span>
+                                <span>End Date</span>
+                            </div>
+                            <div class="flex justify-between text-sm font-medium">
+                                <span>Oct 15, 2025</span>
+                                <span>Oct 20, 2025</span>
+                            </div>
+                        </div>
+                        
+                        <button class="w-full gradient-bg text-white py-2 px-4 rounded-lg hover:opacity-90 transition font-medium">
+                            View Candidates
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Election Card 2 -->
+                <div class="bg-white rounded-xl shadow-md overflow-hidden transition duration-300 card-hover">
+                    <div class="p-6">
+                        <div class="flex justify-between items-start mb-4">
+                            <div>
+                                <span class="inline-block bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full uppercase font-semibold">Active</span>
+                                <span class="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full uppercase font-semibold ml-2">Department</span>
+                            </div>
+                            <div class="text-gray-500 text-sm">
+                                <i class="fas fa-clock mr-1"></i> 5 days left
+                            </div>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">Computer Science Dept. Head</h3>
+                        <p class="text-gray-600 mb-4">Vote for the next head of the Computer Science Department.</p>
+                        
+                        <div class="mb-4">
+                            <div class="flex justify-between text-sm text-gray-500 mb-1">
+                                <span>Start Date</span>
+                                <span>End Date</span>
+                            </div>
+                            <div class="flex justify-between text-sm font-medium">
+                                <span>Oct 10, 2025</span>
+                                <span>Oct 25, 2025</span>
+                            </div>
+                        </div>
+                        
+                        <button class="w-full gradient-bg text-white py-2 px-4 rounded-lg hover:opacity-90 transition font-medium">
+                            View Candidates
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Election Card 3 -->
+                <div class="bg-white rounded-xl shadow-md overflow-hidden transition duration-300 card-hover">
+                    <div class="p-6">
+                        <div class="flex justify-between items-start mb-4">
+                            <div>
+                                <span class="inline-block bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded-full uppercase font-semibold">Upcoming</span>
+                                <span class="inline-block bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded-full uppercase font-semibold ml-2">National</span>
+                            </div>
+                            <div class="text-gray-500 text-sm">
+                                <i class="fas fa-clock mr-1"></i> Starts in 3 days
+                            </div>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">National Youth Council</h3>
+                        <p class="text-gray-600 mb-4">Elect representatives for the National Youth Council 2026.</p>
+                        
+                        <div class="mb-4">
+                            <div class="flex justify-between text-sm text-gray-500 mb-1">
+                                <span>Start Date</span>
+                                <span>End Date</span>
+                            </div>
+                            <div class="flex justify-between text-sm font-medium">
+                                <span>Oct 25, 2025</span>
+                                <span>Nov 5, 2025</span>
+                            </div>
+                        </div>
+                        
+                        <button class="w-full bg-gray-200 text-gray-700 py-2 px-4 rounded-lg font-medium cursor-not-allowed" disabled>
+                            Coming Soon
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Voting Booth Section -->
+        <section class="mb-12 bg-white rounded-xl shadow-md overflow-hidden">
+            <div class="md:flex">
+                <div class="md:w-1/3 gradient-bg text-white p-8 flex flex-col justify-center">
+                    <h2 class="text-2xl font-bold mb-4">Student Union Election 2026/h2>
+                    <p class="mb-6">Cast your vote for the student representatives. Your vote is confidential and secure.</p>
+                    
+                    <div class="mb-6">
+                        <div class="flex items-center mb-2">
+                            <div class="w-8 h-8 rounded-full bg-purple-200 flex items-center justify-center mr-3">
+                                <i class="fas fa-user-check text-purple-700"></i>
+                            </div>
+                            <span>Verified voters only</span>
+                        </div>
+                        <div class="flex items-center mb-2">
+                            <div class="w-8 h-8 rounded-full bg-purple-200 flex items-center justify-center mr-3">
+                                <i class="fas fa-lock text-purple-700"></i>
+                            </div>
+                            <span>Secure voting system</span>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="w-8 h-8 rounded-full bg-purple-200 flex items-center justify-center mr-3">
+                                <i class="fas fa-shield-alt text-purple-700"></i>
+                            </div>
+                            <span>Anonymous voting</span>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-purple-800 bg-opacity-50 rounded-lg p-4">
+                        <h4 class="font-bold mb-2">Voting Instructions</h4>
+                        <ol class="list-decimal list-inside text-sm space-y-1">
+                            <li>Select your preferred candidate</li>
+                            <li>Review your selection</li>
+                            <li>Submit your vote</li>
+                            <li>You'll receive a confirmation</li>
+                        </ol>
+                    </div>
+                </div>
+                
+                <div class="md:w-2/3 p-8">
+                    <h3 class="text-xl font-bold text-gray-800 mb-6">Candidates for President</h3>
+                    
+                    <div class="space-y-6">
+                        <!-- Candidate 1 -->
+                        <div class="border border-gray-200 rounded-lg p-4 hover:border-purple-300 transition" data-candidate="1">
+                            <div class="flex items-center">
+                                <div class="mr-4">
+                                    <div class="w-16 h-16 rounded-full bg-purple-100 flex items-center justify-center text-purple-600 text-2xl font-bold">
+                                        JS
+                                    </div>
+                                </div>
+                                <div class="flex-grow">
+                                    <h4 class="font-bold text-lg">John Smith</h4>
+                                    <p class="text-gray-600 mb-2">Computer Science Major</p>
+                                    <div class="flex items-center text-sm text-gray-500">
+                                        <i class="fas fa-bullhorn mr-1"></i>
+                                        <span>"Empowering students through transparent leadership"</span>
+                                    </div>
+                                </div>
+                                <div>
+                                    <button class="vote-btn bg-gray-100 text-gray-700 px-4 py-2 rounded-lg font-medium hover:bg-gray-200 transition" data-candidate-id="1">
+                                        Select
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Candidate 2 -->
+                        <div class="border border-gray-200 rounded-lg p-4 hover:border-purple-300 transition" data-candidate="2">
+                            <div class="flex items-center">
+                                <div class="mr-4">
+                                    <div class="w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 text-2xl font-bold">
+                                        MJ
+                                    </div>
+                                </div>
+                                <div class="flex-grow">
+                                    <h4 class="font-bold text-lg">Maria Johnson</h4>
+                                    <p class="text-gray-600 mb-2">Political Science Major</p>
+                                    <div class="flex items-center text-sm text-gray-500">
+                                        <i class="fas fa-bullhorn mr-1"></i>
+                                        <span>"Building bridges between students and administration"</span>
+                                    </div>
+                                </div>
+                                <div>
+                                    <button class="vote-btn bg-gray-100 text-gray-700 px-4 py-2 rounded-lg font-medium hover:bg-gray-200 transition" data-candidate-id="2">
+                                        Select
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Candidate 3 -->
+                        <div class="border border-gray-200 rounded-lg p-4 hover:border-purple-300 transition" data-candidate="3">
+                            <div class="flex items-center">
+                                <div class="mr-4">
+                                    <div class="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center text-green-600 text-2xl font-bold">
+                                        AD
+                                    </div>
+                                </div>
+                                <div class="flex-grow">
+                                    <h4 class="font-bold text-lg">Alex Davis</h4>
+                                    <p class="text-gray-600 mb-2">Engineering Major</p>
+                                    <div class="flex items-center text-sm text-gray-500">
+                                        <i class="fas fa-bullhorn mr-1"></i>
+                                        <span>"Innovative solutions for student challenges"</span>
+                                    </div>
+                                </div>
+                                <div>
+                                    <button class="vote-btn bg-gray-100 text-gray-700 px-4 py-2 rounded-lg font-medium hover:bg-gray-200 transition" data-candidate-id="3">
+                                        Select
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Selected candidate confirmation -->
+                    <div id="selected-candidate" class="mt-8 p-4 border border-purple-200 bg-purple-50 rounded-lg hidden">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <h4 class="font-bold text-purple-800">You have selected:</h4>
+                                <p id="selected-candidate-name" class="text-lg font-medium"></p>
+                            </div>
+                            <div>
+                                <button id="change-selection" class="text-purple-600 hover:text-purple-800 mr-4">
+                                    Change
+                                </button>
+                                <button id="submit-vote" class="gradient-bg text-white px-4 py-2 rounded-lg font-medium hover:opacity-90 transition">
+                                    Submit Vote
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Vote Confirmation Modal (hidden by default) -->
+        <div id="vote-confirmation-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+            <div class="bg-white rounded-xl shadow-xl w-full max-w-md p-8 text-center">
+                <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <i class="fas fa-check text-green-500 text-3xl"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-gray-800 mb-4">Vote Submitted Successfully!</h3>
+                <p class="text-gray-600 mb-6">Thank you for participating in the Student Union Election 2023. Your vote has been recorded securely.</p>
+                <button id="close-confirmation-modal" class="gradient-bg text-white px-6 py-2 rounded-lg font-medium hover:opacity-90 transition">
+                    Close
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-12">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <h3 class="text-xl font-bold mb-4 flex items-center">
+                        <i class="fas fa-vote-yea mr-2"></i> VoteEasy
+                    </h3>
+                    <p class="text-gray-400">Secure online voting platform for organizations and institutions.</p>
+                </div>
+                <div>
+                    <h4 class="font-bold mb-4">Quick Links</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-white transition">Home</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition">Elections</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition">Results</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition">About Us</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-bold mb-4">Legal</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-white transition">Privacy Policy</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition">Terms of Service</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition">Security</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-bold mb-4">Contact Us</h4>
+                    <ul class="space-y-2">
+                        <li class="flex items-center">
+                            <i class="fas fa-envelope mr-2 text-gray-400"></i>
+                            <span>support@voteeasy.com</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-phone mr-2 text-gray-400"></i>
+                            <span>+1 (555) 123-4567</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-map-marker-alt mr-2 text-gray-400"></i>
+                            <span>123 Voting St, Democracy City</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-gray-700 mt-8 pt-8 text-center text-gray-400">
+                <p>&copy; 2025 VoteEasy. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Mobile menu toggle
+        document.getElementById('mobile-menu-btn').addEventListener('click', function() {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hidden');
+        });
+
+        // Login modal toggle
+        document.getElementById('login-btn').addEventListener('click', function() {
+            document.getElementById('login-modal').classList.remove('hidden');
+        });
+
+        document.getElementById('close-login-modal').addEventListener('click', function() {
+            document.getElementById('login-modal').classList.add('hidden');
+        });
+
+        // Close modal when clicking outside
+        document.getElementById('login-modal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                this.classList.add('hidden');
+            }
+        });
+
+        // Login form submission
+        document.getElementById('login-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            // Here you would typically send the data to your PHP backend
+            alert('Login functionality would connect to PHP backend in a real implementation');
+            document.getElementById('login-modal').classList.add('hidden');
+        });
+
+        // Voting functionality
+        let selectedCandidate = null;
+        const voteButtons = document.querySelectorAll('.vote-btn');
+        
+        voteButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const candidateId = this.getAttribute('data-candidate-id');
+                const candidateCard = document.querySelector(`[data-candidate="${candidateId}"]`);
+                const candidateName = candidateCard.querySelector('h4').textContent;
+                
+                // Update selected candidate
+                selectedCandidate = candidateId;
+                
+                // Update UI
+                document.getElementById('selected-candidate-name').textContent = candidateName;
+                document.getElementById('selected-candidate').classList.remove('hidden');
+                
+                // Disable all vote buttons
+                voteButtons.forEach(btn => {
+                    btn.disabled = true;
+                    btn.classList.remove('bg-gray-100', 'hover:bg-gray-200');
+                    btn.classList.add('bg-gray-200', 'cursor-not-allowed');
+                });
+                
+                // Enable the selected button
+                this.disabled = false;
+                this.classList.remove('bg-gray-100', 'hover:bg-gray-200');
+                this.classList.add('gradient-bg', 'text-white', 'hover:opacity-90');
+                this.textContent = 'Selected';
+            });
+        });
+
+        // Change selection
+        document.getElementById('change-selection').addEventListener('click', function() {
+            selectedCandidate = null;
+            document.getElementById('selected-candidate').classList.add('hidden');
+            
+            // Reset all vote buttons
+            voteButtons.forEach(btn => {
+                btn.disabled = false;
+                btn.classList.remove('gradient-bg', 'text-white', 'hover:opacity-90', 'bg-gray-200', 'cursor-not-allowed');
+                btn.classList.add('bg-gray-100', 'hover:bg-gray-200');
+                btn.textContent = 'Select';
+            });
+        });
+
+        // Submit vote
+        document.getElementById('submit-vote').addEventListener('click', function() {
+            if (!selectedCandidate) return;
+            
+            // Here you would typically send the vote to your PHP backend
+            console.log(`Vote submitted for candidate ${selectedCandidate}`);
+            
+            // Show confirmation modal
+            document.getElementById('vote-confirmation-modal').classList.remove('hidden');
+            
+            // Trigger confetti
+            triggerConfetti();
+        });
+
+        // Close confirmation modal
+        document.getElementById('close-confirmation-modal').addEventListener('click', function() {
+            document.getElementById('vote-confirmation-modal').classList.add('hidden');
+        });
+
+        // Confetti effect
+        function triggerConfetti() {
+            const canvas = document.getElementById('confetti-canvas');
+            canvas.classList.remove('hidden');
+            
+            // Confetti configuration
+            const confettiSettings = {
+                target: 'confetti-canvas',
+                max: 100,
+                size: 1.5,
+                animate: true,
+                props: ['circle', 'square', 'triangle', 'line'],
+                colors: [[255,0,0],[0,255,0],[0,0,255],[255,255,0],[255,0,255],[0,255,255]],
+                clock: 25,
+                rotate: true,
+                start_from_edge: true,
+                respawn: false
+            };
+            
+            // Load confetti library and trigger
+            const confettiScript = document.createElement('script');
+            confettiScript.src = 'https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js';
+            confettiScript.onload = function() {
+                confetti(confettiSettings);
+                setTimeout(() => {
+                    canvas.classList.add('hidden');
+                }, 5000);
+            };
+            document.head.appendChild(confettiScript);
+        }
+    </script>
+</body>
+</html>
