@@ -12,7 +12,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($user && password_verify($password, $user['password'])) {
         $_SESSION['user_id'] = $user['id'];
-        echo json_encode(["status" => "success"]);
+        echo json_encode(["status" => "success", "email" => $email]);
     } else {
         echo json_encode(["status" => "error", "message" => "Invalid email or password"]);
     }
