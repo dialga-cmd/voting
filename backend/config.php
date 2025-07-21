@@ -5,10 +5,12 @@ try {
     $conn = new PDO("sqlite:$db_file");
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-    // Create tables if not exist
+    // Create tables if they don't exist
     $conn->exec("
     CREATE TABLE IF NOT EXISTS users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
+        first_name TEXT,
+        last_name TEXT,
         email TEXT UNIQUE,
         password TEXT,
         created_at TEXT DEFAULT CURRENT_TIMESTAMP
@@ -28,7 +30,7 @@ try {
     );
     ");
 
-    // Insert candidates if empty
+    // Insert sample candidates if table is empty
     $stmt = $conn->query("SELECT COUNT(*) FROM candidates");
     if ($stmt->fetchColumn() == 0) {
         $conn->exec("INSERT INTO candidates (name) VALUES ('John Smith'), ('Maria Johnson'), ('Alex Davis');");
