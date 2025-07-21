@@ -546,6 +546,28 @@ document.getElementById('close-register-modal').addEventListener('click', functi
     document.getElementById('register-modal').classList.add('hidden');
 });
 
+fetch('backend/login.php', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: `email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`
+})
+.then(res => res.json())
+.then(data => {
+    if (data.status === 'success') {
+        sessionStorage.setItem('userEmail', data.email);
+        document.getElementById('login-btn').style.display = 'none';  // Hides login button
+        document.getElementById('login-modal').classList.add('hidden');
+    } else {
+        alert(data.message || 'Login failed');
+    }
+})
+.catch(() => alert('Server error'));
+document.addEventListener('DOMContentLoaded', () => {
+    if (sessionStorage.getItem('userEmail')) {
+        document.getElementById('login-btn').style.display = 'none';
+    }
+});
+
 // Handle Registration Form Submission
 document.getElementById('register-form').addEventListener('submit', function(e) {
     e.preventDefault();
