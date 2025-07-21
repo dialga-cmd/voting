@@ -4,66 +4,116 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Register - VoteEasy</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    .gradient-bg {
-      background: linear-gradient(135deg, #6b46c1 0%, #805ad5 100%);
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 0;
     }
-    .gradient-bg:hover {
+    .container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .register-box {
+      background: #fff;
+      padding: 25px;
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+      width: 100%;
+      max-width: 400px;
+    }
+    h2 {
+      text-align: center;
+      color: #4b0082;
+      margin-bottom: 20px;
+    }
+    .form-group {
+      margin-bottom: 15px;
+    }
+    .form-group label {
+      display: block;
+      margin-bottom: 5px;
+      color: #333;
+      font-weight: bold;
+    }
+    .form-group input {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 14px;
+    }
+    .form-group input:focus {
+      border-color: #4b0082;
+      outline: none;
+    }
+    .btn {
+      display: block;
+      width: 100%;
+      padding: 10px;
+      background: linear-gradient(135deg, #6b46c1 0%, #805ad5 100%);
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: 0.3s ease;
+    }
+    .btn:hover {
       background: linear-gradient(135deg, #805ad5 0%, #6b46c1 100%);
+    }
+    .text-center {
+      text-align: center;
+      margin-top: 10px;
+    }
+    .text-center a {
+      color: #4b0082;
+      text-decoration: none;
+      font-weight: bold;
+    }
+    .text-center a:hover {
+      text-decoration: underline;
     }
   </style>
 </head>
-<body class="bg-gray-100 font-sans">
-  <div class="min-h-screen flex items-center justify-center">
-    <div class="bg-white rounded-lg shadow-xl w-full max-w-md p-6">
-      <h2 class="text-2xl font-bold text-center text-purple-700 mb-6">Create an Account</h2>
+<body>
+  <div class="container">
+    <div class="register-box">
+      <h2>Create an Account</h2>
       <form id="register-form">
-        <div class="mb-4">
-          <label for="reg-first-name" class="block text-gray-700 mb-2">First Name</label>
-          <input type="text" id="reg-first-name" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" required>
+        <div class="form-group">
+          <label for="reg-email">Email</label>
+          <input type="email" id="reg-email" required>
         </div>
-        <div class="mb-4">
-          <label for="reg-last-name" class="block text-gray-700 mb-2">Last Name</label>
-          <input type="text" id="reg-last-name" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" required>
+        <div class="form-group">
+          <label for="reg-password">Password</label>
+          <input type="password" id="reg-password" required>
         </div>
-        <div class="mb-4">
-          <label for="reg-email" class="block text-gray-700 mb-2">Email</label>
-          <input type="email" id="reg-email" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" required>
+        <div class="form-group">
+          <label for="reg-confirm-password">Confirm Password</label>
+          <input type="password" id="reg-confirm-password" required>
         </div>
-        <div class="mb-4">
-          <label for="reg-password" class="block text-gray-700 mb-2">Password</label>
-          <input type="password" id="reg-password" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" required>
-        </div>
-        <div class="mb-6">
-          <label for="reg-confirm-password" class="block text-gray-700 mb-2">Confirm Password</label>
-          <input type="password" id="reg-confirm-password" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" required>
-        </div>
-        <button type="submit" class="w-full gradient-bg text-white py-2 px-4 rounded-lg hover:opacity-90 transition font-medium">
-          Register
-        </button>
+        <button type="submit" class="btn">Register</button>
       </form>
-      <p class="mt-4 text-center text-gray-600">Already have an account? <a href="index.html" class="text-purple-600 hover:text-purple-800">Login</a></p>
+      <p class="text-center">Already have an account? <a href="index.html">Login</a></p>
     </div>
   </div>
 
   <script>
     document.getElementById('register-form').addEventListener('submit', function(e) {
       e.preventDefault();
-      const firstName = document.getElementById('reg-first-name').value;
-      const lastName = document.getElementById('reg-last-name').value;
       const email = document.getElementById('reg-email').value;
       const password = document.getElementById('reg-password').value;
       const confirmPassword = document.getElementById('reg-confirm-password').value;
 
-      // Validate password match
       if (password !== confirmPassword) {
         alert('Passwords do not match!');
         return;
       }
 
-      // Validate password strength
       if (password.length < 8) {
         alert('Password must be at least 8 characters long');
         return;
@@ -72,7 +122,7 @@
       fetch('backend/register.php', {
         method: 'POST',
         headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-        body: `first_name=${encodeURIComponent(firstName)}&last_name=${encodeURIComponent(lastName)}&email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`
+        body: `email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`
       })
       .then(res => res.json())
       .then(data => {

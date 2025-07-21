@@ -9,8 +9,6 @@ try {
     $conn->exec("
     CREATE TABLE IF NOT EXISTS users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        first_name TEXT,
-        last_name TEXT,
         email TEXT UNIQUE,
         password TEXT,
         created_at TEXT DEFAULT CURRENT_TIMESTAMP
