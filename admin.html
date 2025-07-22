@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Panel - VoteEasy</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    body { font-family: 'Inter', sans-serif; background-color: #f8f9fa; }
+    .sidebar { background: linear-gradient(180deg, #3b82f6 0%, #9333ea 100%); }
+    .nav-btn.active { background: rgba(255, 255, 255, 0.2); }
+    .card { transition: transform 0.2s ease-in-out; }
+    .card:hover { transform: translateY(-3px); }
+  </style>
+</head>
+<body>
+  <!-- Top Navbar -->
+  <header class="fixed top-0 left-0 w-full bg-white shadow z-50 flex justify-between items-center px-6 py-3">
+    <h1 class="text-xl font-bold text-gray-700">VoteEasy Admin Panel</h1>
+    <button id="logout" class="bg-red-500 hover:bg-red-600 px-4 py-2 rounded text-white font-semibold">
+      <i class="fas fa-sign-out-alt mr-2"></i> Logout
+    </button>
+  </header>
+
+  <!-- Sidebar -->
+  <aside class="sidebar fixed top-0 left-0 h-full w-64 pt-16 text-white flex flex-col">
+    <nav class="mt-6 flex-1 px-2">
+      <button class="nav-btn active w-full flex items-center gap-4 px-4 py-3 rounded" data-section="dashboard">
+        <i class="fas fa-chart-line"></i> Dashboard
+      </button>
+      <button class="nav-btn w-full flex items-center gap-4 px-4 py-3 rounded" data-section="polls">
+        <i class="fas fa-poll"></i> Manage Polls
+      </button>
+      <button class="nav-btn w-full flex items-center gap-4 px-4 py-3 rounded" data-section="participants">
+        <i class="fas fa-users"></i> Participants
+      </button>
+      <button class="nav-btn w-full flex items-center gap-4 px-4 py-3 rounded" data-section="council">
+        <i class="fas fa-user-tie"></i> Student Council
+      </button>
+      <button class="nav-btn w-full flex items-center gap-4 px-4 py-3 rounded" data-section="results">
+        <i class="fas fa-chart-pie"></i> Results
+      </button>
+    </nav>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="ml-64 pt-20 p-6 transition-all" id="main-content">
+
+    <!-- Dashboard -->
+    <section id="dashboard" class="admin-section">
+      <h2 class="text-3xl font-bold text-gray-700 mb-8">Dashboard Overview</h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="card bg-white p-6 rounded-lg shadow">
+          <h3 class="text-lg font-semibold text-gray-600">Total Polls</h3>
+          <p class="text-4xl font-bold text-blue-600 mt-2" id="total-polls">0</p>
+        </div>
+        <div class="card bg-white p-6 rounded-lg shadow">
+          <h3 class="text-lg font-semibold text-gray-600">Participants</h3>
+          <p class="text-4xl font-bold text-green-600 mt-2" id="total-participants">0</p>
+        </div>
+        <div class="card bg-white p-6 rounded-lg shadow">
+          <h3 class="text-lg font-semibold text-gray-600">Student Council</h3>
+          <p class="text-4xl font-bold text-purple-600 mt-2" id="total-council">0</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Manage Polls -->
+    <section id="polls" class="admin-section hidden">
+      <h2 class="text-3xl font-bold text-gray-700 mb-6">Manage Polls</h2>
+      <div class="bg-white p-6 rounded-lg shadow mb-6">
+        <h3 class="text-xl font-bold mb-4">Create New Poll</h3>
+        <form id="poll-form" class="grid gap-4">
+          <input type="text" name="title" placeholder="Poll Title" class="border p-2 rounded" required>
+          <div class="grid grid-cols-2 gap-4">
+            <input type="date" name="start_date" class="border p-2 rounded" required>
+            <input type="date" name="end_date" class="border p-2 rounded" required>
+          </div>
+          <textarea name="candidates" placeholder="Add Candidates (comma separated)" class="border p-2 rounded" required></textarea>
+          <button type="submit" class="bg-blue-600 text-white py-2 rounded hover:bg-blue-700">Create Poll</button>
+        </form>
+      </div>
+      <div class="bg-white p-6 rounded-lg shadow">
+        <h3 class="text-xl font-bold mb-4">Active Polls</h3>
+        <ul id="poll-list" class="space-y-3"></ul>
+      </div>
+    </section>
+
+    <!-- Participants -->
+    <section id="participants" class="admin-section hidden">
+      <h2 class="text-3xl font-bold text-gray-700 mb-6">Participants</h2>
+      <div class="bg-white p-6 rounded-lg shadow">
+        <select id="poll-select" class="border p-2 rounded w-full mb-4"></select>
+        <button id="add-participant-btn" class="mb-4 bg-green-600 text-white py-2 px-4 rounded hover:bg-green-700">
+          Add Participant
+        </button>
+        <table class="w-full border">
+          <thead class="bg-gray-100">
+            <tr>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="participant-table"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Student Council -->
+    <section id="council" class="admin-section hidden">
+      <h2 class="text-3xl font-bold text-gray-700 mb-6">Student Council</h2>
+      <button id="add-council-btn" class="mb-4 bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700">
+        Add Member
+      </button>
+      <div id="council-list" class="grid grid-cols-1 md:grid-cols-3 gap-6"></div>
+    </section>
+
+    <!-- Results -->
+    <section id="results" class="admin-section hidden">
+      <h2 class="text-3xl font-bold text-gray-700 mb-6">Results</h2>
+      <select id="results-poll-select" class="border p-2 rounded mb-4"></select>
+      <div class="bg-white p-6 rounded-lg shadow">
+        <h3 class="text-xl font-bold mb-4" id="results-title">Poll Results</h3>
+        <canvas id="resultsChart"></canvas>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    // Sidebar navigation
+    const sections = document.querySelectorAll('.admin-section');
+    document.querySelectorAll('.nav-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        sections.forEach(sec => sec.classList.add('hidden'));
+        document.getElementById(btn.dataset.section).classList.remove('hidden');
+      });
+    });
+
+    // ---- DASHBOARD ----
+    async function loadDashboard() {
+      const pollRes = await fetch('poll.php?action=list');
+      const polls = await pollRes.json();
+      document.getElementById('total-polls').innerText = polls.length;
+
+      const councilRes = await fetch('council.php?action=list');
+      const council = await councilRes.json();
+      document.getElementById('total-council').innerText = council.length;
+
+      // Participants count from all polls
+      let totalParticipants = 0;
+      for (const poll of polls) {
+        const partRes = await fetch(`participants.php?action=list&poll_id=${poll.id}`);
+        const participants = await partRes.json();
+        totalParticipants += participants.length;
+      }
+      document.getElementById('total-participants').innerText = totalParticipants;
+    }
+
+    // ---- POLLS ----
+    async function loadPolls() {
+      const res = await fetch('poll.php?action=list');
+      const polls = await res.json();
+      const list = document.getElementById('poll-list');
+      const pollSelect = document.getElementById('poll-select');
+      const resultsSelect = document.getElementById('results-poll-select');
+      list.innerHTML = '';
+      pollSelect.innerHTML = '';
+      resultsSelect.innerHTML = '';
+
+      polls.forEach(p => {
+        list.innerHTML += `
+          <li class="flex justify-between items-center border-b pb-2">
+            <span>${p.title} (${p.start_date} - ${p.end_date})</span>
+            <div>
+              <button class="text-red-600 hover:underline" onclick="deletePoll(${p.id})">Delete</button>
+            </div>
+          </li>`;
+        pollSelect.innerHTML += `<option value="${p.id}">${p.title}</option>`;
+        resultsSelect.innerHTML += `<option value="${p.id}">${p.title}</option>`;
+      });
+    }
+
+    document.getElementById('poll-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const formData = new FormData(e.target);
+      formData.append('action', 'create');
+      const res = await fetch('poll.php', { method: 'POST', body: formData });
+      const data = await res.json();
+      if (data.status === 'success') { alert('Poll created!'); e.target.reset(); loadPolls(); }
+      else alert('Failed to create poll');
+    });
+
+    async function deletePoll(id) {
+      if (!confirm('Delete this poll?')) return;
+      const res = await fetch('poll.php', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+        body: `action=delete&id=${id}`
+      });
+      const data = await res.json();
+      if (data.status === 'success') loadPolls();
+      else alert('Failed to delete poll');
+    }
+
+    // ---- PARTICIPANTS ----
+    async function loadParticipants() {
+      const pollId = document.getElementById('poll-select').value;
+      const res = await fetch(`participants.php?action=list&poll_id=${pollId}`);
+      const participants = await res.json();
+      const table = document.getElementById('participant-table');
+      table.innerHTML = '';
+      participants.forEach(p => {
+        table.innerHTML += `
+          <tr class="border-b">
+            <td>${p.name}</td>
+            <td>${p.email}</td>
+            <td><button class="text-red-600 hover:underline" onclick="removeParticipant(${p.id})">Remove</button></td>
+          </tr>`;
+      });
+    }
+
+    async function removeParticipant(id) {
+      const res = await fetch('participants.php', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+        body: `action=remove&id=${id}`
+      });
+      const data = await res.json();
+      if (data.status === 'success') loadParticipants();
+      else alert('Failed to remove participant');
+    }
+
+    document.getElementById('poll-select').addEventListener('change', loadParticipants);
+
+    document.getElementById('add-participant-btn').addEventListener('click', async () => {
+      const name = prompt('Enter participant name:');
+      const email = prompt('Enter participant email:');
+      if (!name || !email) return;
+      const pollId = document.getElementById('poll-select').value;
+      const res = await fetch('participants.php', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+        body: `action=add&poll_id=${pollId}&name=${encodeURIComponent(name)}&email=${encodeURIComponent(email)}`
+      });
+      const data = await res.json();
+      if (data.status === 'success') loadParticipants();
+      else alert('Failed to add participant');
+    });
+
+    // ---- STUDENT COUNCIL ----
+    async function loadCouncil() {
+      const res = await fetch('council.php?action=list');
+      const council = await res.json();
+      const list = document.getElementById('council-list');
+      list.innerHTML = '';
+      council.forEach(c => {
+        list.innerHTML += `
+          <div class="bg-white p-4 rounded-lg shadow flex justify-between items-center">
+            <div>
+              <h4 class="font-bold">${c.name}</h4>
+              <p class="text-gray-600 text-sm">${c.role}</p>
+            </div>
+            <button class="text-red-600 hover:underline" onclick="deleteCouncil(${c.id})">Remove</button>
+          </div>`;
+      });
+    }
+
+    document.getElementById('add-council-btn').addEventListener('click', async () => {
+      const name = prompt('Enter member name:');
+      const role = prompt('Enter member role:');
+      if (!name || !role) return;
+      const res = await fetch('council.php', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+        body: `action=add&name=${encodeURIComponent(name)}&role=${encodeURIComponent(role)}`
+      });
+      const data = await res.json();
+      if (data.status === 'success') loadCouncil();
+      else alert('Failed to add member');
+    });
+
+    async function deleteCouncil(id) {
+      const res = await fetch('council.php', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+        body: `action=delete&id=${id}`
+      });
+      const data = await res.json();
+      if (data.status === 'success') loadCouncil();
+      else alert('Failed to remove member');
+    }
+
+    // ---- RESULTS ----
+    let resultsChart;
+    async function loadResults() {
+      const pollId = document.getElementById('results-poll-select').value;
+      const res = await fetch(`result.php?poll_id=${pollId}`);
+      const data = await res.json();
+      const labels = data.map(d => d.candidate);
+      const votes = data.map(d => d.votes);
+
+      if (resultsChart) resultsChart.destroy();
+      const ctx = document.getElementById('resultsChart').getContext('2d');
+      resultsChart = new Chart(ctx, {
+        type: 'pie',
+        data: {
+          labels: labels,
+          datasets: [{
+            data: votes,
+            backgroundColor: ['#3b82f6', '#9333ea', '#10b981', '#f59e0b', '#ef4444']
+          }]
+        }
+      });
+    }
+
+    document.getElementById('results-poll-select').addEventListener('change', loadResults);
+
+    // ---- INIT ----
+    async function init() {
+      await loadDashboard();
+      await loadPolls();
+      await loadParticipants();
+      await loadCouncil();
+      await loadResults();
+    }
+
+    init();
+  </script>
+</body>
+</html> 
