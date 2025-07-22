@@ -1,35 +1,17 @@
 <?php
-session_start();
-header('Content-Type: application/json');
+require "config.php";
 
-$host = "localhost";
-$user = "root";
-$pass = "";
-$db = "voting_db";
-
-$conn = new mysqli($host, $user, $pass, $db);
-if ($conn->connect_error) {
-    echo json_encode(["status" => "error", "message" => "Database connection failed"]);
-    exit();
-}
-
-$email = $_POST['email'] ?? '';
-$password = $_POST['password'] ?? '';
+$data = json_decode(file_get_contents("php://input"), true);
+$email = trim($data['email']);
+$password = trim($data['password']);
 
 $stmt = $conn->prepare("SELECT * FROM users WHERE email = ?");
-$stmt->bind_param("s", $email);
-$stmt->execute();
-$result = $stmt->get_result();
+$stmt->execute([$email]);
+$user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-if ($row = $result->fetch_assoc()) {
-    if (password_verify($password, $row['password'])) {
-        $_SESSION['user'] = $row['email'];
-        echo json_encode(["status" => "success", "email" => $row['email']]);
-    } else {
-        echo json_encode(["status" => "error", "message" => "Invalid password"]);
-    }
+if ($user && password_verify($password, $user['password'])) {
+    echo json_encode(['status' => 'success', 'email' => $user['email']]);
 } else {
-    echo json_encode(["status" => "error", "message" => "User not found"]);
+    echo json_encode(['status' => 'error', 'message' => 'Invalid email or password.']);
 }
-$conn->close();
 ?>

@@ -1,30 +1,23 @@
 <?php
-session_start();
 require "config.php";
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $email = $_POST['email'] ?? '';
-    $password = $_POST['password'] ?? '';
+$data = json_decode(file_get_contents("php://input"), true);
+$email = trim($data['email']);
+$password = trim($data['password']);
 
-    if (!filter_var($email, FILTER_VALIDATE_EMAIL) || strlen($password) < 8) {
-        echo json_encode(["status" => "error", "message" => "Invalid email or password"]);
-        exit;
-    }
+if (empty($email) || empty($password)) {
+    echo json_encode(['status' => 'error', 'message' => 'Email and password are required.']);
+    exit;
+}
 
-    $stmt = $conn->prepare("SELECT id FROM users WHERE email = ?");
-    $stmt->execute([$email]);
-    if ($stmt->fetch()) {
-        echo json_encode(["status" => "error", "message" => "Email already registered"]);
-        exit;
-    }
+// Hash password (more secure)
+$hashedPassword = password_hash($password, PASSWORD_BCRYPT);
 
-    try {
-        $hashed = password_hash($password, PASSWORD_BCRYPT);
-        $stmt = $conn->prepare("INSERT INTO users (email, password) VALUES (?, ?)");
-        $stmt->execute([$email, $hashed]);
-        echo json_encode(["status" => "success"]);
-    } catch (PDOException $e) {
-        echo json_encode(["status" => "error", "message" => "Registration failed"]);
-    }
+try {
+    $stmt = $conn->prepare("INSERT INTO users (email, password) VALUES (?, ?)");
+    $stmt->execute([$email, $hashedPassword]);
+    echo json_encode(['status' => 'success', 'message' => 'Registration successful!']);
+} catch (PDOException $e) {
+    echo json_encode(['status' => 'error', 'message' => 'Email already exists.']);
 }
 ?>
