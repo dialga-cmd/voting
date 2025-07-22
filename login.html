@@ -38,6 +38,23 @@
             border-color: #7c3aed !important;
             background-color: #f3f4f6;
         }
+        nav a {
+        color: white;
+        text-decoration: none;
+        font-weight: 500;
+        transition: color 0.3s ease;
+        }
+        nav a:hover {
+            color: #d1d5db;
+        }
+        .login-section, .user-section {
+            display: flex;
+            align-items: center;
+        }
+        .login-section button, .user-section button {
+            margin-left: 10px;
+        }
+
     </style>
 </head>
 <body class="bg-gray-100 font-sans user-logged-out">
@@ -50,13 +67,14 @@
                     <i class="fas fa-vote-yea text-2xl"></i>
                     <h1 class="text-2xl font-bold">VoteEasy</h1>
                 </div>
-                <nav class="hidden md:flex space-x-6">
+                <nav class="hidden md:flex space-x-6 flex-wrap">
                     <a href="#" class="hover:text-purple-200 transition">Home</a>
                     <a href="#" class="hover:text-purple-200 transition">Elections</a>
                     <a href="#" class="hover:text-purple-200 transition">Results</a>
                     <a href="#" class="hover:text-purple-200 transition">About</a>
                     <a href="admin.html" class="hover:text-purple-200 transition font-semibold">Admin</a>
                 </nav>
+
                 <div class="flex items-center space-x-4">
                     <div class="login-section">
                         <button id="login-btn" class="bg-white text-purple-600 px-4 py-2 rounded-full font-medium hover:bg-purple-100 transition">Login</button>
