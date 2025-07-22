@@ -1,23 +1,30 @@
 <?php
-require "config.php";
+require 'config.php';
 
-$data = json_decode(file_get_contents("php://input"), true);
-$email = trim($data['email']);
-$password = trim($data['password']);
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $email = trim($_POST['email']);
+    $password = trim($_POST['password']);
+    $confirmPassword = trim($_POST['confirm_password']);
 
-if (empty($email) || empty($password)) {
-    echo json_encode(['status' => 'error', 'message' => 'Email and password are required.']);
-    exit;
-}
+    if ($password !== $confirmPassword) {
+        echo json_encode(['status' => 'error', 'message' => 'Passwords do not match']);
+        exit;
+    }
 
-// Hash password (more secure)
-$hashedPassword = password_hash($password, PASSWORD_BCRYPT);
+    // Check if user exists
+    $stmt = $conn->prepare("SELECT id FROM users WHERE email = ?");
+    $stmt->execute([$email]);
 
-try {
+    if ($stmt->fetch()) {
+        echo json_encode(['status' => 'error', 'message' => 'Email is already registered']);
+        exit;
+    }
+
+    // Register user
+    $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
     $stmt = $conn->prepare("INSERT INTO users (email, password) VALUES (?, ?)");
     $stmt->execute([$email, $hashedPassword]);
+
     echo json_encode(['status' => 'success', 'message' => 'Registration successful!']);
-} catch (PDOException $e) {
-    echo json_encode(['status' => 'error', 'message' => 'Email already exists.']);
 }
 ?>

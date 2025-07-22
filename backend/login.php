@@ -1,17 +1,27 @@
 <?php
-require "config.php";
+require 'config.php';
 
-$data = json_decode(file_get_contents("php://input"), true);
-$email = trim($data['email']);
-$password = trim($data['password']);
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $email = trim($_POST['email']);
+    $password = trim($_POST['password']);
 
-$stmt = $conn->prepare("SELECT * FROM users WHERE email = ?");
-$stmt->execute([$email]);
-$user = $stmt->fetch(PDO::FETCH_ASSOC);
+    $stmt = $conn->prepare("SELECT id, password, role FROM users WHERE email = ?");
+    $stmt->execute([$email]);
+    $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-if ($user && password_verify($password, $user['password'])) {
-    echo json_encode(['status' => 'success', 'email' => $user['email']]);
-} else {
-    echo json_encode(['status' => 'error', 'message' => 'Invalid email or password.']);
+    if ($user && password_verify($password, $user['password'])) {
+        session_start();
+        $_SESSION['user_id'] = $user['id'];
+        $_SESSION['email'] = $email;
+        $_SESSION['role'] = $user['role'];
+        
+        echo json_encode([
+            'status' => 'success', 
+            'message' => 'Login successful',
+            'role' => $user['role']
+        ]);
+    } else {
+        echo json_encode(['status' => 'error', 'message' => 'Invalid email or password']);
+    }
 }
 ?>

@@ -1,10 +1,5 @@
 <?php
-require 'db.php';
-$dbPath = __DIR__ . '/voting.db';
-$db = new PDO('sqlite:' . $dbPath);
-
-// Enable exceptions for errors
-$db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+require 'db.php'; // Uses $pdo from db.php
 $action = $_GET['action'] ?? $_POST['action'] ?? '';
 
 switch ($action) {
