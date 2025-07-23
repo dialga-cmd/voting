@@ -15,6 +15,43 @@
         .user-logged-in .login-section { display: none !important; }
         .candidate-selected { border-color: #7c3aed !important; background-color: #f3f4f6; }
         #login-btn:hover, #vote-login-btn:hover { background: #f3f4f6; color: #4f46e5; }
+        .card-hover {
+        transition: box-shadow 0.3s ease, transform 0.3s ease;
+        }
+        .card-hover:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 12px 28px -6px rgba(0,0,0,0.1);
+        }
+        .bg-gradient-to-r {
+            background-image: linear-gradient(to right, var(--tw-gradient-stops));
+        }
+        .from-purple-600 {
+            --tw-gradient-from: #7c3aed;
+        }
+        .to-purple-700 {
+            --tw-gradient-to: #4f46e5;
+        }
+        .hover\:from-purple-700:hover {
+            --tw-gradient-from: #4f46e5;
+        }
+        .hover\:to-purple-800:hover {
+            --tw-gradient-to: #4338ca;
+        }
+        .bg-purple-800 {
+            background-color: #4338ca;
+        }
+        .bg-purple-900 {
+            background-color: #3730a3;
+        }
+        .bg-purple-600 {
+            background-color: #7c3aed;
+        }
+        .bg-purple-100 {
+            background-color: #f3e8ff;
+        }
+        .bg-purple-50 {
+            background-color: #f5f3ff;
+        }
     </style>
 </head>
 <body class="bg-gray-100 font-sans user-logged-out">
@@ -75,23 +112,106 @@
     </section>
 
     <!-- Active Elections -->
-    <section id="elections" class="mb-12">
+        <section id="elections" class="mb-12">
         <div class="flex justify-between items-center mb-6">
             <h2 class="text-2xl font-bold text-gray-800">Active Elections</h2>
         </div>
         <div id="poll-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <!-- Polls will load dynamically here -->
+            <!-- Poll cards load dynamically here -->
         </div>
-    </section>
+        </section>
+    <!-- Ended Polls -->
+            <section id="ended-polls" class="mb-12">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-800">Ended Elections</h2>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 
-    <!-- Results -->
-    <section id="results" class="mb-12">
-        <h2 class="text-2xl font-bold text-gray-800 mb-6">Latest Results</h2>
-        <div id="results-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <!-- Results will load dynamically here -->
+        <!-- Fake ended poll cards -->
+                <div class="bg-white/90 rounded-xl shadow p-6 border card-hover">
+                <h3 class="text-lg font-bold text-gray-800 mb-2">Science Club Election 2024</h3>
+                <p class="text-sm text-gray-600 mb-2">
+                    <i class="fas fa-calendar-alt text-red-500 mr-2"></i> Oct 1 – Oct 10, 2024
+                </p>
+                <p class="text-xs font-medium text-green-700 bg-green-50 px-3 py-1 inline-block rounded-full">Completed</p>
+                </div>
+
+                <div class="bg-white/90 rounded-xl shadow p-6 border card-hover">
+                <h3 class="text-lg font-bold text-gray-800 mb-2">President Election 2023</h3>
+                <p class="text-sm text-gray-600 mb-2">
+                    <i class="fas fa-calendar-alt text-red-500 mr-2"></i> Nov 5 – Nov 9, 2023
+                </p>
+                <p class="text-xs font-medium text-green-700 bg-green-50 px-3 py-1 inline-block rounded-full">Completed</p>
+                </div>
+
+                <div class="bg-white/90 rounded-xl shadow p-6 border card-hover">
+                <h3 class="text-lg font-bold text-gray-800 mb-2">Debate Team Election 2024</h3>
+                <p class="text-sm text-gray-600 mb-2">
+                    <i class="fas fa-calendar-alt text-red-500 mr-2"></i> May 12 – May 14, 2024
+                </p>
+                <p class="text-xs font-medium text-green-700 bg-green-50 px-3 py-1 inline-block rounded-full">Completed</p>
+                </div>
+            </div>
+            </section>
+
+        <!-- Ended Poll Results -->
+<section id="ended-results" class="mb-12">
+  <div class="flex justify-between items-center mb-6">
+    <h2 class="text-2xl font-bold text-gray-800">Results for Ended Elections</h2>
+  </div>
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <!-- Science Club Election Result -->
+    <div class="bg-white/85 rounded-xl shadow p-6 border card-hover">
+      <h3 class="text-lg font-bold text-gray-800 mb-2">Science Club Election 2024</h3>
+      <p class="text-sm text-gray-600 mb-1">
+        <i class="fas fa-calendar-alt text-red-500 mr-2"></i> Oct 1 – Oct 10, 2024
+      </p>
+      <div class="bg-green-50 px-4 py-2 rounded-lg my-2">
+        <span class="font-bold text-green-700"><i class="fas fa-trophy mr-1"></i> Winner: </span>
+        <span class="font-semibold">Samantha Tran</span>
+      </div>
+      <ul class="text-sm mt-4">
+        <li><strong>1st:</strong> Samantha Tran — 68 votes</li>
+        <li><strong>2nd:</strong> Emily Park — 52 votes</li>
+        <li><strong>3rd:</strong> Kevin Zhou — 37 votes</li>
+      </ul>
+    </div>
+
+    <!-- President Election Result -->
+    <div class="bg-white/85 rounded-xl shadow p-6 border card-hover">
+      <h3 class="text-lg font-bold text-gray-800 mb-2">President Election 2023</h3>
+      <p class="text-sm text-gray-600 mb-1">
+        <i class="fas fa-calendar-alt text-red-500 mr-2"></i> Nov 5 – Nov 9, 2023
+      </p>
+      <div class="bg-green-50 px-4 py-2 rounded-lg my-2">
+        <span class="font-bold text-green-700"><i class="fas fa-trophy mr-1"></i> Winner: </span>
+        <span class="font-semibold">Maria Johnson</span>
+      </div>
+      <ul class="text-sm mt-4">
+        <li><strong>1st:</strong> Maria Johnson — 120 votes</li>
+        <li><strong>2nd:</strong> David Kim — 95 votes</li>
+        <li><strong>3rd:</strong> Hannah Smith — 81 votes</li>
+      </ul>
+    </div>
+
+    <!-- Debate Team Election Result -->
+        <div class="bg-white/85 rounded-xl shadow p-6 border card-hover">
+          <h3 class="text-lg font-bold text-gray-800 mb-2">Debate Team Election 2024</h3>
+            <p class="text-sm text-gray-600 mb-1">
+                <i class="fas fa-calendar-alt text-red-500 mr-2"></i> May 12 – May 14, 2024
+            </p>
+            <div class="bg-green-50 px-4 py-2 rounded-lg my-2">
+                <span class="font-bold text-green-700"><i class="fas fa-trophy mr-1"></i> Winner: </span>
+                <span class="font-semibold">John Smith</span>
+            </div>
+            <ul class="text-sm mt-4">
+                <li><strong>1st:</strong> John Smith — 44 votes</li>
+                <li><strong>2nd:</strong> Priya Patel — 34 votes</li>
+                <li><strong>3rd:</strong> Alex Davis — 19 votes</li>
+            </ul>
+            </div>
         </div>
-    </section>
-
+        </section>
     <!-- Student Council -->
     <section id="council" class="mb-12">
         <h2 class="text-2xl font-bold text-gray-800 mb-6">Student Council</h2>
@@ -166,14 +286,16 @@ document.addEventListener("DOMContentLoaded", function () {
                 pollContainer.innerHTML = '';
                 polls.forEach(poll => {
                     pollContainer.innerHTML += `
-                        <div class="bg-white rounded-xl shadow-md p-6 card-hover">
-                            <h3 class="text-xl font-bold text-gray-800 mb-2">${poll.title}</h3>
-                            <p class="text-gray-600 mb-4">
-                                ${poll.start_date} to ${poll.end_date}
-                            </p>
-                            <button class="w-full gradient-bg text-white py-2 px-4 rounded-lg hover:opacity-90 transition font-medium"
-                                onclick="viewPoll(${poll.id})">View Candidates</button>
+                    <div class="bg-white rounded-2xl shadow-lg overflow-hidden card-hover border border-gray-100" style="min-height: 220px;">
+                        <div class="p-6">
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">${poll.title}</h3>
+                        <p class="text-gray-600 mb-4 text-sm">
+                            <i class="fas fa-calendar-alt text-purple-500 mr-1"></i> ${poll.start_date} → ${poll.end_date}
+                        </p>
+                        <button class="w-full bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white py-3 px-4 rounded-lg text-sm font-medium shadow-sm transition"
+                            onclick="viewPoll(${poll.id})">View Candidates</button>
                         </div>
+                    </div>
                     `;
                 });
             }
