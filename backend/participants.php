@@ -1,32 +1,41 @@
 <?php
-require 'db.php'; // Uses $pdo from db.php
-$action = $_GET['action'] ?? $_POST['action'] ?? '';
+require 'config.php';
 
-switch ($action) {
-    case 'list':
-        $poll_id = $_GET['poll_id'];
-        $stmt = $pdo->prepare("SELECT id, name, email FROM participants WHERE poll_id=?");
+header('Content-Type: application/json');
+$action = $_GET['action'] ?? $_POST['action'] ?? 'list';
+
+try {
+    if ($action === 'list') {
+        $poll_id = $_GET['poll_id'] ?? null;
+        if (!$poll_id) {
+            echo json_encode(["status" => "error", "message" => "Poll ID required."]);
+            exit;
+        }
+        $stmt = $conn->prepare("SELECT id, email FROM users WHERE id IN (SELECT user_id FROM votes WHERE poll_id = ?)");
         $stmt->execute([$poll_id]);
         echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
-        break;
+    }
 
-    case 'add':
+    elseif ($action === 'add') {
         $poll_id = $_POST['poll_id'];
-        $name = $_POST['name'];
         $email = $_POST['email'];
+        $password = password_hash('default123', PASSWORD_BCRYPT);
 
-        $stmt = $pdo->prepare("INSERT INTO participants (poll_id, name, email) VALUES (?, ?, ?)");
-        $success = $stmt->execute([$poll_id, $name, $email]);
-        echo json_encode(["status" => $success ? "success" : "error"]);
-        break;
+        // Add user if not exists
+        $stmt = $conn->prepare("INSERT OR IGNORE INTO users (email, password) VALUES (?, ?)");
+        $stmt->execute([$email, $password]);
 
-    case 'remove':
+        echo json_encode(["status" => "success", "message" => "Participant added successfully."]);
+    }
+
+    elseif ($action === 'remove') {
         $id = $_POST['id'];
-        $stmt = $pdo->prepare("DELETE FROM participants WHERE id=?");
-        $success = $stmt->execute([$id]);
-        echo json_encode(["status" => $success ? "success" : "error"]);
-        break;
+        $stmt = $conn->prepare("DELETE FROM users WHERE id = ?");
+        $stmt->execute([$id]);
+        echo json_encode(["status" => "success", "message" => "Participant removed successfully."]);
+    }
 
-    default:
-        echo json_encode(["status" => "error", "message" => "Invalid action"]);
+} catch (Exception $e) {
+    echo json_encode(["status" => "error", "message" => $e->getMessage()]);
 }
+?>

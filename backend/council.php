@@ -1,28 +1,31 @@
 <?php
-require 'db.php'; // Uses $pdo from db.php
-$action = $_GET['action'] ?? $_POST['action'] ?? '';
+require 'config.php';
 
-switch ($action) {
-    case 'list':
-        $stmt = $pdo->query("SELECT id, name, role FROM student_council ORDER BY id DESC");
+header('Content-Type: application/json');
+$action = $_GET['action'] ?? $_POST['action'] ?? 'list';
+
+try {
+    if ($action === 'list') {
+        $stmt = $conn->query("SELECT id, name, position FROM student_council ORDER BY id DESC");
         echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
-        break;
+    }
 
-    case 'add':
+    elseif ($action === 'add') {
         $name = $_POST['name'];
-        $role = $_POST['role'];
-        $stmt = $pdo->prepare("INSERT INTO student_council (name, role) VALUES (?, ?)");
-        $success = $stmt->execute([$name, $role]);
-        echo json_encode(["status" => $success ? "success" : "error"]);
-        break;
+        $position = $_POST['position'];
+        $stmt = $conn->prepare("INSERT INTO student_council (name, position) VALUES (?, ?)");
+        $stmt->execute([$name, $position]);
+        echo json_encode(["status" => "success", "message" => "Member added successfully."]);
+    }
 
-    case 'delete':
+    elseif ($action === 'delete') {
         $id = $_POST['id'];
-        $stmt = $pdo->prepare("DELETE FROM student_council WHERE id=?");
-        $success = $stmt->execute([$id]);
-        echo json_encode(["status" => $success ? "success" : "error"]);
-        break;
+        $stmt = $conn->prepare("DELETE FROM student_council WHERE id = ?");
+        $stmt->execute([$id]);
+        echo json_encode(["status" => "success", "message" => "Member removed successfully."]);
+    }
 
-    default:
-        echo json_encode(["status" => "error", "message" => "Invalid action"]);
+} catch (Exception $e) {
+    echo json_encode(["status" => "error", "message" => $e->getMessage()]);
 }
+?>
