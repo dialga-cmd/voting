@@ -1,26 +1,32 @@
 <?php
-require 'config.php';
+require_once __DIR__ . '/config.php';
 $db = $conn;
 
 $action = $_GET['action'] ?? $_POST['action'] ?? '';
 
 switch ($action) {
     case 'list':
-        $stmt = $db->query("SELECT * FROM participants ORDER BY id DESC");
+        // Fetch all users with role 'user' (participants)
+        $stmt = $db->query("SELECT id, name, email FROM users WHERE role='user' ORDER BY id DESC");
         echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
         break;
 
     case 'add':
         $name = $_POST['name'] ?? '';
         $email = $_POST['email'] ?? '';
-        $stmt = $db->prepare("INSERT INTO participants (name, email) VALUES (?, ?)");
+        // email and name required
+        if (!$name || !$email) {
+            echo json_encode(["status" => "error", "message" => "Name and email required"]);
+            exit;
+        }
+        $stmt = $db->prepare("INSERT INTO users (name, email, role) VALUES (?, ?, 'user')");
         $success = $stmt->execute([$name, $email]);
         echo json_encode(["status" => $success ? "success" : "error"]);
         break;
 
     case 'remove':
         $id = $_POST['id'] ?? 0;
-        $stmt = $db->prepare("DELETE FROM participants WHERE id=?");
+        $stmt = $db->prepare("DELETE FROM users WHERE id=? AND role='user'");
         $success = $stmt->execute([$id]);
         echo json_encode(["status" => $success ? "success" : "error"]);
         break;

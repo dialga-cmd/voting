@@ -1,12 +1,12 @@
 <?php
-require 'config.php';
+require_once __DIR__ . '/config.php';
 $db = $conn;
 
 $action = $_GET['action'] ?? '';
 
 if ($action === 'list') {
     $stmt = $db->query("
-        SELECT polls.title as poll_title, candidates.name as candidate, candidates.votes 
+        SELECT polls.title AS poll_title, candidates.name AS candidate, candidates.votes
         FROM polls
         LEFT JOIN candidates ON candidates.poll_id = polls.id
         ORDER BY polls.id DESC

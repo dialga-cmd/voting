@@ -1,12 +1,13 @@
 <?php
-require 'config.php';
-$db = $conn; // Use connection from config.php
+require_once __DIR__ . '/config.php';
+$db = $conn;
 
 $action = $_GET['action'] ?? $_POST['action'] ?? '';
 
 switch ($action) {
     case 'list':
-        $stmt = $db->query("SELECT * FROM polls ORDER BY start_date DESC");
+        // Fetch all polls, newest first
+        $stmt = $db->query("SELECT id, title, start_date, end_date FROM polls ORDER BY start_date DESC");
         echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
         break;
 
@@ -14,7 +15,10 @@ switch ($action) {
         $title = $_POST['title'] ?? '';
         $start = $_POST['start_date'] ?? '';
         $end = $_POST['end_date'] ?? '';
-        if (!$title) { echo json_encode(["status" => "error", "message" => "Title required"]); exit; }
+        if (!$title) {
+            echo json_encode(["status" => "error", "message" => "Title required"]);
+            exit;
+        }
         $stmt = $db->prepare("INSERT INTO polls (title, start_date, end_date) VALUES (?, ?, ?)");
         $success = $stmt->execute([$title, $start, $end]);
         echo json_encode(["status" => $success ? "success" : "error"]);
