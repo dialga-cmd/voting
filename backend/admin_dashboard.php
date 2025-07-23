@@ -217,7 +217,7 @@ $totalCouncil = $conn->query("SELECT COUNT(*) FROM student_council")->fetchColum
                         <i class="fas fa-poll text-white text-2xl"></i>
                     </div>
                     <div class="text-right">
-                        <div class="text-3xl font-bold text-gray-800"><?php echo $totalPolls; ?></div>
+                        <div class="text-3xl font-bold text-gray-800"><span id="totalPollsCount"><?php echo $totalPolls; ?></span></div>
                         <div class="text-purple-600 font-semibold">Active Polls</div>
                     </div>
                 </div>
@@ -322,20 +322,37 @@ $totalCouncil = $conn->query("SELECT COUNT(*) FROM student_council")->fetchColum
 
     <!-- Participants Section -->
     <section id="participants" class="mb-12 animate-fade-in">
-        <div class="flex items-center justify-between mb-6">
-            <h2 class="text-2xl font-bold text-gray-800 flex items-center">
-                <i class="fas fa-users mr-3 text-green-600"></i>
-                Manage Participants
-            </h2>
-        </div>
-        <div class="bg-white/80 backdrop-blur-sm rounded-2xl p-8 shadow-xl">
-            <div class="text-center py-12">
-                <i class="fas fa-users text-6xl text-gray-300 mb-4"></i>
-                <p class="text-gray-600 text-lg">Participants management UI will be loaded here</p>
-                <p class="text-gray-500 text-sm mt-2">Dynamic content loading...</p>
+    <div class="flex items-center justify-between mb-6">
+        <h2 class="text-2xl font-bold text-gray-800 flex items-center">
+            <i class="fas fa-users mr-3 text-green-600"></i>
+            Manage Participants
+        </h2>
+    </div>
+
+    <!-- Add Participant Form -->
+    <div class="bg-white/90 rounded-2xl p-6 shadow-xl mb-8 w-full md:w-2/3 lg:w-1/2">
+        <form id="addParticipantForm" class="space-y-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Full Name</label>
+                <input type="text" name="name" required class="mt-1 w-full border px-4 py-2 rounded-lg focus:ring-green-600 focus:border-green-600" placeholder="John Doe">
             </div>
-        </div>
-    </section>
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Email</label>
+                <input type="email" name="email" required class="mt-1 w-full border px-4 py-2 rounded-lg focus:ring-green-600 focus:border-green-600" placeholder="john@example.com">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Assign to Poll</label>
+                <select name="poll_id" required class="mt-1 w-full border px-4 py-2 rounded-lg focus:ring-green-600 focus:border-green-600" id="pollSelect"></select>
+            </div>
+            <button type="submit" class="bg-green-600 hover:bg-green-700 text-white font-medium px-6 py-2 rounded-lg">Add Participant</button>
+        </form>
+    </div>
+
+    <!-- Participants Table -->
+    <div class="bg-white/90 rounded-2xl shadow-xl p-6" id="participantsList">
+        <p class="text-center text-gray-500">Loading participants...</p>
+    </div>
+</section>
 
     <!-- Council Section -->
     <section id="council" class="mb-12 animate-fade-in">
@@ -380,164 +397,260 @@ $totalCouncil = $conn->query("SELECT COUNT(*) FROM student_council")->fetchColum
 </main>
 
 <script>
-// Update current time
 function updateTime() {
-    const now = new Date();
-    document.getElementById('currentTime').textContent = now.toLocaleTimeString();
+	const now = new Date();
+	document.getElementById('currentTime').textContent = now.toLocaleTimeString();
 }
 updateTime();
 setInterval(updateTime, 1000);
 
-// Enhanced poll loading with better UI
+
+// 📊 Dashboard Poll Stats & Table
+function updatePollCount() {
+	fetch('poll.php?action=count')
+		.then(res => res.json())
+		.then(data => {
+			document.querySelector('#totalPollsCount').textContent = data.total;
+		});
+}
+
 function loadPolls() {
-    const pollsBody = document.getElementById('pollsBody');
-    pollsBody.innerHTML = '<tr><td colspan="4" class="px-6 py-8 text-center"><i class="fas fa-spinner fa-spin text-xl text-gray-400 mr-2"></i><span class="text-gray-500">Loading polls...</span></td></tr>';
-    
-    fetch('poll.php?action=list')
-        .then(res => res.json())
-        .then(data => {
-            pollsBody.innerHTML = '';
-            if (data.length === 0) {
-                pollsBody.innerHTML = '<tr><td colspan="4" class="px-6 py-8 text-center text-gray-500"><i class="fas fa-inbox text-2xl mb-2 block"></i>No polls found. Create your first poll above!</td></tr>';
-                return;
-            }
-            
-            data.forEach((poll, index) => {
-                const row = document.createElement('tr');
-                row.className = 'hover:bg-gray-50 transition-colors duration-200';
-                row.style.animationDelay = `${index * 0.1}s`;
-                row.innerHTML = `
-                    <td class="px-6 py-4">
-                        <span class="inline-flex items-center justify-center w-8 h-8 bg-purple-100 text-purple-600 rounded-full font-semibold text-sm">${poll.id}</span>
-                    </td>
-                    <td class="px-6 py-4">
-                        <div class="font-semibold text-gray-800">${poll.title}</div>
-                    </td>
-                    <td class="px-6 py-4">
-                        <div class="flex items-center space-x-2 text-sm text-gray-600">
-                            <i class="fas fa-calendar-alt text-gray-400"></i>
-                            <span>${poll.start_date} → ${poll.end_date}</span>
-                        </div>
-                    </td>
-                    <td class="px-6 py-4">
-                        <button onclick="deletePoll(${poll.id})" class="inline-flex items-center px-3 py-2 bg-red-100 hover:bg-red-200 text-red-600 rounded-lg transition-colors duration-200 text-sm font-medium">
-                            <i class="fas fa-trash-alt mr-1"></i>
-                            Delete
-                        </button>
-                    </td>
-                `;
-                pollsBody.appendChild(row);
-            });
-        })
-        .catch(error => {
-            pollsBody.innerHTML = '<tr><td colspan="4" class="px-6 py-8 text-center text-red-500"><i class="fas fa-exclamation-triangle mr-2"></i>Error loading polls</td></tr>';
-        });
+	const pollsBody = document.getElementById('pollsBody');
+	pollsBody.innerHTML = '<tr><td colspan="4" class="px-6 py-8 text-center"><i class="fas fa-spinner fa-spin text-xl text-gray-400 mr-2"></i><span class="text-gray-500">Loading polls...</span></td></tr>';
+
+	fetch('poll.php?action=list')
+		.then(res => res.json())
+		.then(data => {
+			pollsBody.innerHTML = '';
+			if (!data.length) {
+				pollsBody.innerHTML = '<tr><td colspan="4" class="px-6 py-8 text-center text-gray-500"><i class="fas fa-inbox text-2xl mb-2 block"></i>No polls found. Create your first poll above!</td></tr>';
+				return;
+			}
+
+			data.forEach((poll, index) => {
+				const row = document.createElement('tr');
+				row.className = 'hover:bg-gray-50 transition-colors duration-200';
+				row.style.animationDelay = `${index * 0.1}s`;
+
+				row.innerHTML = `
+					<td class="px-6 py-4">
+						<span class="inline-flex items-center justify-center w-8 h-8 bg-purple-100 text-purple-600 rounded-full font-semibold text-sm">${poll.id}</span>
+					</td>
+					<td class="px-6 py-4"><div class="font-semibold text-gray-800">${poll.title}</div></td>
+					<td class="px-6 py-4">
+						<div class="flex items-center space-x-2 text-sm text-gray-600">
+							<i class="fas fa-calendar-alt text-gray-400"></i>
+							<span>${poll.start_date} → ${poll.end_date}</span>
+						</div>
+					</td>
+					<td class="px-6 py-4">
+						<button onclick="deletePoll(${poll.id})" class="inline-flex items-center px-3 py-2 bg-red-100 hover:bg-red-200 text-red-600 rounded-lg text-sm font-medium">
+							<i class="fas fa-trash-alt mr-1"></i> Delete
+						</button>
+					</td>
+				`;
+				pollsBody.appendChild(row);
+			});
+		})
+		.catch(error => {
+			pollsBody.innerHTML = '<tr><td colspan="4" class="text-center text-red-500 py-6"><i class="fas fa-exclamation-triangle mr-2"></i>Error loading polls</td></tr>';
+		});
 }
 
-// Load polls on page load
-loadPolls();
-
-// Enhanced form submission with better feedback
-document.getElementById('createPollForm').addEventListener('submit', function(e){
-    e.preventDefault();
-    const submitBtn = this.querySelector('button[type="submit"]');
-    const originalText = submitBtn.innerHTML;
-    
-    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Creating...';
-    submitBtn.disabled = true;
-    
-    fetch('poll.php?action=create', {
-        method: 'POST',
-        body: new FormData(this)
-    })
-    .then(response => response.json())
-    .then(data => {
-        // Reset form
-        this.reset();
-        
-        // Show success animation
-        submitBtn.innerHTML = '<i class="fas fa-check mr-2"></i>Created!';
-        submitBtn.className = submitBtn.className.replace('from-purple-500 to-purple-600', 'from-green-500 to-green-600');
-        
-        setTimeout(() => {
-            submitBtn.innerHTML = originalText;
-            submitBtn.className = submitBtn.className.replace('from-green-500 to-green-600', 'from-purple-500 to-purple-600');
-            submitBtn.disabled = false;
-        }, 2000);
-        
-        // Reload polls
-        loadPolls();
-    })
-    .catch(error => {
-        submitBtn.innerHTML = '<i class="fas fa-exclamation-triangle mr-2"></i>Error';
-        submitBtn.className = submitBtn.className.replace('from-purple-500 to-purple-600', 'from-red-500 to-red-600');
-        
-        setTimeout(() => {
-            submitBtn.innerHTML = originalText;
-            submitBtn.className = submitBtn.className.replace('from-red-500 to-red-600', 'from-purple-500 to-purple-600');
-            submitBtn.disabled = false;
-        }, 2000);
-    });
-});
-
-// Enhanced delete function with better confirmation
 function deletePoll(id) {
-    // Create custom confirmation modal
-    const confirmDelete = confirm('⚠️ Are you sure you want to delete this poll?\n\nThis action cannot be undone.');
-    if (!confirmDelete) return;
-    
-    fetch('poll.php?action=delete', {
-        method: 'POST',
-        body: new URLSearchParams({id})
-    })
-    .then(response => response.json())
-    .then(data => {
-        // Reload polls with success indication
-        loadPolls();
-    })
-    .catch(error => {
-        alert('❌ Error deleting poll. Please try again.');
-    });
+	if (!confirm('⚠️ Are you sure you want to delete this poll?\n\nThis action cannot be undone.')) return;
+
+	fetch('poll.php?action=delete', {
+		method: 'POST',
+		body: new URLSearchParams({ id })
+	})
+	.then(res => res.json())
+	.then(data => {
+		loadPolls();
+		updatePollCount();
+	})
+	.catch(() => alert('❌ Error deleting poll. Please try again.'));
 }
 
-// Smooth scrolling for navigation links
-document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-    anchor.addEventListener('click', function (e) {
-        e.preventDefault();
-        const target = document.querySelector(this.getAttribute('href'));
-        if (target) {
-            target.scrollIntoView({
-                behavior: 'smooth',
-                block: 'start'
-            });
-        }
-    });
+
+// 🧑‍🎓 Load Council Table
+function loadCouncilTable() {
+	const councilTable = document.getElementById('councilTable');
+	councilTable.innerHTML = `<div class="text-center py-6 text-gray-400">
+		<i class="fas fa-spinner fa-spin mr-2"></i>Loading council members...
+	</div>`;
+
+	fetch('council.php?action=list')
+		.then(res => res.json())
+		.then(data => {
+			if (!data.length) {
+				councilTable.innerHTML = `<p class="text-gray-500 text-center p-4">No members yet. Add some above.</p>`;
+				return;
+			}
+
+			let html = '<div class="space-y-4">';
+			data.forEach(member => {
+				html += `
+					<div class="flex justify-between items-center bg-white p-4 rounded-xl shadow">
+						<div>
+							<div class="text-lg font-semibold text-gray-800">${member.name}</div>
+							<div class="text-sm text-gray-500">${member.position}</div>
+						</div>
+						<button onclick="deleteCouncilMember(${member.id})" class="bg-red-100 hover:bg-red-200 text-red-600 px-3 py-1 rounded-lg text-sm">
+							<i class="fas fa-trash-alt"></i> Delete
+						</button>
+					</div>`;
+			});
+			html += '</div>';
+			councilTable.innerHTML = html;
+		})
+		.catch(() => councilTable.innerHTML = `<p class="text-red-500 text-center">Error loading members</p>`);
+}
+
+function deleteCouncilMember(id) {
+	if (!confirm("Are you sure you want to remove this council member?")) return;
+
+	fetch('council.php?action=delete', {
+		method: 'POST',
+		body: new URLSearchParams({ id })
+	})
+	.then(res => res.json())
+	.then(data => data.status === 'success' ? loadCouncilTable() : alert('Error deleting member.'))
+	.catch(() => alert('Server error.'));
+}
+
+
+// 👥 PARTICIPANTS
+let currentPollId = null;
+
+function loadPollDropdown() {
+	fetch('poll.php?action=list')
+		.then(res => res.json())
+		.then(data => {
+			const select = document.getElementById('pollSelect');
+			if (!data.length) {
+				select.innerHTML = '<option value="">No polls available</option>';
+				select.disabled = true;
+				return;
+			}
+			select.innerHTML = data.map(
+				poll => `<option value="${poll.id}">${poll.title} (${poll.start_date} – ${poll.end_date})</option>`
+			).join('');
+			currentPollId = select.value;
+			loadParticipants(currentPollId);
+		});
+}
+
+function loadParticipants(pollId) {
+	const list = document.getElementById('participantsList');
+	list.innerHTML = '<p class="text-center text-gray-500"><i class="fas fa-spinner fa-spin mr-2"></i>Loading participants...</p>';
+
+	fetch('participants.php?action=list&poll_id=' + encodeURIComponent(pollId))
+		.then(res => res.json())
+		.then(data => {
+			if (!data.length) {
+				list.innerHTML = '<p class="text-center text-gray-500">No participants found for this poll.</p>';
+				return;
+			}
+			let html = '<div class="space-y-4">';
+			data.forEach(participant => {
+				html += `
+					<div class="flex justify-between items-center border p-4 rounded-lg bg-white shadow-sm">
+						<div>
+							<p class="font-semibold text-gray-800">${participant.name}</p>
+							<p class="text-sm text-gray-500">${participant.email}</p>
+						</div>
+						<button onclick="deleteParticipant(${participant.id})" class="bg-red-100 text-red-600 text-sm px-3 py-1 rounded-lg hover:bg-red-200">
+							<i class="fas fa-trash-alt mr-1"></i> Remove
+						</button>
+					</div>
+				`;
+			});
+			html += '</div>';
+			list.innerHTML = html;
+		})
+		.catch(() => {
+			list.innerHTML = '<p class="text-center text-red-500">Error loading participants</p>';
+		});
+}
+
+function deleteParticipant(id) {
+	if (!confirm('Are you sure you want to delete this participant and remove all their votes?')) return;
+
+	fetch('participants.php?action=remove', {
+		method: 'POST',
+		body: new URLSearchParams({ id })
+	})
+	.then(res => res.json())
+	.then(data => data.status === 'success' ? loadParticipants(currentPollId) : alert('Error deleting participant'))
+	.catch(() => alert('Server error'));
+}
+
+
+// 📩 Participant Form Submit
+document.addEventListener('DOMContentLoaded', function() {
+	// Setup
+	updateTime();
+	loadPolls();
+	loadCouncilTable();
+	loadPollDropdown();
+
+	// Form: Add poll events
+	const select = document.getElementById('pollSelect');
+	select.addEventListener('change', function () {
+		currentPollId = this.value;
+		loadParticipants(currentPollId);
+	});
+
+	document.getElementById('addParticipantForm').addEventListener('submit', function (e) {
+		e.preventDefault();
+		const formData = new FormData(this);
+
+		fetch('participants.php?action=add', {
+			method: 'POST',
+			body: formData
+		})
+		.then(res => res.json())
+		.then(data => {
+			if (data.status === 'success') {
+				this.reset();
+				document.getElementById('pollSelect').value = currentPollId;
+				loadParticipants(currentPollId);
+			} else {
+				alert('Error: ' + (data.message || 'Unknown error'));
+			}
+		})
+		.catch(() => alert('Network error'));
+	});
 });
 
-// Add council dialog placeholder function
-function addCouncilDialog() {
-    alert('Council member addition dialog would open here.\nThis connects to your existing backend logic.');
-}
 
-// Add loading states and animations
-document.addEventListener('DOMContentLoaded', function() {
-    // Animate elements on scroll
-    const observerOptions = {
-        threshold: 0.1,
-        rootMargin: '0px 0px -50px 0px'
-    };
-    
-    const observer = new IntersectionObserver(function(entries) {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.style.animationPlayState = 'running';
-            }
-        });
-    }, observerOptions);
-    
-    document.querySelectorAll('.animate-fade-in, .animate-slide-up').forEach(el => {
-        observer.observe(el);
-    });
+// 🔗 Smooth section scrolling
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+	anchor.addEventListener('click', function (e) {
+		e.preventDefault();
+		const target = document.querySelector(this.getAttribute('href'));
+		if (target) {
+			target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+		}
+	});
+});
+
+
+// ✨ Animate on Scroll
+document.addEventListener('DOMContentLoaded', () => {
+	const observer = new IntersectionObserver((entries) => {
+		entries.forEach(entry => {
+			if (entry.isIntersecting) {
+				entry.target.style.animationPlayState = 'running';
+			}
+		});
+	}, {
+		threshold: 0.1,
+		rootMargin: '0px 0px -50px 0px'
+	});
+
+	document.querySelectorAll('.animate-fade-in, .animate-slide-up').forEach(el => observer.observe(el));
 });
 </script>
 

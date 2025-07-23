@@ -1,36 +1,52 @@
 <?php
 require_once __DIR__ . '/config.php';
-$db = $conn;
+header('Content-Type: application/json');
 
+$db = $conn;
 $action = $_GET['action'] ?? $_POST['action'] ?? '';
 
 switch ($action) {
     case 'list':
-        // Fetch all users with role 'user' (participants)
-        $stmt = $db->query("SELECT id, name, email FROM users WHERE role='user' ORDER BY id DESC");
+        $poll_id = $_GET['poll_id'] ?? null;
+        if ($poll_id) {
+            $stmt = $db->prepare("SELECT id, name, email FROM users WHERE role = 'user' AND poll_id = ?");
+            $stmt->execute([$poll_id]);
+        } else {
+            $stmt = $db->query("SELECT id, name, email FROM users WHERE role = 'user'");
+        }
         echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
         break;
 
     case 'add':
         $name = $_POST['name'] ?? '';
         $email = $_POST['email'] ?? '';
-        // email and name required
-        if (!$name || !$email) {
-            echo json_encode(["status" => "error", "message" => "Name and email required"]);
+        $poll_id = $_POST['poll_id'] ?? '';
+
+        if (!$name || !$email || !$poll_id) {
+            echo json_encode(["status" => "error", "message" => "All fields required"]);
             exit;
         }
-        $stmt = $db->prepare("INSERT INTO users (name, email, role) VALUES (?, ?, 'user')");
-        $success = $stmt->execute([$name, $email]);
-        echo json_encode(["status" => $success ? "success" : "error"]);
+
+        $stmt = $db->prepare("INSERT INTO users (name, email, role, poll_id) VALUES (?, ?, 'user', ?)");
+        $saved = $stmt->execute([$name, $email, $poll_id]);
+
+        echo json_encode(["status" => $saved ? "success" : "error"]);
         break;
 
     case 'remove':
         $id = $_POST['id'] ?? 0;
-        $stmt = $db->prepare("DELETE FROM users WHERE id=? AND role='user'");
-        $success = $stmt->execute([$id]);
-        echo json_encode(["status" => $success ? "success" : "error"]);
+
+        // Remove all votes for this user
+        $db->prepare("DELETE FROM votes WHERE user_id = ?")->execute([$id]);
+
+        // Remove the user
+        $stmt = $db->prepare("DELETE FROM users WHERE id = ? AND role = 'user'");
+        $deleted = $stmt->execute([$id]);
+
+        echo json_encode(["status" => $deleted ? "success" : "error"]);
         break;
 
     default:
         echo json_encode(["status" => "error", "message" => "Invalid action"]);
+        break;
 }

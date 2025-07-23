@@ -44,6 +44,13 @@ try {
         name TEXT,
         position TEXT
     );
+
+    ALTER TABLE users ADD COLUMN poll_id INT AFTER role;
+    ALTER TABLE users
+    ADD CONSTRAINT fk_user_poll
+    FOREIGN KEY (poll_id)
+    REFERENCES polls(id)
+    ON DELETE CASCADE;
     ");
 
     // Insert sample candidates if table is empty
