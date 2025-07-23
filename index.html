@@ -154,7 +154,7 @@
 <script>
 document.addEventListener("DOMContentLoaded", function () {
     // Fetch active polls
-    fetch('poll.php?action=list')
+    fetch('backend/poll.php?action=list')
         .then(res => res.json())
         .then(polls => {
             const pollContainer = document.getElementById('polls-container');
@@ -177,7 +177,7 @@ document.addEventListener("DOMContentLoaded", function () {
         .catch(err => console.error('Poll fetch error:', err));
 
     // Fetch student council
-    fetch('council.php?action=list')
+    fetch('backend/council.php?action=list')
         .then(res => res.json())
         .then(members => {
             const councilContainer = document.getElementById('council-container');
