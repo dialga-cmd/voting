@@ -648,17 +648,17 @@
     // ---- DASHBOARD ----
     async function loadDashboard() {
       try {
-        const pollRes = await fetch('poll.php?action=list');
+        const pollRes = await fetch('backend/poll.php?action=list');
         const polls = await pollRes.json();
         document.getElementById('total-polls').innerText = polls.length;
 
-        const councilRes = await fetch('council.php?action=list');
+        const councilRes = await fetch('backend/council.php?action=list');
         const council = await councilRes.json();
         document.getElementById('total-council').innerText = council.length;
 
         let totalParticipants = 0;
         for (const poll of polls) {
-          const partRes = await fetch(`participants.php?action=list&poll_id=${poll.id}`);
+          const partRes = await fetch(`backend/participants.php?action=list&poll_id=${poll.id}`);
           const participants = await partRes.json();
           totalParticipants += participants.length;
         }
