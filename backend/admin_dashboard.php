@@ -407,7 +407,7 @@ setInterval(updateTime, 1000);
 
 // 📊 Dashboard Poll Stats & Table
 function updatePollCount() {
-	fetch('poll.php?action=count')
+	fetch('backend/poll.php?action=count')
 		.then(res => res.json())
 		.then(data => {
 			document.querySelector('#totalPollsCount').textContent = data.total;
@@ -418,7 +418,7 @@ function loadPolls() {
 	const pollsBody = document.getElementById('pollsBody');
 	pollsBody.innerHTML = '<tr><td colspan="4" class="px-6 py-8 text-center"><i class="fas fa-spinner fa-spin text-xl text-gray-400 mr-2"></i><span class="text-gray-500">Loading polls...</span></td></tr>';
 
-	fetch('poll.php?action=list')
+	fetch('backend/poll.php?action=list')
 		.then(res => res.json())
 		.then(data => {
 			pollsBody.innerHTML = '';
@@ -460,7 +460,7 @@ function loadPolls() {
 function deletePoll(id) {
 	if (!confirm('⚠️ Are you sure you want to delete this poll?\n\nThis action cannot be undone.')) return;
 
-	fetch('poll.php?action=delete', {
+	fetch('backend/poll.php?action=delete', {
 		method: 'POST',
 		body: new URLSearchParams({ id })
 	})
@@ -480,7 +480,7 @@ function loadCouncilTable() {
 		<i class="fas fa-spinner fa-spin mr-2"></i>Loading council members...
 	</div>`;
 
-	fetch('council.php?action=list')
+	fetch('backend/council.php?action=list')
 		.then(res => res.json())
 		.then(data => {
 			if (!data.length) {
@@ -510,7 +510,7 @@ function loadCouncilTable() {
 function deleteCouncilMember(id) {
 	if (!confirm("Are you sure you want to remove this council member?")) return;
 
-	fetch('council.php?action=delete', {
+	fetch('backend/council.php?action=delete', {
 		method: 'POST',
 		body: new URLSearchParams({ id })
 	})
@@ -524,7 +524,7 @@ function deleteCouncilMember(id) {
 let currentPollId = null;
 
 function loadPollDropdown() {
-	fetch('poll.php?action=list')
+	fetch('backend/poll.php?action=list')
 		.then(res => res.json())
 		.then(data => {
 			const select = document.getElementById('pollSelect');
@@ -545,7 +545,7 @@ function loadParticipants(pollId) {
 	const list = document.getElementById('participantsList');
 	list.innerHTML = '<p class="text-center text-gray-500"><i class="fas fa-spinner fa-spin mr-2"></i>Loading participants...</p>';
 
-	fetch('participants.php?action=list&poll_id=' + encodeURIComponent(pollId))
+	fetch('backend/participants.php?action=list&poll_id=' + encodeURIComponent(pollId))
 		.then(res => res.json())
 		.then(data => {
 			if (!data.length) {
@@ -577,7 +577,7 @@ function loadParticipants(pollId) {
 function deleteParticipant(id) {
 	if (!confirm('Are you sure you want to delete this participant and remove all their votes?')) return;
 
-	fetch('participants.php?action=remove', {
+	fetch('backend/participants.php?action=remove', {
 		method: 'POST',
 		body: new URLSearchParams({ id })
 	})
@@ -606,7 +606,7 @@ document.addEventListener('DOMContentLoaded', function() {
 		e.preventDefault();
 		const formData = new FormData(this);
 
-		fetch('participants.php?action=add', {
+		fetch('backend/participants.php?action=add', {
 			method: 'POST',
 			body: formData
 		})
