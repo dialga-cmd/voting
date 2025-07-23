@@ -1,19 +1,17 @@
 <?php
 require 'config.php';
-header('Content-Type: application/json');
+$db = $conn;
 
-$poll_id = $_GET['poll_id'] ?? 0;
+$action = $_GET['action'] ?? '';
 
-try {
-    $stmt = $conn->prepare("
-        SELECT candidates.name, candidates.votes
-        FROM candidates
-        WHERE candidates.poll_id = ?
-        ORDER BY votes DESC
+if ($action === 'list') {
+    $stmt = $db->query("
+        SELECT polls.title as poll_title, candidates.name as candidate, candidates.votes 
+        FROM polls
+        LEFT JOIN candidates ON candidates.poll_id = polls.id
+        ORDER BY polls.id DESC
     ");
-    $stmt->execute([$poll_id]);
     echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
-} catch (PDOException $e) {
-    echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
+} else {
+    echo json_encode(["status" => "error", "message" => "Invalid action"]);
 }
-?>

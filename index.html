@@ -35,7 +35,7 @@
                 <a href="poll.html" class="hover:text-purple-200 transition">Elections</a>
                 <a href="results.html" class="hover:text-purple-200 transition">Results</a>
                 <a href="council.html" class="hover:text-purple-200 transition">Council</a>
-                <a href="backend/admin_dashboard.php" class="hover:text-yellow-300 font-semibold">Admin</a>
+                <a href="admin.php" class="hover:text-yellow-300 font-semibold">Admin</a>
             </nav>
             <div class="flex items-center space-x-4">
                 <div class="login-section">
@@ -59,7 +59,7 @@
     <a href="poll.html" class="block py-2 hover:text-purple-200 transition">Elections</a>
     <a href="results.html" class="block py-2 hover:text-purple-200 transition">Results</a>
     <a href="council.html" class="block py-2 hover:text-purple-200 transition">Council</a>
-    <a href="backend/admin_dashboard.php" class="block py-2 text-yellow-300 font-semibold">Admin</a>
+    <a href="adminphp" class="block py-2 text-yellow-300 font-semibold">Admin</a>
 </div>
 
 <!-- MAIN CONTENT -->
@@ -150,14 +150,18 @@
         </div>
     </div>
 </footer>
-
 <script>
+// Mobile menu toggle
+document.getElementById('mobile-menu-btn').addEventListener('click', function() {
+    const menu = document.getElementById('mobile-menu');
+    menu.classList.toggle('hidden');
+});
 document.addEventListener("DOMContentLoaded", function () {
     // Fetch active polls
     fetch('backend/poll.php?action=list')
         .then(res => res.json())
         .then(polls => {
-            const pollContainer = document.getElementById('polls-container');
+            const pollContainer = document.getElementById('poll-list'); // Correct ID
             if (pollContainer) {
                 pollContainer.innerHTML = '';
                 polls.forEach(poll => {
@@ -180,15 +184,15 @@ document.addEventListener("DOMContentLoaded", function () {
     fetch('backend/council.php?action=list')
         .then(res => res.json())
         .then(members => {
-            const councilContainer = document.getElementById('council-container');
+            const councilContainer = document.getElementById('council-list'); // Correct ID
             if (councilContainer) {
                 councilContainer.innerHTML = '';
                 members.forEach(member => {
                     councilContainer.innerHTML += `
-                        <li class="flex justify-between py-2 border-b">
-                            <span>${member.name}</span>
-                            <span class="text-gray-500">${member.position}</span>
-                        </li>
+                        <div class="bg-white rounded-xl shadow-md p-4 card-hover">
+                            <h3 class="text-lg font-bold text-gray-800">${member.name}</h3>
+                            <p class="text-gray-600">${member.position}</p>
+                        </div>
                     `;
                 });
             }
