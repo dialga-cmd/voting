@@ -5,16 +5,11 @@ try {
     $conn = new PDO("sqlite:$db_file");
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-    // Create all necessary tables
-    $conn->exec("
-    CREATE TABLE IF NOT EXISTS users (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        email TEXT UNIQUE,
-        password TEXT,
-        role TEXT DEFAULT 'user', -- user or admin
-        created_at TEXT DEFAULT CURRENT_TIMESTAMP
-    );
+    // 🔐 Enforce foreign key constraints in SQLite
+    $conn->exec("PRAGMA foreign_keys = ON;");
 
+    // ✅ Create all necessary tables
+    $conn->exec("
     CREATE TABLE IF NOT EXISTS polls (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         title TEXT NOT NULL,
@@ -22,12 +17,22 @@ try {
         end_date TEXT
     );
 
+    CREATE TABLE IF NOT EXISTS users (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        email TEXT UNIQUE,
+        password TEXT,
+        role TEXT DEFAULT 'user', -- user or admin
+        poll_id INTEGER,
+        created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (poll_id) REFERENCES polls(id) ON DELETE CASCADE
+    );
+
     CREATE TABLE IF NOT EXISTS candidates (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         poll_id INTEGER,
         name TEXT,
         votes INTEGER DEFAULT 0,
-        FOREIGN KEY(poll_id) REFERENCES polls(id)
+        FOREIGN KEY(poll_id) REFERENCES polls(id) ON DELETE CASCADE
     );
 
     CREATE TABLE IF NOT EXISTS votes (
@@ -35,8 +40,8 @@ try {
         user_id INTEGER,
         candidate_id INTEGER,
         created_at TEXT DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY(user_id) REFERENCES users(id),
-        FOREIGN KEY(candidate_id) REFERENCES candidates(id)
+        FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE,
+        FOREIGN KEY(candidate_id) REFERENCES candidates(id) ON DELETE CASCADE
     );
 
     CREATE TABLE IF NOT EXISTS student_council (
@@ -44,16 +49,18 @@ try {
         name TEXT,
         position TEXT
     );
-
-    ALTER TABLE users ADD COLUMN poll_id INT AFTER role;
-    ALTER TABLE users
-    ADD CONSTRAINT fk_user_poll
-    FOREIGN KEY (poll_id)
-    REFERENCES polls(id)
-    ON DELETE CASCADE;
     ");
 
-    // Insert sample candidates if table is empty
+    // 📥 Insert default poll if none exists
+    $stmt = $conn->query("SELECT COUNT(*) FROM polls");
+    if ($stmt->fetchColumn() == 0) {
+        $conn->exec("
+            INSERT INTO polls (title, start_date, end_date) 
+            VALUES ('Student Union Election 2025', '2025-10-15', '2025-10-20');
+        ");
+    }
+
+    // 📥 Insert default candidates if empty
     $stmt = $conn->query("SELECT COUNT(*) FROM candidates");
     if ($stmt->fetchColumn() == 0) {
         $conn->exec("
@@ -64,21 +71,12 @@ try {
         ");
     }
 
-    // Insert default poll if empty
-    $stmt = $conn->query("SELECT COUNT(*) FROM polls");
-    if ($stmt->fetchColumn() == 0) {
-        $conn->exec("
-            INSERT INTO polls (title, start_date, end_date) 
-            VALUES ('Student Union Election 2025', '2025-10-15', '2025-10-20');
-        ");
-    }
-
-    // Insert default admin if none exists
+    // 👨‍💼 Insert admin if none exists
     $checkAdmin = $conn->query("SELECT COUNT(*) FROM users WHERE role = 'admin'")->fetchColumn();
     if ($checkAdmin == 0) {
         $password = password_hash('admin123', PASSWORD_BCRYPT);
-        $conn->prepare("INSERT INTO users (email, password, role) VALUES (?, ?, 'admin')")
-             ->execute(['admin@vote.com', $password]);
+        $conn->prepare("INSERT INTO users (email, password, role, poll_id) VALUES (?, ?, 'admin', NULL)")
+             ->execute(['admin@voteeasy.com', $password]);
     }
 
 } catch (PDOException $e) {
