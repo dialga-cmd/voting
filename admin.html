@@ -7,329 +7,1046 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    body { font-family: 'Inter', sans-serif; background-color: #f8f9fa; }
-    .sidebar { background: linear-gradient(180deg, #3b82f6 0%, #9333ea 100%); }
-    .nav-btn.active { background: rgba(255, 255, 255, 0.2); }
-    .card { transition: transform 0.2s ease-in-out; }
-    .card:hover { transform: translateY(-3px); }
+    :root {
+      --primary-blue: #1e40af;
+      --primary-purple: #7c3aed;
+      --success: #059669;
+      --warning: #d97706;
+      --danger: #dc2626;
+      --gray-50: #f9fafb;
+      --gray-100: #f3f4f6;
+      --gray-200: #e5e7eb;
+      --gray-600: #4b5563;
+      --gray-700: #374151;
+      --gray-800: #1f2937;
+      --gray-900: #111827;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body { 
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; 
+      background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+      min-height: 100vh;
+    }
+
+    .sidebar { 
+      background: linear-gradient(180deg, var(--primary-blue) 0%, var(--primary-purple) 100%);
+      box-shadow: 4px 0 24px rgba(0, 0, 0, 0.12);
+    }
+
+    .nav-btn {
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      border-radius: 12px;
+      margin: 4px 0;
+      font-weight: 500;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .nav-btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+      transition: left 0.5s;
+    }
+
+    .nav-btn:hover::before {
+      left: 100%;
+    }
+
+    .nav-btn:hover {
+      background: rgba(255, 255, 255, 0.15);
+      transform: translateX(4px);
+    }
+
+    .nav-btn.active { 
+      background: rgba(255, 255, 255, 0.25);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      transform: translateX(4px);
+    }
+
+    .nav-btn.active::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 4px;
+      height: 24px;
+      background: white;
+      border-radius: 0 4px 4px 0;
+    }
+
+    .card { 
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.8);
+    }
+
+    .card:hover { 
+      transform: translateY(-4px);
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    }
+
+    .stat-card {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--primary-blue), var(--primary-purple));
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-purple) 100%);
+      transition: all 0.3s ease;
+      border-radius: 10px;
+      font-weight: 600;
+      box-shadow: 0 4px 12px rgba(30, 64, 175, 0.3);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(30, 64, 175, 0.4);
+    }
+
+    .btn-success {
+      background: linear-gradient(135deg, var(--success) 0%, #10b981 100%);
+      transition: all 0.3s ease;
+      border-radius: 10px;
+      font-weight: 600;
+      box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3);
+    }
+
+    .btn-success:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(5, 150, 105, 0.4);
+    }
+
+    .btn-danger {
+      background: linear-gradient(135deg, var(--danger) 0%, #ef4444 100%);
+      transition: all 0.3s ease;
+      border-radius: 10px;
+      font-weight: 600;
+      box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+    }
+
+    .btn-danger:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(220, 38, 38, 0.4);
+    }
+
+    .input-field {
+      border: 2px solid var(--gray-200);
+      border-radius: 12px;
+      transition: all 0.3s ease;
+      background: white;
+    }
+
+    .input-field:focus {
+      border-color: var(--primary-blue);
+      box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
+      outline: none;
+    }
+
+    .table-modern {
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+
+    .table-modern thead {
+      background: linear-gradient(135deg, var(--gray-50) 0%, var(--gray-100) 100%);
+    }
+
+    .table-modern th {
+      font-weight: 600;
+      color: var(--gray-700);
+      padding: 16px;
+      text-align: left;
+    }
+
+    .table-modern td {
+      padding: 16px;
+      border-bottom: 1px solid var(--gray-200);
+      transition: background-color 0.2s ease;
+    }
+
+    .table-modern tr:hover td {
+      background-color: var(--gray-50);
+    }
+
+    .header-glass {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .section-title {
+      background: linear-gradient(135deg, var(--gray-800) 0%, var(--gray-600) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .poll-item {
+      background: white;
+      border-radius: 12px;
+      border: 1px solid var(--gray-200);
+      transition: all 0.3s ease;
+    }
+
+    .poll-item:hover {
+      border-color: var(--primary-blue);
+      box-shadow: 0 4px 12px rgba(30, 64, 175, 0.1);
+    }
+
+    .council-card {
+      background: linear-gradient(135deg, white 0%, #f8fafc 100%);
+      border-radius: 16px;
+      border: 1px solid var(--gray-200);
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .council-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--primary-blue), var(--primary-purple));
+    }
+
+    .council-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+    }
+
+    .loading-spinner {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top-color: white;
+      animation: spin 1s ease-in-out infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .fade-in {
+      animation: fadeIn 0.6s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .notification {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 16px 24px;
+      border-radius: 12px;
+      color: white;
+      font-weight: 600;
+      z-index: 1000;
+      transform: translateX(400px);
+      transition: transform 0.3s ease;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    }
+
+    .notification.show {
+      transform: translateX(0);
+    }
+
+    .notification.success {
+      background: linear-gradient(135deg, var(--success) 0%, #10b981 100%);
+    }
+
+    .notification.error {
+      background: linear-gradient(135deg, var(--danger) 0%, #ef4444 100%);
+    }
+
+    @media (max-width: 768px) {
+      .sidebar {
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+      }
+      
+      .sidebar.open {
+        transform: translateX(0);
+      }
+      
+      .main-content {
+        margin-left: 0 !important;
+      }
+    }
   </style>
 </head>
 <body>
   <!-- Top Navbar -->
-  <header class="fixed top-0 left-0 w-full bg-white shadow z-50 flex justify-between items-center px-6 py-3">
-    <h1 class="text-xl font-bold text-gray-700">VoteEasy Admin Panel</h1>
-    <button id="logout" class="bg-red-500 hover:bg-red-600 px-4 py-2 rounded text-white font-semibold">
-      <i class="fas fa-sign-out-alt mr-2"></i> Logout
-    </button>
+  <header class="header-glass fixed top-0 left-0 w-full z-50 flex justify-between items-center px-6 py-4">
+    <div class="flex items-center space-x-4">
+      <button id="mobile-menu" class="md:hidden text-gray-600 hover:text-gray-900">
+        <i class="fas fa-bars text-xl"></i>
+      </button>
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 bg-gradient-to-br from-blue-600 to-purple-600 rounded-xl flex items-center justify-center">
+          <i class="fas fa-vote-yea text-white text-lg"></i>
+        </div>
+        <div>
+          <h1 class="text-xl font-bold text-gray-800">VoteEasy</h1>
+          <p class="text-xs text-gray-500">Admin Panel</p>
+        </div>
+      </div>
+    </div>
+    <div class="flex items-center space-x-4">
+      <div class="hidden md:flex items-center space-x-2 text-sm text-gray-600">
+        <i class="fas fa-clock"></i>
+        <span id="current-time"></span>
+      </div>
+      <button id="logout" class="btn-danger text-white px-6 py-2 rounded-xl font-semibold flex items-center space-x-2">
+        <i class="fas fa-sign-out-alt"></i>
+        <span>Logout</span>
+      </button>
+    </div>
   </header>
 
   <!-- Sidebar -->
-  <aside class="sidebar fixed top-0 left-0 h-full w-64 pt-16 text-white flex flex-col">
-    <nav class="mt-6 flex-1 px-2">
-      <button class="nav-btn active w-full flex items-center gap-4 px-4 py-3 rounded" data-section="dashboard">
-        <i class="fas fa-chart-line"></i> Dashboard
+  <aside class="sidebar fixed top-0 left-0 h-full w-64 pt-20 text-white flex flex-col z-40">
+    <nav class="mt-8 flex-1 px-4">
+      <button class="nav-btn active w-full flex items-center gap-4 px-6 py-4 rounded-xl text-left" data-section="dashboard">
+        <i class="fas fa-chart-line text-lg"></i> 
+        <span class="font-medium">Dashboard</span>
       </button>
-      <button class="nav-btn w-full flex items-center gap-4 px-4 py-3 rounded" data-section="polls">
-        <i class="fas fa-poll"></i> Manage Polls
+      <button class="nav-btn w-full flex items-center gap-4 px-6 py-4 rounded-xl text-left" data-section="polls">
+        <i class="fas fa-poll text-lg"></i> 
+        <span class="font-medium">Manage Polls</span>
       </button>
-      <button class="nav-btn w-full flex items-center gap-4 px-4 py-3 rounded" data-section="participants">
-        <i class="fas fa-users"></i> Participants
+      <button class="nav-btn w-full flex items-center gap-4 px-6 py-4 rounded-xl text-left" data-section="participants">
+        <i class="fas fa-users text-lg"></i> 
+        <span class="font-medium">Participants</span>
       </button>
-      <button class="nav-btn w-full flex items-center gap-4 px-4 py-3 rounded" data-section="council">
-        <i class="fas fa-user-tie"></i> Student Council
+      <button class="nav-btn w-full flex items-center gap-4 px-6 py-4 rounded-xl text-left" data-section="council">
+        <i class="fas fa-user-tie text-lg"></i> 
+        <span class="font-medium">Student Council</span>
       </button>
-      <button class="nav-btn w-full flex items-center gap-4 px-4 py-3 rounded" data-section="results">
-        <i class="fas fa-chart-pie"></i> Results
+      <button class="nav-btn w-full flex items-center gap-4 px-6 py-4 rounded-xl text-left" data-section="results">
+        <i class="fas fa-chart-pie text-lg"></i> 
+        <span class="font-medium">Results</span>
       </button>
     </nav>
+    <div class="px-4 py-6 border-t border-white/20">
+      <div class="text-xs text-white/60 text-center">
+        VoteEasy Admin v2.0
+      </div>
+    </div>
   </aside>
 
   <!-- Main Content -->
-  <main class="ml-64 pt-20 p-6 transition-all" id="main-content">
+  <main class="main-content ml-64 pt-24 p-8 transition-all" id="main-content">
 
     <!-- Dashboard -->
-    <section id="dashboard" class="admin-section">
-      <h2 class="text-3xl font-bold text-gray-700 mb-8">Dashboard Overview</h2>
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div class="card bg-white p-6 rounded-lg shadow">
-          <h3 class="text-lg font-semibold text-gray-600">Total Polls</h3>
-          <p class="text-4xl font-bold text-blue-600 mt-2" id="total-polls">0</p>
+    <section id="dashboard" class="admin-section fade-in">
+      <div class="mb-8">
+        <h2 class="section-title text-4xl font-bold mb-2">Dashboard Overview</h2>
+        <p class="text-gray-600">Welcome back! Here's what's happening with your voting system.</p>
+      </div>
+      
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+        <div class="card stat-card p-8">
+          <div class="flex items-center justify-between">
+            <div>
+              <h3 class="text-lg font-semibold text-gray-600 mb-2">Total Polls</h3>
+              <p class="text-4xl font-bold text-blue-600" id="total-polls">0</p>
+              <p class="text-sm text-gray-500 mt-2">Active voting campaigns</p>
+            </div>
+            <div class="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center">
+              <i class="fas fa-poll text-blue-600 text-2xl"></i>
+            </div>
+          </div>
         </div>
-        <div class="card bg-white p-6 rounded-lg shadow">
-          <h3 class="text-lg font-semibold text-gray-600">Participants</h3>
-          <p class="text-4xl font-bold text-green-600 mt-2" id="total-participants">0</p>
+        
+        <div class="card stat-card p-8">
+          <div class="flex items-center justify-between">
+            <div>
+              <h3 class="text-lg font-semibold text-gray-600 mb-2">Participants</h3>
+              <p class="text-4xl font-bold text-green-600" id="total-participants">0</p>
+              <p class="text-sm text-gray-500 mt-2">Registered voters</p>
+            </div>
+            <div class="w-16 h-16 bg-green-100 rounded-2xl flex items-center justify-center">
+              <i class="fas fa-users text-green-600 text-2xl"></i>
+            </div>
+          </div>
         </div>
-        <div class="card bg-white p-6 rounded-lg shadow">
-          <h3 class="text-lg font-semibold text-gray-600">Student Council</h3>
-          <p class="text-4xl font-bold text-purple-600 mt-2" id="total-council">0</p>
+        
+        <div class="card stat-card p-8">
+          <div class="flex items-center justify-between">
+            <div>
+              <h3 class="text-lg font-semibold text-gray-600 mb-2">Council Members</h3>
+              <p class="text-4xl font-bold text-purple-600" id="total-council">0</p>
+              <p class="text-sm text-gray-500 mt-2">Student representatives</p>
+            </div>
+            <div class="w-16 h-16 bg-purple-100 rounded-2xl flex items-center justify-center">
+              <i class="fas fa-user-tie text-purple-600 text-2xl"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div class="card p-6">
+          <h3 class="text-xl font-bold text-gray-800 mb-4">Recent Activity</h3>
+          <div class="space-y-4">
+            <div class="flex items-center space-x-4 p-3 bg-gray-50 rounded-lg">
+              <div class="w-2 h-2 bg-green-500 rounded-full"></div>
+              <span class="text-sm text-gray-600">New poll created successfully</span>
+            </div>
+            <div class="flex items-center space-x-4 p-3 bg-gray-50 rounded-lg">
+              <div class="w-2 h-2 bg-blue-500 rounded-full"></div>
+              <span class="text-sm text-gray-600">5 new participants registered</span>
+            </div>
+            <div class="flex items-center space-x-4 p-3 bg-gray-50 rounded-lg">
+              <div class="w-2 h-2 bg-purple-500 rounded-full"></div>
+              <span class="text-sm text-gray-600">Council member added</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="card p-6">
+          <h3 class="text-xl font-bold text-gray-800 mb-4">System Status</h3>
+          <div class="space-y-4">
+            <div class="flex items-center justify-between">
+              <span class="text-gray-600">Server Status</span>
+              <span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium">Online</span>
+            </div>
+            <div class="flex items-center justify-between">
+              <span class="text-gray-600">Database</span>
+              <span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium">Connected</span>
+            </div>
+            <div class="flex items-center justify-between">
+              <span class="text-gray-600">Security</span>
+              <span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium">Secure</span>
+            </div>
+          </div>
         </div>
       </div>
     </section>
 
     <!-- Manage Polls -->
-    <section id="polls" class="admin-section hidden">
-      <h2 class="text-3xl font-bold text-gray-700 mb-6">Manage Polls</h2>
-      <div class="bg-white p-6 rounded-lg shadow mb-6">
-        <h3 class="text-xl font-bold mb-4">Create New Poll</h3>
-        <form id="poll-form" class="grid gap-4">
-          <input type="text" name="title" placeholder="Poll Title" class="border p-2 rounded" required>
-          <div class="grid grid-cols-2 gap-4">
-            <input type="date" name="start_date" class="border p-2 rounded" required>
-            <input type="date" name="end_date" class="border p-2 rounded" required>
+    <section id="polls" class="admin-section hidden fade-in">
+      <div class="mb-8">
+        <h2 class="section-title text-4xl font-bold mb-2">Manage Polls</h2>
+        <p class="text-gray-600">Create and manage your voting polls</p>
+      </div>
+      
+      <div class="card p-8 mb-8">
+        <h3 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+          <i class="fas fa-plus-circle text-blue-600 mr-3"></i>
+          Create New Poll
+        </h3>
+        <form id="poll-form" class="space-y-6">
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-2">Poll Title</label>
+            <input type="text" name="title" placeholder="Enter your poll title" class="input-field w-full p-4 text-lg" required>
           </div>
-          <textarea name="candidates" placeholder="Add Candidates (comma separated)" class="border p-2 rounded" required></textarea>
-          <button type="submit" class="bg-blue-600 text-white py-2 rounded hover:bg-blue-700">Create Poll</button>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-2">Start Date</label>
+              <input type="date" name="start_date" class="input-field w-full p-4" required>
+            </div>
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-2">End Date</label>
+              <input type="date" name="end_date" class="input-field w-full p-4" required>
+            </div>
+          </div>
+          
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-2">Candidates</label>
+            <textarea name="candidates" placeholder="Add candidates (comma separated)" rows="4" class="input-field w-full p-4" required></textarea>
+          </div>
+          
+          <button type="submit" class="btn-primary text-white px-8 py-4 text-lg font-semibold flex items-center space-x-2">
+            <i class="fas fa-plus"></i>
+            <span>Create Poll</span>
+          </button>
         </form>
       </div>
-      <div class="bg-white p-6 rounded-lg shadow">
-        <h3 class="text-xl font-bold mb-4">Active Polls</h3>
-        <ul id="poll-list" class="space-y-3"></ul>
+      
+      <div class="card p-8">
+        <h3 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+          <i class="fas fa-list text-green-600 mr-3"></i>
+          Active Polls
+        </h3>
+        <div id="poll-list" class="space-y-4"></div>
       </div>
     </section>
 
     <!-- Participants -->
-    <section id="participants" class="admin-section hidden">
-      <h2 class="text-3xl font-bold text-gray-700 mb-6">Participants</h2>
-      <div class="bg-white p-6 rounded-lg shadow">
-        <select id="poll-select" class="border p-2 rounded w-full mb-4"></select>
-        <button id="add-participant-btn" class="mb-4 bg-green-600 text-white py-2 px-4 rounded hover:bg-green-700">
-          Add Participant
-        </button>
-        <table class="w-full border">
-          <thead class="bg-gray-100">
-            <tr>
-              <th>Name</th>
-              <th>Email</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody id="participant-table"></tbody>
-        </table>
+    <section id="participants" class="admin-section hidden fade-in">
+      <div class="mb-8">
+        <h2 class="section-title text-4xl font-bold mb-2">Participants</h2>
+        <p class="text-gray-600">Manage poll participants and voters</p>
+      </div>
+      
+      <div class="card p-8">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
+          <h3 class="text-2xl font-bold text-gray-800 mb-4 md:mb-0">Participant Management</h3>
+          <button id="add-participant-btn" class="btn-success text-white px-6 py-3 rounded-xl font-semibold flex items-center space-x-2">
+            <i class="fas fa-user-plus"></i>
+            <span>Add Participant</span>
+          </button>
+        </div>
+        
+        <div class="mb-6">
+          <label class="block text-sm font-semibold text-gray-700 mb-2">Select Poll</label>
+          <select id="poll-select" class="input-field w-full p-4"></select>
+        </div>
+        
+        <div class="table-modern bg-white rounded-xl overflow-hidden">
+          <table class="w-full">
+            <thead>
+              <tr>
+                <th class="text-left">Name</th>
+                <th class="text-left">Email</th>
+                <th class="text-left">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="participant-table"></tbody>
+          </table>
+        </div>
       </div>
     </section>
 
     <!-- Student Council -->
-    <section id="council" class="admin-section hidden">
-      <h2 class="text-3xl font-bold text-gray-700 mb-6">Student Council</h2>
-      <button id="add-council-btn" class="mb-4 bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700">
-        Add Member
-      </button>
-      <div id="council-list" class="grid grid-cols-1 md:grid-cols-3 gap-6"></div>
+    <section id="council" class="admin-section hidden fade-in">
+      <div class="mb-8">
+        <h2 class="section-title text-4xl font-bold mb-2">Student Council</h2>
+        <p class="text-gray-600">Manage student representatives and council members</p>
+      </div>
+      
+      <div class="mb-8">
+        <button id="add-council-btn" class="btn-primary text-white px-8 py-4 rounded-xl font-semibold flex items-center space-x-2">
+          <i class="fas fa-user-plus"></i>
+          <span>Add Council Member</span>
+        </button>
+      </div>
+      
+      <div id="council-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
     </section>
 
     <!-- Results -->
-    <section id="results" class="admin-section hidden">
-      <h2 class="text-3xl font-bold text-gray-700 mb-6">Results</h2>
-      <select id="results-poll-select" class="border p-2 rounded mb-4"></select>
-      <div class="bg-white p-6 rounded-lg shadow">
-        <h3 class="text-xl font-bold mb-4" id="results-title">Poll Results</h3>
-        <canvas id="resultsChart"></canvas>
+    <section id="results" class="admin-section hidden fade-in">
+      <div class="mb-8">
+        <h2 class="section-title text-4xl font-bold mb-2">Results</h2>
+        <p class="text-gray-600">View and analyze poll results</p>
+      </div>
+      
+      <div class="mb-6">
+        <label class="block text-sm font-semibold text-gray-700 mb-2">Select Poll</label>
+        <select id="results-poll-select" class="input-field w-full p-4 max-w-md"></select>
+      </div>
+      
+      <div class="card p-8">
+        <h3 class="text-2xl font-bold text-gray-800 mb-6" id="results-title">Poll Results</h3>
+        <div class="bg-gray-50 rounded-xl p-6">
+          <canvas id="resultsChart"></canvas>
+        </div>
       </div>
     </section>
   </main>
 
+  <!-- Notification Container -->
+  <div id="notification" class="notification"></div>
+
   <script>
-    // Sidebar navigation
+    // Update current time
+    function updateTime() {
+      const now = new Date();
+      const timeString = now.toLocaleTimeString('en-US', { 
+        hour12: false, 
+        hour: '2-digit', 
+        minute: '2-digit' 
+      });
+      document.getElementById('current-time').textContent = timeString;
+    }
+    updateTime();
+    setInterval(updateTime, 1000);
+
+    // Mobile menu toggle
+    document.getElementById('mobile-menu').addEventListener('click', () => {
+      document.querySelector('.sidebar').classList.toggle('open');
+    });
+
+    // Notification system
+    function showNotification(message, type = 'success') {
+      const notification = document.getElementById('notification');
+      notification.textContent = message;
+      notification.className = `notification ${type} show`;
+      
+      setTimeout(() => {
+        notification.classList.remove('show');
+      }, 3000);
+    }
+
+    // Sidebar navigation with improved animations
     const sections = document.querySelectorAll('.admin-section');
     document.querySelectorAll('.nav-btn').forEach(btn => {
       btn.addEventListener('click', () => {
+        // Update active state
         document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
-        sections.forEach(sec => sec.classList.add('hidden'));
-        document.getElementById(btn.dataset.section).classList.remove('hidden');
+        
+        // Hide all sections with fade out
+        sections.forEach(sec => {
+          sec.classList.add('hidden');
+          sec.classList.remove('fade-in');
+        });
+        
+        // Show selected section with fade in
+        setTimeout(() => {
+          const targetSection = document.getElementById(btn.dataset.section);
+          targetSection.classList.remove('hidden');
+          targetSection.classList.add('fade-in');
+        }, 150);
       });
     });
 
+    // Enhanced loading states
+    function setLoading(elementId, isLoading) {
+      const element = document.getElementById(elementId);
+      if (isLoading) {
+        element.innerHTML = '<div class="loading-spinner"></div>';
+      }
+    }
+
     // ---- DASHBOARD ----
     async function loadDashboard() {
-      const pollRes = await fetch('poll.php?action=list');
-      const polls = await pollRes.json();
-      document.getElementById('total-polls').innerText = polls.length;
+      try {
+        const pollRes = await fetch('poll.php?action=list');
+        const polls = await pollRes.json();
+        document.getElementById('total-polls').innerText = polls.length;
 
-      const councilRes = await fetch('council.php?action=list');
-      const council = await councilRes.json();
-      document.getElementById('total-council').innerText = council.length;
+        const councilRes = await fetch('council.php?action=list');
+        const council = await councilRes.json();
+        document.getElementById('total-council').innerText = council.length;
 
-      // Participants count from all polls
-      let totalParticipants = 0;
-      for (const poll of polls) {
-        const partRes = await fetch(`participants.php?action=list&poll_id=${poll.id}`);
-        const participants = await partRes.json();
-        totalParticipants += participants.length;
+        let totalParticipants = 0;
+        for (const poll of polls) {
+          const partRes = await fetch(`participants.php?action=list&poll_id=${poll.id}`);
+          const participants = await partRes.json();
+          totalParticipants += participants.length;
+        }
+        document.getElementById('total-participants').innerText = totalParticipants;
+      } catch (error) {
+        showNotification('Failed to load dashboard data', 'error');
       }
-      document.getElementById('total-participants').innerText = totalParticipants;
     }
 
     // ---- POLLS ----
     async function loadPolls() {
-      const res = await fetch('poll.php?action=list');
-      const polls = await res.json();
-      const list = document.getElementById('poll-list');
-      const pollSelect = document.getElementById('poll-select');
-      const resultsSelect = document.getElementById('results-poll-select');
-      list.innerHTML = '';
-      pollSelect.innerHTML = '';
-      resultsSelect.innerHTML = '';
+      try {
+        const res = await fetch('poll.php?action=list');
+        const polls = await res.json();
+        const list = document.getElementById('poll-list');
+        const pollSelect = document.getElementById('poll-select');
+        const resultsSelect = document.getElementById('results-poll-select');
+        
+        list.innerHTML = '';
+        pollSelect.innerHTML = '<option value="">Select a poll...</option>';
+        resultsSelect.innerHTML = '<option value="">Select a poll...</option>';
 
-      polls.forEach(p => {
-        list.innerHTML += `
-          <li class="flex justify-between items-center border-b pb-2">
-            <span>${p.title} (${p.start_date} - ${p.end_date})</span>
-            <div>
-              <button class="text-red-600 hover:underline" onclick="deletePoll(${p.id})">Delete</button>
-            </div>
-          </li>`;
-        pollSelect.innerHTML += `<option value="${p.id}">${p.title}</option>`;
-        resultsSelect.innerHTML += `<option value="${p.id}">${p.title}</option>`;
-      });
+        polls.forEach(p => {
+          list.innerHTML += `
+            <div class="poll-item p-6 flex justify-between items-center">
+              <div>
+                <h4 class="text-lg font-semibold text-gray-800">${p.title}</h4>
+                <p class="text-gray-600 mt-1">
+                  <i class="fas fa-calendar-alt mr-2"></i>
+                  ${p.start_date} - ${p.end_date}
+                </p>
+              </div>
+              <button class="btn-danger text-white px-4 py-2 rounded-lg text-sm" onclick="deletePoll(${p.id})">
+                <i class="fas fa-trash mr-2"></i>Delete
+              </button>
+            </div>`;
+          pollSelect.innerHTML += `<option value="${p.id}">${p.title}</option>`;
+          resultsSelect.innerHTML += `<option value="${p.id}">${p.title}</option>`;
+        });
+
+        if (polls.length === 0) {
+          list.innerHTML = `
+            <div class="text-center py-12 text-gray-500">
+              <i class="fas fa-poll text-4xl mb-4"></i>
+              <p class="text-lg">No polls created yet</p>
+              <p class="text-sm">Create your first poll to get started</p>
+            </div>`;
+        }
+      } catch (error) {
+        showNotification('Failed to load polls', 'error');
+      }
     }
 
     document.getElementById('poll-form').addEventListener('submit', async (e) => {
       e.preventDefault();
-      const formData = new FormData(e.target);
-      formData.append('action', 'create');
-      const res = await fetch('poll.php', { method: 'POST', body: formData });
-      const data = await res.json();
-      if (data.status === 'success') { alert('Poll created!'); e.target.reset(); loadPolls(); }
-      else alert('Failed to create poll');
+      const submitBtn = e.target.querySelector('button[type="submit"]');
+      const originalText = submitBtn.innerHTML;
+      
+      submitBtn.innerHTML = '<div class="loading-spinner mr-2"></div>Creating...';
+      submitBtn.disabled = true;
+
+      try {
+        const formData = new FormData(e.target);
+        formData.append('action', 'create');
+        const res = await fetch('poll.php', { method: 'POST', body: formData });
+        const data = await res.json();
+        
+        if (data.status === 'success') {
+          showNotification('Poll created successfully!', 'success');
+          e.target.reset();
+          loadPolls();
+          loadDashboard();
+        } else {
+          showNotification('Failed to create poll', 'error');
+        }
+      } catch (error) {
+        showNotification('Failed to create poll', 'error');
+      } finally {
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+      }
     });
 
     async function deletePoll(id) {
-      if (!confirm('Delete this poll?')) return;
-      const res = await fetch('poll.php', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-        body: `action=delete&id=${id}`
-      });
-      const data = await res.json();
-      if (data.status === 'success') loadPolls();
-      else alert('Failed to delete poll');
+      if (!confirm('Are you sure you want to delete this poll? This action cannot be undone.')) return;
+      
+      try {
+        const res = await fetch('poll.php', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+          body: `action=delete&id=${id}`
+        });
+        const data = await res.json();
+        
+        if (data.status === 'success') {
+          showNotification('Poll deleted successfully', 'success');
+          loadPolls();
+          loadDashboard();
+        } else {
+          showNotification('Failed to delete poll', 'error');
+        }
+      } catch (error) {
+        showNotification('Failed to delete poll', 'error');
+      }
     }
 
     // ---- PARTICIPANTS ----
     async function loadParticipants() {
       const pollId = document.getElementById('poll-select').value;
-      const res = await fetch(`participants.php?action=list&poll_id=${pollId}`);
-      const participants = await res.json();
-      const table = document.getElementById('participant-table');
-      table.innerHTML = '';
-      participants.forEach(p => {
-        table.innerHTML += `
-          <tr class="border-b">
-            <td>${p.name}</td>
-            <td>${p.email}</td>
-            <td><button class="text-red-600 hover:underline" onclick="removeParticipant(${p.id})">Remove</button></td>
-          </tr>`;
-      });
+      if (!pollId) {
+        document.getElementById('participant-table').innerHTML = `
+          <tr><td colspan="3" class="text-center py-8 text-gray-500">Please select a poll first</td></tr>
+        `;
+        return;
+      }
+
+      try {
+        const res = await fetch(`participants.php?action=list&poll_id=${pollId}`);
+        const participants = await res.json();
+        const table = document.getElementById('participant-table');
+        
+        table.innerHTML = '';
+        participants.forEach(p => {
+          table.innerHTML += `
+            <tr>
+              <td class="font-medium text-gray-900">${p.name}</td>
+              <td class="text-gray-600">${p.email}</td>
+              <td>
+                <button class="text-red-600 hover:text-red-800 font-medium" onclick="removeParticipant(${p.id})">
+                  <i class="fas fa-trash mr-1"></i>Remove
+                </button>
+              </td>
+            </tr>`;
+        });
+
+        if (participants.length === 0) {
+          table.innerHTML = `
+            <tr><td colspan="3" class="text-center py-8 text-gray-500">No participants found for this poll</td></tr>
+          `;
+        }
+      } catch (error) {
+        showNotification('Failed to load participants', 'error');
+      }
     }
 
     async function removeParticipant(id) {
-      const res = await fetch('participants.php', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-        body: `action=remove&id=${id}`
-      });
-      const data = await res.json();
-      if (data.status === 'success') loadParticipants();
-      else alert('Failed to remove participant');
+      if (!confirm('Remove this participant?')) return;
+      
+      try {
+        const res = await fetch('participants.php', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+          body: `action=remove&id=${id}`
+        });
+        const data = await res.json();
+        
+        if (data.status === 'success') {
+          showNotification('Participant removed successfully', 'success');
+          loadParticipants();
+          loadDashboard();
+        } else {
+          showNotification('Failed to remove participant', 'error');
+        }
+      } catch (error) {
+        showNotification('Failed to remove participant', 'error');
+      }
     }
 
     document.getElementById('poll-select').addEventListener('change', loadParticipants);
 
     document.getElementById('add-participant-btn').addEventListener('click', async () => {
+      const pollId = document.getElementById('poll-select').value;
+      if (!pollId) {
+        showNotification('Please select a poll first', 'error');
+        return;
+      }
+
       const name = prompt('Enter participant name:');
       const email = prompt('Enter participant email:');
       if (!name || !email) return;
-      const pollId = document.getElementById('poll-select').value;
-      const res = await fetch('participants.php', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-        body: `action=add&poll_id=${pollId}&name=${encodeURIComponent(name)}&email=${encodeURIComponent(email)}`
-      });
-      const data = await res.json();
-      if (data.status === 'success') loadParticipants();
-      else alert('Failed to add participant');
+
+      try {
+        const res = await fetch('participants.php', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+          body: `action=add&poll_id=${pollId}&name=${encodeURIComponent(name)}&email=${encodeURIComponent(email)}`
+        });
+        const data = await res.json();
+        
+        if (data.status === 'success') {
+          showNotification('Participant added successfully', 'success');
+          loadParticipants();
+          loadDashboard();
+        } else {
+          showNotification('Failed to add participant', 'error');
+        }
+      } catch (error) {
+        showNotification('Failed to add participant', 'error');
+      }
     });
 
     // ---- STUDENT COUNCIL ----
     async function loadCouncil() {
-      const res = await fetch('council.php?action=list');
-      const council = await res.json();
-      const list = document.getElementById('council-list');
-      list.innerHTML = '';
-      council.forEach(c => {
-        list.innerHTML += `
-          <div class="bg-white p-4 rounded-lg shadow flex justify-between items-center">
-            <div>
-              <h4 class="font-bold">${c.name}</h4>
-              <p class="text-gray-600 text-sm">${c.role}</p>
-            </div>
-            <button class="text-red-600 hover:underline" onclick="deleteCouncil(${c.id})">Remove</button>
-          </div>`;
-      });
+      try {
+        const res = await fetch('council.php?action=list');
+        const council = await res.json();
+        const list = document.getElementById('council-list');
+        
+        list.innerHTML = '';
+        council.forEach(c => {
+          list.innerHTML += `
+            <div class="council-card p-6">
+              <div class="flex items-center justify-between mb-4">
+                <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
+                  <i class="fas fa-user text-white text-lg"></i>
+                </div>
+                <button class="text-red-500 hover:text-red-700 text-sm" onclick="deleteCouncil(${c.id})">
+                  <i class="fas fa-times"></i>
+                </button>
+              </div>
+              <h4 class="text-lg font-bold text-gray-900 mb-1">${c.name}</h4>
+              <p class="text-gray-600 text-sm mb-3">${c.role}</p>
+              <div class="flex items-center text-xs text-gray-500">
+                <i class="fas fa-user-tie mr-1"></i>
+                <span>Council Member</span>
+              </div>
+            </div>`;
+        });
+
+        if (council.length === 0) {
+          list.innerHTML = `
+            <div class="col-span-full text-center py-12 text-gray-500">
+              <i class="fas fa-user-tie text-4xl mb-4"></i>
+              <p class="text-lg">No council members yet</p>
+              <p class="text-sm">Add your first council member to get started</p>
+            </div>`;
+        }
+      } catch (error) {
+        showNotification('Failed to load council members', 'error');
+      }
     }
 
     document.getElementById('add-council-btn').addEventListener('click', async () => {
       const name = prompt('Enter member name:');
-      const role = prompt('Enter member role:');
+      const role = prompt('Enter member role (e.g., President, Vice President):');
       if (!name || !role) return;
-      const res = await fetch('council.php', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-        body: `action=add&name=${encodeURIComponent(name)}&role=${encodeURIComponent(role)}`
-      });
-      const data = await res.json();
-      if (data.status === 'success') loadCouncil();
-      else alert('Failed to add member');
+
+      try {
+        const res = await fetch('council.php', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+          body: `action=add&name=${encodeURIComponent(name)}&role=${encodeURIComponent(role)}`
+        });
+        const data = await res.json();
+        
+        if (data.status === 'success') {
+          showNotification('Council member added successfully', 'success');
+          loadCouncil();
+          loadDashboard();
+        } else {
+          showNotification('Failed to add council member', 'error');
+        }
+      } catch (error) {
+        showNotification('Failed to add council member', 'error');
+      }
     });
 
     async function deleteCouncil(id) {
-      const res = await fetch('council.php', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-        body: `action=delete&id=${id}`
-      });
-      const data = await res.json();
-      if (data.status === 'success') loadCouncil();
-      else alert('Failed to remove member');
+      if (!confirm('Remove this council member?')) return;
+      
+      try {
+        const res = await fetch('council.php', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+          body: `action=delete&id=${id}`
+        });
+        const data = await res.json();
+        
+        if (data.status === 'success') {
+          showNotification('Council member removed successfully', 'success');
+          loadCouncil();
+          loadDashboard();
+        } else {
+          showNotification('Failed to remove council member', 'error');
+        }
+      } catch (error) {
+        showNotification('Failed to remove council member', 'error');
+      }
     }
 
     // ---- RESULTS ----
     let resultsChart;
     async function loadResults() {
       const pollId = document.getElementById('results-poll-select').value;
-      const res = await fetch(`result.php?poll_id=${pollId}`);
-      const data = await res.json();
-      const labels = data.map(d => d.candidate);
-      const votes = data.map(d => d.votes);
-
-      if (resultsChart) resultsChart.destroy();
-      const ctx = document.getElementById('resultsChart').getContext('2d');
-      resultsChart = new Chart(ctx, {
-        type: 'pie',
-        data: {
-          labels: labels,
-          datasets: [{
-            data: votes,
-            backgroundColor: ['#3b82f6', '#9333ea', '#10b981', '#f59e0b', '#ef4444']
-          }]
+      if (!pollId) {
+        if (resultsChart) {
+          resultsChart.destroy();
+          resultsChart = null;
         }
-      });
+        return;
+      }
+
+      try {
+        const res = await fetch(`result.php?poll_id=${pollId}`);
+        const data = await res.json();
+        
+        if (!data || data.length === 0) {
+          if (resultsChart) {
+            resultsChart.destroy();
+            resultsChart = null;
+          }
+          return;
+        }
+
+        const labels = data.map(d => d.candidate);
+        const votes = data.map(d => d.votes);
+
+        if (resultsChart) resultsChart.destroy();
+        
+        const ctx = document.getElementById('resultsChart').getContext('2d');
+        resultsChart = new Chart(ctx, {
+          type: 'doughnut',
+          data: {
+            labels: labels,
+            datasets: [{
+              data: votes,
+              backgroundColor: [
+                '#3b82f6', '#9333ea', '#10b981', '#f59e0b', '#ef4444',
+                '#8b5cf6', '#06b6d4', '#84cc16', '#f97316', '#ec4899'
+              ],
+              borderWidth: 0,
+              borderRadius: 8
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                position: 'bottom',
+                labels: {
+                  padding: 20,
+                  font: {
+                    family: 'Inter',
+                    size: 14
+                  }
+                }
+              }
+            }
+          }
+        });
+
+        // Update chart container height
+        document.getElementById('resultsChart').style.height = '400px';
+      } catch (error) {
+        showNotification('Failed to load results', 'error');
+      }
     }
 
     document.getElementById('results-poll-select').addEventListener('change', loadResults);
 
-    // ---- INIT ----
+    // ---- INITIALIZATION ----
     async function init() {
-      await loadDashboard();
-      await loadPolls();
-      await loadParticipants();
-      await loadCouncil();
-      await loadResults();
+      try {
+        await loadDashboard();
+        await loadPolls();
+        await loadParticipants();
+        await loadCouncil();
+        await loadResults();
+        
+        showNotification('Dashboard loaded successfully', 'success');
+      } catch (error) {
+        showNotification('Failed to initialize dashboard', 'error');
+      }
     }
 
+    // Logout functionality
+    document.getElementById('logout').addEventListener('click', () => {
+      if (confirm('Are you sure you want to logout?')) {
+        showNotification('Logging out...', 'success');
+        setTimeout(() => {
+          window.location.href = 'login.php';
+        }, 1500);
+      }
+    });
+
+    // Initialize the dashboard
     init();
   </script>
 </body>
-</html> 
+</html>
