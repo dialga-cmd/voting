@@ -32,10 +32,10 @@
             </div>
             <nav class="hidden md:flex space-x-6">
                 <a href="#" class="hover:text-purple-200 transition">Home</a>
-                <a href="#elections" class="hover:text-purple-200 transition">Elections</a>
-                <a href="#results" class="hover:text-purple-200 transition">Results</a>
-                <a href="#council" class="hover:text-purple-200 transition">Council</a>
-                <a href="admin_dashboard.php" class="hover:text-yellow-300 font-semibold">Admin</a>
+                <a href="poll.html" class="hover:text-purple-200 transition">Elections</a>
+                <a href="results.html" class="hover:text-purple-200 transition">Results</a>
+                <a href="council.html" class="hover:text-purple-200 transition">Council</a>
+                <a href="admin.html" class="hover:text-yellow-300 font-semibold">Admin</a>
             </nav>
             <div class="flex items-center space-x-4">
                 <div class="login-section">
@@ -56,10 +56,10 @@
 <!-- Mobile menu -->
 <div id="mobile-menu" class="hidden md:hidden bg-purple-800 px-4 py-2">
     <a href="#" class="block py-2 hover:text-purple-200 transition">Home</a>
-    <a href="#elections" class="block py-2 hover:text-purple-200 transition">Elections</a>
-    <a href="#results" class="block py-2 hover:text-purple-200 transition">Results</a>
-    <a href="#council" class="block py-2 hover:text-purple-200 transition">Council</a>
-    <a href="admin_dashboard.php" class="block py-2 text-yellow-300 font-semibold">Admin</a>
+    <a href="poll.html" class="block py-2 hover:text-purple-200 transition">Elections</a>
+    <a href="results.html" class="block py-2 hover:text-purple-200 transition">Results</a>
+    <a href="council.html" class="block py-2 hover:text-purple-200 transition">Council</a>
+    <a href="admin.html" class="block py-2 text-yellow-300 font-semibold">Admin</a>
 </div>
 
 <!-- MAIN CONTENT -->
@@ -70,8 +70,7 @@
         <h2 class="text-3xl md:text-4xl font-bold mb-4">Make Your Voice Heard</h2>
         <p class="text-lg md:text-xl mb-6">Participate in our secure online voting system. Your vote matters in shaping the future.</p>
         <div class="flex flex-col sm:flex-row justify-center gap-4">
-            <a href="#elections" class="bg-white text-purple-600 px-6 py-3 rounded-full font-medium hover:bg-purple-100 transition">View Current Elections</a>
-            <a href="#how-it-works" class="border-2 border-white text-white px-6 py-3 rounded-full font-medium hover:bg-white hover:text-purple-600 transition">How It Works</a>
+            <a href="poll.html" class="bg-white text-purple-600 px-6 py-3 rounded-full font-medium hover:bg-purple-100 transition">View Current Elections</a>
         </div>
     </section>
 
@@ -116,9 +115,9 @@
                 <h4 class="font-bold mb-4">Quick Links</h4>
                 <ul class="space-y-2">
                     <li><a href="#" class="text-gray-400 hover:text-white transition">Home</a></li>
-                    <li><a href="#elections" class="text-gray-400 hover:text-white transition">Elections</a></li>
-                    <li><a href="#results" class="text-gray-400 hover:text-white transition">Results</a></li>
-                    <li><a href="#council" class="text-gray-400 hover:text-white transition">Council</a></li>
+                    <li><a href="poll.html" class="text-gray-400 hover:text-white transition">Elections</a></li>
+                    <li><a href="results.html" class="text-gray-400 hover:text-white transition">Results</a></li>
+                    <li><a href="council.html" class="text-gray-400 hover:text-white transition">Council</a></li>
                 </ul>
             </div>
             <div>
@@ -153,49 +152,49 @@
 </footer>
 
 <script>
-document.addEventListener("DOMContentLoaded", function() {
-    // Fetch polls
-    fetch("poll.php?action=list")
+document.addEventListener("DOMContentLoaded", function () {
+    // Fetch active polls
+    fetch('poll.php?action=list')
         .then(res => res.json())
-        .then(data => {
-            const pollList = document.getElementById("poll-list");
-            pollList.innerHTML = data.map(poll => `
-                <div class="bg-white rounded-xl shadow-md overflow-hidden transition duration-300 card-hover p-6">
-                    <h3 class="text-xl font-bold text-gray-800 mb-2">${poll.title}</h3>
-                    <p class="text-gray-600 mb-4">${poll.status} ( ${poll.start_date} to ${poll.end_date} )</p>
-                    <button class="w-full ${poll.status === 'Ongoing' ? 'gradient-bg text-white' : 'bg-gray-300 text-gray-700 cursor-not-allowed'} py-2 px-4 rounded-lg font-medium hover:opacity-90 transition"
-                        ${poll.status !== 'Ongoing' ? 'disabled' : ''}>${poll.status === 'Ongoing' ? 'View Candidates' : 'Coming Soon'}</button>
-                </div>
-            `).join('');
-        });
-
-    // Fetch results
-    fetch("result.php")
-        .then(res => res.json())
-        .then(data => {
-            const resultList = document.getElementById("results-list");
-            resultList.innerHTML = data.map(r => `
-                <div class="bg-white rounded-xl shadow-md p-6 card-hover">
-                    <h3 class="text-lg font-bold text-gray-800">${r.title}</h3>
-                    <p class="text-gray-600">Winner: <strong>${r.winner}</strong> with ${r.max_votes} votes</p>
-                </div>
-            `).join('');
-        });
+        .then(polls => {
+            const pollContainer = document.getElementById('polls-container');
+            if (pollContainer) {
+                pollContainer.innerHTML = '';
+                polls.forEach(poll => {
+                    pollContainer.innerHTML += `
+                        <div class="bg-white rounded-xl shadow-md p-6 card-hover">
+                            <h3 class="text-xl font-bold text-gray-800 mb-2">${poll.title}</h3>
+                            <p class="text-gray-600 mb-4">
+                                ${poll.start_date} to ${poll.end_date}
+                            </p>
+                            <button class="w-full gradient-bg text-white py-2 px-4 rounded-lg hover:opacity-90 transition font-medium"
+                                onclick="viewPoll(${poll.id})">View Candidates</button>
+                        </div>
+                    `;
+                });
+            }
+        })
+        .catch(err => console.error('Poll fetch error:', err));
 
     // Fetch student council
-    fetch("council.php?action=list")
+    fetch('council.php?action=list')
         .then(res => res.json())
-        .then(data => {
-            const councilList = document.getElementById("council-list");
-            councilList.innerHTML = data.map(member => `
-                <div class="bg-white rounded-xl shadow-md p-6 card-hover">
-                    <h3 class="text-lg font-bold text-gray-800">${member.name}</h3>
-                    <p class="text-gray-600">${member.position}</p>
-                </div>
-            `).join('');
-        });
+        .then(members => {
+            const councilContainer = document.getElementById('council-container');
+            if (councilContainer) {
+                councilContainer.innerHTML = '';
+                members.forEach(member => {
+                    councilContainer.innerHTML += `
+                        <li class="flex justify-between py-2 border-b">
+                            <span>${member.name}</span>
+                            <span class="text-gray-500">${member.position}</span>
+                        </li>
+                    `;
+                });
+            }
+        })
+        .catch(err => console.error('Council fetch error:', err));
 });
 </script>
-
 </body>
 </html>
