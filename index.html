@@ -516,127 +516,223 @@
 // ================= MOBILE MENU =================
 const mobileBtn = document.getElementById('mobile-menu-btn');
 if (mobileBtn) {
-    mobileBtn.addEventListener('click', function () {
-        const menu = document.getElementById('mobile-menu');
-        menu.classList.toggle('hidden');
-    });
+  mobileBtn.addEventListener('click', function () {
+    const menu = document.getElementById('mobile-menu');
+    if (menu) menu.classList.toggle('hidden');
+  });
 }
 
 // ================= FETCH DATA =================
 document.addEventListener("DOMContentLoaded", function () {
-    // Fetch active polls
-    fetch('backend/poll.php?action=list')
-        .then(res => res.json())
-        .then(polls => {
-            const pollContainer = document.getElementById('poll-list');
-            if (pollContainer) {
-                pollContainer.innerHTML = '';
-                polls.forEach(poll => {
-                    pollContainer.innerHTML += `
-                    <div class="bg-white/90 rounded-xl shadow p-6 border card-hover">
-                        <h3 class="text-lg font-bold text-gray-800 mb-2">${poll.title}</h3>
-                        <p class="text-sm text-gray-600 mb-2">
-                            <i class="fas fa-calendar-alt text-purple-500 mr-2"></i> ${poll.start_date} → ${poll.end_date}
-                        </p>
-                        <button class="w-full bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white py-3 px-4 rounded-lg text-sm font-medium shadow-sm transition"
-                            onclick="viewPoll(${poll.id})">View Candidates</button>
-                    </div>
-                    `;
-                });
-            }
-        })
-        .catch(err => console.error('Poll fetch error:', err));
+// ================= CHECK SESSION =================
+async function checkSession() {
+  try {
+    const res = await fetch("backend/me.php");
+    const data = await res.json();
 
-    // Fetch student council
-    fetch('backend/council.php?action=list')
-        .then(res => res.json())
-        .then(members => {
-            const councilContainer = document.getElementById('council-list');
-            if (councilContainer) {
-                councilContainer.innerHTML = '';
-                members.forEach(member => {
-                    councilContainer.innerHTML += `
-                        <div class="bg-white rounded-xl shadow-md p-4 card-hover">
-                            <h3 class="text-lg font-bold text-gray-800">${member.name}</h3>
-                            <p class="text-gray-600">${member.position}</p>
-                        </div>
-                    `;
-                });
-            }
-        })
-        .catch(err => console.error('Council fetch error:', err));
+    if (data.loggedIn) {
+      document.getElementById("user-email").textContent = data.email;
+      document.getElementById("login-btn").classList.add("hidden");
+      document.querySelector(".user-section").classList.remove("hidden");
+    } else {
+      document.getElementById("login-btn").classList.remove("hidden");
+      document.querySelector(".user-section").classList.add("hidden");
+    }
+  } catch (err) {
+    console.error("Session check failed:", err);
+  }
+}
+
+// ================= FETCH DATA =================
+document.addEventListener("DOMContentLoaded", function () {
+  // Run session check first
+  checkSession();
+
+  // Fetch active polls
+  fetch('backend/poll.php?action=list')
+    .then(res => res.json())
+    .then(polls => {
+      const pollContainer = document.getElementById('poll-list');
+      if (pollContainer) {
+        pollContainer.innerHTML = '';
+        polls.forEach(poll => {
+          pollContainer.innerHTML += `
+            <div class="bg-white/90 rounded-xl shadow p-6 border card-hover">
+              <h3 class="text-lg font-bold text-gray-800 mb-2">${poll.title}</h3>
+              <p class="text-sm text-gray-600 mb-2">
+                <i class="fas fa-calendar-alt text-purple-500 mr-2"></i> ${poll.start_date} → ${poll.end_date}
+              </p>
+              <button class="w-full bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white py-3 px-4 rounded-lg text-sm font-medium shadow-sm transition"
+                onclick="viewPoll(${poll.id})">View Candidates</button>
+            </div>
+          `;
+        });
+      }
+    })
+    .catch(err => console.error('Poll fetch error:', err));
 });
 
-// ================= POPUP & TABS =================
+  // Fetch student council
+  fetch('backend/council.php?action=list')
+    .then(res => res.json())
+    .then(members => {
+      const councilContainer = document.getElementById('council-list');
+      if (councilContainer) {
+        councilContainer.innerHTML = '';
+        members.forEach(member => {
+          councilContainer.innerHTML += `
+            <div class="bg-white rounded-xl shadow-md p-4 card-hover">
+              <h3 class="text-lg font-bold text-gray-800">${member.name}</h3>
+              <p class="text-gray-600">${member.position}</p>
+            </div>
+          `;
+        });
+      }
+    })
+    .catch(err => console.error('Council fetch error:', err));
+
+  // Restore auth UI on load
+  restoreSession();
+});
+
+// ================= POPUP (OPEN/CLOSE) =================
 function showPopup() {
-    const el = document.getElementById('popupOverlay');
-    el.classList.remove('hidden');
-    el.style.display = "flex";   // ✅ force visible
-    el.style.visibility = "visible";
-    el.style.opacity = 1;
-    document.body.style.overflow = 'hidden';
+  const el = document.getElementById('popupOverlay');
+  if (!el) return;
+  el.classList.remove('hidden');
+  el.style.display = "flex";      // force visible
+  el.style.visibility = "visible";
+  el.style.opacity = 1;
+  document.body.style.overflow = 'hidden';
 }
 function hidePopup() {
-    const el = document.getElementById('popupOverlay');
-    el.classList.add('hidden');
-    el.style.display = "none";   // ✅ force hidden
-    el.style.visibility = "hidden";
-    el.style.opacity = 0;
-    document.body.style.overflow = 'auto';
+  const el = document.getElementById('popupOverlay');
+  if (!el) return;
+  el.classList.add('hidden');
+  el.style.display = "none";      // force hidden
+  el.style.visibility = "hidden";
+  el.style.opacity = 0;
+  document.body.style.overflow = 'auto';
 }
-document.getElementById('popupOverlay').addEventListener('click', (e) => {
-    if (e.target === e.currentTarget) hidePopup();
-});
-document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') hidePopup();
-});
+const overlayEl = document.getElementById('popupOverlay');
+if (overlayEl) {
+  overlayEl.addEventListener('click', (e) => { if (e.target === e.currentTarget) hidePopup(); });
+}
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') hidePopup(); });
 
-// Tab switching
-document.querySelectorAll('.tab').forEach(tab => {
-  tab.addEventListener('click', () => {
-    const tabName = tab.dataset.tab;
-
-    // Reset tab buttons
-    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-    tab.classList.add('active');
-
-    // Hide all forms
-    document.querySelectorAll('.form').forEach(f => f.classList.add('hidden'));
-
-    // Show correct form
-    const formToShow = document.getElementById(tabName + "Form");
-    if (formToShow) {
-      formToShow.classList.remove("hidden");
-    }
-  });
-});
-
-
-// Password toggle
+// ================= INPUT UX =================
 function togglePassword(fieldId) {
-    const field = document.getElementById(fieldId);
-    const toggle = field.nextElementSibling;
-    if (field.type === 'password') {
-        field.type = 'text';
-        toggle.textContent = '🙈';
-    } else {
-        field.type = 'password';
-        toggle.textContent = '👁️';
-    }
+  const field = document.getElementById(fieldId);
+  if (!field) return;
+  const toggle = field.nextElementSibling;
+  if (field.type === 'password') {
+    field.type = 'text';
+    if (toggle) toggle.textContent = '🙈';
+  } else {
+    field.type = 'password';
+    if (toggle) toggle.textContent = '👁️';
+  }
 }
-
-// Input focus animation
 document.querySelectorAll('input').forEach(input => {
-    input.addEventListener('focus', () => input.parentElement.style.transform = 'scale(1.02)');
-    input.addEventListener('blur', () => input.parentElement.style.transform = 'scale(1)');
+  input.addEventListener('focus', () => input.parentElement && (input.parentElement.style.transform = 'scale(1.02)'));
+  input.addEventListener('blur', () => input.parentElement && (input.parentElement.style.transform = 'scale(1)'));
 });
 
-// ================= LOGIN / SIGNUP / LOGOUT =================
+const USERS_KEY = 've_users';
+const SESSION_KEY = 've_session';
 
-// Login form submit
+function loadUsers() {
+  try { return JSON.parse(localStorage.getItem(USERS_KEY)) || {}; }
+  catch { return {}; }
+}
+function saveUsers(users) {
+  localStorage.setItem(USERS_KEY, JSON.stringify(users));
+}
+function setSession(email) {
+  localStorage.setItem(SESSION_KEY, email);
+}
+function clearSession() {
+  localStorage.removeItem(SESSION_KEY);
+}
+function getSessionEmail() {
+  return localStorage.getItem(SESSION_KEY) || null;
+}
+
+// Web Crypto helpers for salted SHA-256
+function uint8ToB64(arr) {
+  let s = '';
+  arr.forEach(b => s += String.fromCharCode(b));
+  return btoa(s);
+}
+function genSaltB64() {
+  const bytes = new Uint8Array(16);
+  crypto.getRandomValues(bytes);
+  return uint8ToB64(bytes);
+}
+async function hashPassword(password, saltB64) {
+  const enc = new TextEncoder();
+  const data = enc.encode(`${password}:${saltB64}`);
+  const buf = await crypto.subtle.digest('SHA-256', data);
+  return uint8ToB64(new Uint8Array(buf));
+}
+
+// UI helpers
+function updateAuthUI(user) {
+  const loginBtn = document.getElementById('login-btn');
+  const userSection = document.querySelector('.user-section');
+  const userEmailEl = document.getElementById('user-email');
+
+  if (user) {
+    if (userEmailEl) userEmailEl.textContent = user.username || user.email;
+    if (loginBtn) loginBtn.classList.add('hidden');
+    if (userSection) userSection.classList.remove('hidden');
+  } else {
+    if (userEmailEl) userEmailEl.textContent = '';
+    if (loginBtn) loginBtn.classList.remove('hidden');
+    if (userSection) userSection.classList.add('hidden');
+  }
+}
+
+function restoreSession() {
+  const email = getSessionEmail();
+  const users = loadUsers();
+  const user = email ? users[email.toLowerCase()] : null;
+  updateAuthUI(user || null);
+}
+
+// ============ SIGNUP ============
+document.getElementById("signupForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const email = document.getElementById("signupEmail").value.trim();
+    const password = document.getElementById("signupPassword").value;
+    const confirmPassword = document.getElementById("confirmPassword").value;
+
+    if (password !== confirmPassword) {
+        return alert("Passwords do not match!");
+    }
+
+    try {
+        const res = await fetch("backend/register.php", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, password })
+        });
+        const data = await res.json();
+        if (data.success) {
+            alert("Account created! Please log in.");
+        } else {
+            alert(data.message);
+        }
+    } catch (err) {
+        console.error("Signup error:", err);
+        alert("Server error, try again later.");
+    }
+});
+
+// ============ LOGIN ============
 document.getElementById("loginForm").addEventListener("submit", async (e) => {
     e.preventDefault();
-    const email = document.getElementById("loginEmail").value;
+    const email = document.getElementById("loginEmail").value.trim();
     const password = document.getElementById("loginPassword").value;
 
     try {
@@ -653,53 +749,17 @@ document.getElementById("loginForm").addEventListener("submit", async (e) => {
             document.querySelector(".user-section").classList.remove("hidden");
             hidePopup();
         } else {
-            alert(data.message || "Invalid credentials");
+            alert(data.message);
         }
     } catch (err) {
         console.error("Login error:", err);
-        alert("Server error. Please try again later.");
+        alert("Server error, try again later.");
     }
 });
 
-// Signup form submit
-document.getElementById("signupForm").addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const email = document.getElementById("signupEmail").value;
-    const password = document.getElementById("signupPassword").value;
-    const confirmPassword = document.getElementById("confirmPassword").value;
-
-    if (password !== confirmPassword) {
-        alert("Passwords do not match!");
-        return;
-    }
-
-    try {
-        const res = await fetch("backend/register.php", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ email, password })
-        });
-        const data = await res.json();
-
-        if (data.success) {
-            alert("Account created successfully! Please log in.");
-            document.querySelector('[data-tab="login"]').click();
-        } else {
-            alert(data.message || "Registration failed");
-        }
-    } catch (err) {
-        console.error("Signup error:", err);
-        alert("Server error. Please try again later.");
-    }
-});
-
-// Logout button
+// ============ LOGOUT ============
 document.getElementById("logout-btn").addEventListener("click", async () => {
-    try {
-        await fetch("backend/logout.php", { method: "POST" });
-    } catch (err) {
-        console.error("Logout error:", err);
-    }
+    await fetch("backend/logout.php", { method: "POST" });
     document.getElementById("login-btn").classList.remove("hidden");
     document.querySelector(".user-section").classList.add("hidden");
 });
