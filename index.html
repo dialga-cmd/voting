@@ -597,7 +597,11 @@ document.querySelectorAll('.tab').forEach(tab => {
         const tabName = tab.dataset.tab;
         document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
         tab.classList.add('active');
-        document.querySelectorAll('.form').forEach(form => form.classList.add('hidden'));
+
+        // Hide all forms
+        document.querySelectorAll('.form').forEach(f => f.classList.add('hidden'));
+
+        // Show the selected form
         document.getElementById(tabName + 'Form').classList.remove('hidden');
     });
 });
