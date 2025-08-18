@@ -595,14 +595,19 @@ document.addEventListener('keydown', (e) => {
 document.querySelectorAll('.tab').forEach(tab => {
     tab.addEventListener('click', () => {
         const tabName = tab.dataset.tab;
+
+        // update tab buttons
         document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
         tab.classList.add('active');
 
-        // Hide all forms
+        // hide all forms
         document.querySelectorAll('.form').forEach(f => f.classList.add('hidden'));
 
-        // Show the selected form
-        document.getElementById(tabName + 'Form').classList.remove('hidden');
+        // show only the selected one
+        const activeForm = document.getElementById(tabName + "Form");
+        if (activeForm) {
+            activeForm.classList.remove("hidden");
+        }
     });
 });
 
