@@ -7,7 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* ===============================
+/* ===============================
    Base Site Styles (Polls, Cards, Buttons)
    =============================== */
 .gradient-bg {
@@ -131,6 +131,7 @@
   font-size: 15px;
   transition: all 0.2s ease;
   background: #fafafa;
+  color: #111; /* FIXED: ensure text is visible */
 }
 .form-group input:focus {
   outline: none;
@@ -494,10 +495,13 @@
 </footer>
 <script>
 // ================= MOBILE MENU =================
-document.getElementById('mobile-menu-btn').addEventListener('click', function() {
-    const menu = document.getElementById('mobile-menu');
-    menu.classList.toggle('hidden');
-});
+const mobileBtn = document.getElementById('mobile-menu-btn');
+if(mobileBtn){
+    mobileBtn.addEventListener('click', function() {
+        const menu = document.getElementById('mobile-menu');
+        menu.classList.toggle('hidden');
+    });
+}
 
 // ================= FETCH DATA =================
 document.addEventListener("DOMContentLoaded", function () {
@@ -510,15 +514,13 @@ document.addEventListener("DOMContentLoaded", function () {
                 pollContainer.innerHTML = '';
                 polls.forEach(poll => {
                     pollContainer.innerHTML += `
-                    <div class="bg-white rounded-2xl shadow-lg overflow-hidden card-hover border border-gray-100" style="min-height: 220px;">
-                        <div class="p-6">
-                        <h3 class="text-xl font-bold text-gray-800 mb-2">${poll.title}</h3>
-                        <p class="text-gray-600 mb-4 text-sm">
-                            <i class="fas fa-calendar-alt text-purple-500 mr-1"></i> ${poll.start_date} → ${poll.end_date}
+                    <div class="bg-white/90 rounded-xl shadow p-6 border card-hover">
+                        <h3 class="text-lg font-bold text-gray-800 mb-2">${poll.title}</h3>
+                        <p class="text-sm text-gray-600 mb-2">
+                            <i class="fas fa-calendar-alt text-purple-500 mr-2"></i> ${poll.start_date} → ${poll.end_date}
                         </p>
                         <button class="w-full bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white py-3 px-4 rounded-lg text-sm font-medium shadow-sm transition"
                             onclick="viewPoll(${poll.id})">View Candidates</button>
-                        </div>
                     </div>
                     `;
                 });
@@ -561,7 +563,6 @@ document.getElementById('popupOverlay').addEventListener('click', (e) => {
 document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') hidePopup();
 });
-document.getElementById("login-btn").addEventListener("click", showPopup);
 
 // Tab switching
 document.querySelectorAll('.tab').forEach(tab => {
@@ -591,78 +592,6 @@ function togglePassword(fieldId) {
 document.querySelectorAll('input').forEach(input => {
     input.addEventListener('focus', () => input.parentElement.style.transform = 'scale(1.02)');
     input.addEventListener('blur', () => input.parentElement.style.transform = 'scale(1)');
-});
-
-// ================= LOGIN / SIGNUP / LOGOUT =================
-// Login
-document.getElementById("loginForm").addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const email = document.getElementById("loginEmail").value;
-    const password = document.getElementById("loginPassword").value;
-
-    try {
-        const res = await fetch("backend/login.php", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ email, password })
-        });
-        const data = await res.json();
-
-        if (data.success) {
-            document.getElementById("user-email").textContent = data.email;
-            document.querySelector(".login-section").style.display = "none";
-            document.querySelector(".user-section").style.display = "flex";
-            hidePopup();
-        } else {
-            alert(data.message || "Invalid credentials");
-        }
-    } catch (err) {
-        console.error("Login error:", err);
-        alert("Server error. Please try again later.");
-    }
-});
-
-// Signup
-document.getElementById("signupForm").addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const email = document.getElementById("signupEmail").value;
-    const password = document.getElementById("signupPassword").value;
-    const confirmPassword = document.getElementById("confirmPassword").value;
-
-    if (password !== confirmPassword) {
-        alert("Passwords do not match!");
-        return;
-    }
-
-    try {
-        const res = await fetch("backend/register.php", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ email, password })
-        });
-        const data = await res.json();
-
-        if (data.success) {
-            alert("Account created successfully! Please log in.");
-            document.querySelector('[data-tab="login"]').click();
-        } else {
-            alert(data.message || "Registration failed");
-        }
-    } catch (err) {
-        console.error("Signup error:", err);
-        alert("Server error. Please try again later.");
-    }
-});
-
-// Logout
-document.getElementById("logout-btn").addEventListener("click", async () => {
-    try {
-        await fetch("backend/logout.php", { method: "POST" });
-    } catch (err) {
-        console.error("Logout error:", err);
-    }
-    document.querySelector(".login-section").style.display = "block";
-    document.querySelector(".user-section").style.display = "none";
 });
 </script>
 </body>
