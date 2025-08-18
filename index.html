@@ -230,7 +230,6 @@
 <canvas id="confetti-canvas" class="hidden"></canvas>
 
 <!-- Header -->
-<!-- Header -->
 <header class="gradient-bg text-white shadow-lg">
   <div class="container mx-auto px-4 py-4 flex justify-between items-center">
     
@@ -240,20 +239,20 @@
       <h1 class="text-2xl font-bold">VoteEasy</h1>
     </div>
 
-    <!-- Desktop Navigation -->
-    <nav class="hidden md:flex space-x-6">
+    <!-- Desktop Navigation + Login -->
+    <div class="hidden md:flex items-center space-x-6">
       <a href="index.html" class="hover:text-purple-200 transition">Home</a>
       <a href="poll.html" class="hover:text-purple-200 transition">Elections</a>
       <a href="results.html" class="hover:text-purple-200 transition">Results</a>
       <a href="about.html" class="hover:text-purple-200 transition">About Us</a>
       <a href="admin.php" class="hover:text-yellow-300 font-semibold">Admin</a>
-    </nav>
 
-    <!-- Right Login/Signup Button -->
-    <button class="hidden md:inline-block bg-white text-purple-600 px-4 py-2 rounded-lg font-semibold shadow hover:bg-purple-100 transition"
-      onclick="showPopup()">
-      Login / Sign Up
-    </button>
+      <!-- Login Button -->
+      <button class="bg-white text-purple-600 px-4 py-2 rounded-lg font-semibold shadow hover:bg-purple-100 transition"
+        onclick="showPopup()">
+        Login / Sign Up
+      </button>
+    </div>
 
     <!-- Mobile Hamburger -->
     <button id="mobile-menu-btn" class="md:hidden text-white text-2xl focus:outline-none">
