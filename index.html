@@ -453,62 +453,62 @@
 <!-- ================= LOGIN / SIGNUP POPUP ================= -->
 <div id="popupOverlay"
   class="hidden fixed inset-0 w-full h-full bg-black/60 flex items-center justify-center z-50">
-  <div class="bg-white rounded-xl shadow-lg w-full max-w-md p-6 relative">
+  <div class="bg-white rounded-xl shadow-lg w-full max-w-4xl p-8 relative flex">
     <!-- Close -->
     <button onclick="hidePopup()" class="absolute top-3 right-3 text-gray-500 hover:text-gray-700">✖</button>
 
-    <!-- Tabs -->
-    <div class="flex justify-center mb-6 space-x-6">
-      <button type="button" class="tab active font-medium" data-tab="login">Login</button>
-      <button type="button" class="tab font-medium" data-tab="signup">Sign Up</button>
+    <!-- Login (Left Half) -->
+    <div class="w-1/2 pr-6 border-r">
+      <h2 class="text-xl font-bold mb-4 text-purple-700">Login</h2>
+      <form id="loginForm" class="space-y-4">
+        <div>
+          <label for="loginUsername" class="block text-sm font-medium">Username</label>
+          <input id="loginUsername" type="username" required
+            class="w-full border rounded px-3 py-2 focus:outline-none">
+        </div>
+        <div>
+          <label for="loginPassword" class="block text-sm font-medium">Password</label>
+          <div class="flex items-center border rounded">
+            <input id="loginPassword" type="password" required
+              class="w-full px-3 py-2 focus:outline-none">
+            <span class="px-2 cursor-pointer" onclick="togglePassword('loginPassword')">👁️</span>
+          </div>
+        </div>
+        <button type="submit"
+          class="w-full bg-purple-600 text-white rounded px-4 py-2 font-medium hover:bg-purple-700">
+          Login
+        </button>
+      </form>
     </div>
 
-    <!-- Login Form -->
-    <form id="loginForm" class="form active space-y-4">
-      <div>
-        <label for="loginEmail" class="block text-sm font-medium">Email</label>
-        <input id="loginEmail" type="email" required
-          class="w-full border rounded px-3 py-2 focus:outline-none">
-      </div>
-      <div>
-        <label for="loginPassword" class="block text-sm font-medium">Password</label>
-        <div class="flex items-center border rounded">
-          <input id="loginPassword" type="password" required
-            class="w-full px-3 py-2 focus:outline-none">
-          <span class="px-2 cursor-pointer" onclick="togglePassword('loginPassword')">👁️</span>
+    <!-- Sign Up (Right Half) -->
+    <div class="w-1/2 pl-6">
+      <h2 class="text-xl font-bold mb-4 text-green-700">Sign Up</h2>
+      <form id="signupForm" class="space-y-4">
+        <div>
+          <label for="signupUsername" class="block text-sm font-medium">Username</label>
+          <input id="signupUsername" type="username" required
+            class="w-full border rounded px-3 py-2 focus:outline-none">
         </div>
-      </div>
-      <button type="submit"
-        class="w-full bg-purple-600 text-white rounded px-4 py-2 font-medium hover:bg-purple-700">
-        Login
-      </button>
-    </form>
-
-    <!-- Signup Form -->
-    <form id="signupForm" class="form hidden space-y-4">
-      <div>
-        <label for="signupEmail" class="block text-sm font-medium">Email</label>
-        <input id="signupEmail" type="email" required
-          class="w-full border rounded px-3 py-2 focus:outline-none">
-      </div>
-      <div>
-        <label for="signupPassword" class="block text-sm font-medium">Password</label>
-        <div class="flex items-center border rounded">
-          <input id="signupPassword" type="password" required
-            class="w-full px-3 py-2 focus:outline-none">
-          <span class="px-2 cursor-pointer" onclick="togglePassword('signupPassword')">👁️</span>
+        <div>
+          <label for="signupPassword" class="block text-sm font-medium">Password</label>
+          <div class="flex items-center border rounded">
+            <input id="signupPassword" type="password" required
+              class="w-full px-3 py-2 focus:outline-none">
+            <span class="px-2 cursor-pointer" onclick="togglePassword('signupPassword')">👁️</span>
+          </div>
         </div>
-      </div>
-      <div>
-        <label for="confirmPassword" class="block text-sm font-medium">Confirm Password</label>
-        <input id="confirmPassword" type="password" required
-          class="w-full border rounded px-3 py-2 focus:outline-none">
-      </div>
-      <button type="submit"
-        class="w-full bg-green-600 text-white rounded px-4 py-2 font-medium hover:bg-green-700">
-        Sign Up
-      </button>
-    </form>
+        <div>
+          <label for="confirmPassword" class="block text-sm font-medium">Confirm Password</label>
+          <input id="confirmPassword" type="password" required
+            class="w-full border rounded px-3 py-2 focus:outline-none">
+        </div>
+        <button type="submit"
+          class="w-full bg-green-600 text-white rounded px-4 py-2 font-medium hover:bg-green-700">
+          Sign Up
+        </button>
+      </form>
+    </div>
   </div>
 </div>
 
