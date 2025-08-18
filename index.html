@@ -222,76 +222,7 @@
   .popup-container { margin: 0 10px; }
   .form-container { padding: 18px; }
 }
-
-/* Header styles */
-.site-header {
-  background: linear-gradient(135deg, #4f46e5, #7c3aed);
-  color: white;
-  padding: 12px 20px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-}
-
-.header-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.logo {
-  display: flex;
-  align-items: center;
-  font-size: 22px;
-  font-weight: bold;
-}
-
-.logo i {
-  margin-right: 8px;
-  font-size: 24px;
-}
-
-.nav-links {
-  display: flex;
-  gap: 20px;
-}
-
-.nav-links a {
-  color: white;
-  text-decoration: none;
-  font-weight: 500;
-  transition: color 0.2s;
-}
-
-.nav-links a:hover {
-  color: #e9d5ff; /* light purple hover */
-}
-
-.nav-links .admin-link {
-  color: #ffd966; /* yellow highlight for Admin */
-  font-weight: 600;
-}
-
-.login-btn {
-  background: white;
-  color: #4f46e5;
-  border: none;
-  padding: 8px 16px;
-  font-size: 15px;
-  font-weight: 600;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: background 0.2s, transform 0.1s;
-}
-
-.login-btn:hover {
-  background: #f3f3f3;
-}
-
-.login-btn:active {
-  transform: scale(0.97);
-}
-    </style>
+</style>
 </head>
 <body class="bg-gray-100 font-sans user-logged-out">
 
@@ -299,29 +230,35 @@
 <canvas id="confetti-canvas" class="hidden"></canvas>
 
 <!-- Header -->
-<header class="site-header">
-  <div class="header-container">
-    
-    <!-- Logo -->
-    <div class="logo">
-      <i class="fas fa-vote-yea"></i>
-      <span>VoteEasy</span>
+<header class="gradient-bg text-white shadow-lg">
+    <div class="container mx-auto px-4 py-4">
+        <div class="flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <i class="fas fa-vote-yea text-2xl"></i>
+                <h1 class="text-2xl font-bold">VoteEasy</h1>
+            </div>
+            <nav class="hidden md:flex space-x-6">
+                <a href="index.html" class="hover:text-purple-200 transition">Home</a>
+                <a href="poll.html" class="hover:text-purple-200 transition">Elections</a>
+                <a href="result.html" class="hover:text-purple-200 transition">Results</a>
+                <a href="about.html" class="text-yellow-300 font-semibold">About</a>
+                <a href="admin_dashboard.php" class="hover:text-yellow-300 transition">Admin</a>
+            </nav>
+            <div class="flex items-center space-x-4">
+                <div class="login-section">
+                    <button id="login-btn" class="bg-white text-purple-600 px-4 py-2 rounded-full font-medium hover:bg-purple-100 transition">
+                        Login
+                    </button>
+                </div>
+                <div class="user-section flex items-center space-x-4">
+                    <span class="text-purple-100">Welcome, <span id="user-email"></span></span>
+                    <button id="logout-btn" class="bg-purple-800 text-white px-4 py-2 rounded-full font-medium hover:bg-purple-900 transition">Logout</button>
+                </div>
+                <button class="md:hidden text-2xl" id="mobile-menu-btn"><i class="fas fa-bars"></i></button>
+            </div>
+        </div>
     </div>
-
-    <!-- Navigation -->
-    <nav class="nav-links">
-      <a href="index.html">Home</a>
-      <a href="poll.html">Elections</a>
-      <a href="results.html">Results</a>
-      <a href="about.html">About Us</a>
-      <a href="admin.php" class="admin-link">Admin</a>
-    </nav>
-
-    <!-- Login Button -->
-    <button class="login-btn" onclick="showPopup()">Login / Sign Up</button>
-
-  </div>
-</header>
+</header>   
 
 <!-- Mobile menu -->
 <div id="mobile-menu" class="hidden md:hidden bg-purple-800 px-4 py-2">
