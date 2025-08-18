@@ -276,8 +276,49 @@ document.getElementById('mobile-menu-btn').addEventListener('click', function() 
     const menu = document.getElementById('mobile-menu');
     menu.classList.toggle('hidden');
 });
+
 document.addEventListener("DOMContentLoaded", function () {
-    // Fetch active polls
+    // === LOGIN / LOGOUT HANDLERS ===
+    const loginBtn = document.getElementById("login-btn");
+    const logoutBtn = document.getElementById("logout-btn");
+
+    if (loginBtn) {
+        loginBtn.addEventListener("click", () => {
+            const email = prompt("Enter email:");
+            const password = prompt("Enter password:");
+            if (!email || !password) return;
+
+            fetch("backend/login.php", {
+                method: "POST",
+                headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                body: `email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === "success") {
+                    document.body.classList.remove("user-logged-out");
+                    document.body.classList.add("user-logged-in");
+                    document.getElementById("user-email").textContent = data.email;
+                    alert("Login successful!");
+                } else {
+                    alert("Login failed: " + data.message);
+                }
+            })
+            .catch(err => console.error("Login error:", err));
+        });
+    }
+
+    if (logoutBtn) {
+        logoutBtn.addEventListener("click", () => {
+            fetch("backend/logout.php")
+                .then(() => {
+                    document.body.classList.add("user-logged-out");
+                    document.body.classList.remove("user-logged-in");
+                });
+        });
+    }
+
+    // === FETCH ACTIVE POLLS ===
     fetch('backend/poll.php?action=list')
         .then(res => res.json())
         .then(polls => {
@@ -302,7 +343,7 @@ document.addEventListener("DOMContentLoaded", function () {
         })
         .catch(err => console.error('Poll fetch error:', err));
 
-    // Fetch student council
+    // === FETCH STUDENT COUNCIL ===
     fetch('backend/council.php?action=list')
         .then(res => res.json())
         .then(members => {
