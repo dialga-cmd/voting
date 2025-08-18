@@ -44,6 +44,15 @@ try {
         FOREIGN KEY(candidate_id) REFERENCES candidates(id) ON DELETE CASCADE
     );
 
+    CREATE TABLE IF NOT EXISTS participants (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        poll_id INTEGER,
+        name TEXT,
+        email TEXT,
+        FOREIGN KEY(poll_id) REFERENCES polls(id)
+    );
+
+
     CREATE TABLE IF NOT EXISTS student_council (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT,
