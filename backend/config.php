@@ -19,7 +19,7 @@ try {
 
     CREATE TABLE IF NOT EXISTS users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        email TEXT UNIQUE,
+        username TEXT UNIQUE,
         password TEXT,
         role TEXT DEFAULT 'user', -- user or admin
         poll_id INTEGER,
@@ -73,7 +73,7 @@ try {
     $stmt = $conn->query("SELECT COUNT(*) FROM candidates");
     if ($stmt->fetchColumn() == 0) {
         $conn->exec("
-            INSERT INTO candidates (name, poll_id) VALUES
+            INSERT INTO participants (name, poll_id) VALUES
             ('John Smith', 1),
             ('Maria Johnson', 1),
             ('Alex Davis', 1);

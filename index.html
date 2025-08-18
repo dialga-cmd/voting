@@ -3,766 +3,648 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VoteEasy - Online Voting</title>
+    <title>Online Voting System</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-/* ===============================
-   Base Site Styles (Polls, Cards, Buttons)
-   =============================== */
-.gradient-bg {
-  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
-}
-.card-hover { transition: box-shadow 0.3s ease, transform 0.3s ease; }
-.card-hover:hover { transform: translateY(-5px); box-shadow: 0 12px 28px -6px rgba(0,0,0,0.1); }
-.vote-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-#confetti-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1000; pointer-events: none; }
-.user-logged-out .user-section { display: none !important; }
-.user-logged-in .login-section { display: none !important; }
-.candidate-selected { border-color: #7c3aed !important; background-color: #f3f4f6; }
-#login-btn:hover, #vote-login-btn:hover { background: #f3f4f6; color: #4f46e5; }
+        .gradient-bg {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+        }
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        .vote-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        #confetti-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1000;
+            pointer-events: none;
+        }
+        /* Login state management */
+        .user-logged-out .user-section {
+            display: none !important;
+        }
+        .user-logged-in .login-section {
+            display: none !important;
+        }
+        .candidate-selected {
+            border-color: #7c3aed !important;
+            background-color: #f3f4f6;
+        }
+        nav a {
+        color: white;
+        text-decoration: none;
+        font-weight: 500;
+        transition: color 0.3s ease;
+        }
+        nav a:hover {
+            color: #d1d5db;
+        }
+        .login-section, .user-section {
+            display: flex;
+            align-items: center;
+        }
+        .login-section button, .user-section button {
+            margin-left: 10px;
+        }
 
-.bg-gradient-to-r { background-image: linear-gradient(to right, var(--tw-gradient-stops)); }
-.from-purple-600 { --tw-gradient-from: #7c3aed; }
-.to-purple-700 { --tw-gradient-to: #4f46e5; }
-.hover\:from-purple-700:hover { --tw-gradient-from: #4f46e5; }
-.hover\:to-purple-800:hover { --tw-gradient-to: #4338ca; }
-.bg-purple-800 { background-color: #4338ca; }
-.bg-purple-900 { background-color: #3730a3; }
-.bg-purple-600 { background-color: #7c3aed; }
-.bg-purple-100 { background-color: #f3e8ff; }
-.bg-purple-50 { background-color: #f5f3ff; }
-
-/* ===============================
-   Popup Overlay + Container
-   =============================== */
-.popup-overlay {
-  position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  background: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(10px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-}
-
-.popup-container {
-  background: white;
-  border-radius: 16px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
-  width: 100%;
-  max-width: 380px;
-  overflow: hidden;
-  position: relative;
-  animation: slideUp 0.3s ease-out;
-}
-
-@keyframes slideUp {
-  from { opacity: 0; transform: translateY(50px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.close-btn {
-  position: absolute;
-  top: 15px;
-  right: 15px;
-  background: none;
-  border: none;
-  font-size: 24px;
-  cursor: pointer;
-  color: #666;
-  z-index: 10;
-  transition: color 0.2s ease;
-}
-.close-btn:hover { color: #2563eb; }
-
-/* ===============================
-   Tabs
-   =============================== */
-.tab-container {
-  display: flex;
-  background: #f8fafc;
-  border-radius: 16px 16px 0 0;
-}
-.tab {
-  flex: 1;
-  padding: 16px;
-  text-align: center;
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-size: 15px;
-  font-weight: 600;
-  color: #64748b;
-  transition: all 0.3s ease;
-  position: relative;
-}
-.tab.active { color: #2563eb; }
-.tab.active::after {
-  content: '';
-  position: absolute;
-  bottom: 0; left: 0; right: 0;
-  height: 3px;
-  background: linear-gradient(90deg, #3b82f6, #1d4ed8);
-  border-radius: 3px 3px 0 0;
-}
-
-/* ===============================
-   Forms
-   =============================== */
-.form-container { padding: 24px; position: relative; overflow: hidden; }
-.form { display: none; animation: fadeIn 0.3s ease-in; }
-.form.active { display: block; }
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateX(20px); }
-  to { opacity: 1; transform: translateX(0); }
-}
-
-.form-group { margin-bottom: 16px; position: relative; }
-.form-group label { display: block; margin-bottom: 5px; font-weight: 500; color: #374151; }
-.form-group input {
-  width: 100%;
-  padding: 10px 14px;
-  border: 1.5px solid #e5e7eb;
-  border-radius: 8px;
-  font-size: 15px;
-  transition: all 0.2s ease;
-  background: #fafafa;
-  color: #111; /* FIXED: ensure text is visible */
-}
-.form-group input:focus {
-  outline: none;
-  border-color: #2563eb;
-  background: white;
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-}
-
-.password-toggle {
-  position: absolute;
-  right: 10px;
-  top: 34px;
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: #6b7280;
-  padding: 4px;
-  font-size: 14px;
-}
-.password-toggle:hover { color: #3b82f6; }
-
-/* ===============================
-   Buttons + Extras
-   =============================== */
-.submit-btn {
-  width: 100%;
-  padding: 12px;
-  background: #2563eb;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-size: 15px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-.submit-btn:hover {
-  background: #1d4ed8;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
-}
-.submit-btn:active { transform: translateY(0); }
-
-.divider { display: flex; align-items: center; margin: 25px 0; color: #6b7280; font-size: 14px; }
-.divider::before, .divider::after {
-  content: '';
-  flex: 1;
-  height: 1px;
-  background: #e5e7eb;
-}
-.divider span { padding: 0 15px; }
-
-.social-login { display: flex; gap: 10px; }
-.social-btn {
-  flex: 1;
-  padding: 12px;
-  border: 2px solid #e5e7eb;
-  border-radius: 12px;
-  background: white;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  font-size: 14px;
-  font-weight: 500;
-}
-.social-btn:hover {
-  border-color: #3b82f6;
-  transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-}
-
-.terms {
-  text-align: center;
-  font-size: 12px;
-  color: #6b7280;
-  margin-top: 16px;
-  line-height: 1.4;
-}
-.terms a { color: #3b82f6; text-decoration: none; }
-.terms a:hover { text-decoration: underline; }
-
-.hidden { display: none !important; }
-
-@media (max-width: 480px) {
-  .popup-container { margin: 0 10px; }
-  .form-container { padding: 18px; }
-}
-</style>
+    </style>
 </head>
 <body class="bg-gray-100 font-sans user-logged-out">
+    <canvas id="confetti-canvas" class="hidden"></canvas>
 
-<!-- Confetti -->
-<canvas id="confetti-canvas" class="hidden"></canvas>
+    <header class="gradient-bg text-white shadow-lg">
+        <div class="container mx-auto px-4 py-4">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-vote-yea text-2xl"></i>
+                    <h1 class="text-2xl font-bold">VoteEasy</h1>
+                </div>
+                <nav class="flex space-x-6">
+                    <a href="#" class="hover:text-purple-200 transition">Home</a>
+                    <a href="#" class="hover:text-purple-200 transition">Elections</a>
+                    <a href="#" class="hover:text-purple-200 transition">Results</a>
+                    <a href="#" class="hover:text-purple-200 transition">About</a>
+                    <a href="admin.html" class="hover:text-purple-200 transition font-semibold">Admin</a>
+                </nav>
 
-<!-- ================= HEADER ================= -->
-<header class="gradient-bg text-white shadow-lg">
-  <div class="container mx-auto px-4 py-4">
-    <div class="flex justify-between items-center">
-      <!-- Logo -->
-      <div class="flex items-center space-x-2">
-        <i class="fas fa-vote-yea text-2xl"></i>
-        <h1 class="text-2xl font-bold">VoteEasy</h1>
-      </div>
-
-      <!-- Navigation -->
-      <nav class="flex space-x-6">
-        <a href="index.html" class="hover:text-purple-200 transition">Home</a>
-        <a href="poll.html" class="hover:text-purple-200 transition">Elections</a>
-        <a href="result.html" class="hover:text-purple-200 transition">Results</a>
-        <a href="about.html" class="hover:text-purple-200 transition">About</a>
-        <a href="admin_dashboard.php" class="hover:text-yellow-300 transition">Admin</a>
-      </nav>
-
-      <!-- Right Section -->
-      <div class="flex items-center space-x-4">
-        <!-- Login -->
-        <div class="login-section">
-          <button onclick="showPopup()" id="login-btn"
-            class="bg-white text-purple-600 px-4 py-2 rounded-full font-medium hover:bg-purple-100 transition">
-            Login / Sign Up
-          </button>
+                <div class="flex items-center space-x-4">
+                    <div class="login-section">
+                        <button id="login-btn" class="bg-white text-purple-600 px-4 py-2 rounded-full font-medium hover:bg-purple-100 transition">Login</button>
+                    </div>
+                    <div class="user-section flex items-center space-x-4">
+                        <span class="text-purple-100">Welcome, <span id="user-email"></span></span>
+                        <button id="logout-btn" class="bg-purple-800 text-white px-4 py-2 rounded-full font-medium hover:bg-purple-900 transition">Logout</button>
+                    </div>
+                    <button class="md:hidden text-2xl" id="mobile-menu-btn"><i class="fas fa-bars"></i></button>
+                </div>
+            </div>
         </div>
-        <!-- User (hidden by default) -->
-        <div class="user-section flex items-center space-x-4 hidden">
-          <span class="text-purple-100">Welcome, <span id="user-email"></span></span>
-          <button id="logout-btn"
-            class="bg-purple-800 text-white px-4 py-2 rounded-full font-medium hover:bg-purple-900 transition">
-            Logout
-          </button>
+        <div id="mobile-menu" class="hidden md:hidden bg-purple-800 px-4 py-2">
+            <a href="#" class="block py-2 hover:text-purple-200 transition">Home</a>
+            <a href="#" class="block py-2 hover:text-purple-200 transition">Elections</a>
+            <a href="#" class="block py-2 hover:text-purple-200 transition">Results</a>
+            <a href="#" class="block py-2 hover:text-purple-200 transition">About</a>
+            <a href="admin/admin.html" class="block py-2 hover:text-purple-200 transition font-semibold">Admin</a>
         </div>
-      </div>
+    </header>
+
+    <!-- Login Modal -->
+    <div id="login-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-md">
+            <div class="flex justify-between items-center border-b px-6 py-4">
+                <h3 class="text-xl font-bold">Login to Vote</h3>
+                <button id="close-login-modal" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="p-6">
+                <form id="login-form">
+                    <div class="mb-4">
+                        <label for="login-username" class="block text-gray-700 mb-2">Username</label>
+                        <input type="text" id="login-username" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="username" required>
+                    </div>
+                    <div class="mb-6">
+                        <label for="login-password" class="block text-gray-700 mb-2">Password</label>
+                        <input type="password" id="login-password" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="••••••••" required>
+                    </div>
+                    <button type="submit" class="w-full gradient-bg text-white py-2 px-4 rounded-lg hover:opacity-90 transition font-medium">
+                        Login
+                    </button>
+                </form>
+                <div class="mt-4 text-center">
+                    <p class="text-gray-600">Don't have an account?
+                        <a href="#" id="open-register" class="text-purple-600 hover:text-purple-800">Register</a>
+                    </p>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
-</header>
 
-<!-- Mobile menu -->
-<div id="mobile-menu" class="hidden md:hidden bg-purple-800 px-4 py-2">
-    <a href="#" class="block py-2 hover:text-purple-200 transition">Home</a>
-    <a href="poll.html" class="block py-2 hover:text-purple-200 transition">Elections</a>
-    <a href="results.html" class="block py-2 hover:text-purple-200 transition">Results</a>
-    <a href="about.html" class="block py-2 hover:text-purple-200 transition">About Us</a>
-    <a href="adminphp" class="block py-2 text-yellow-300 font-semibold">Admin</a>
-</div>
-
-<!-- MAIN CONTENT -->
-<main class="container mx-auto px-4 py-8">
-
-    <!-- HERO SECTION -->
-    <section class="gradient-bg text-white rounded-xl p-8 mb-10 shadow-lg text-center">
-        <h2 class="text-3xl md:text-4xl font-bold mb-4">Make Your Voice Heard</h2>
-        <p class="text-lg md:text-xl mb-6">Participate in our secure online voting system. Your vote matters in shaping the future.</p>
-        <div class="flex flex-col sm:flex-row justify-center gap-4">
-            <a href="poll.html" class="bg-white text-purple-600 px-6 py-3 rounded-full font-medium hover:bg-purple-100 transition">View Current Elections</a>
+    <!-- Register Modal -->
+    <div id="register-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-md">
+            <div class="flex justify-between items-center border-b px-6 py-4">
+                <h3 class="text-xl font-bold">Create Account</h3>
+                <button id="close-register-modal" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="p-6">
+                <form id="register-form">
+                    <div class="mb-4">
+                        <label for="reg-username" class="block text-gray-700 mb-2">Username</label>
+                        <input type="text" id="reg-username" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="username" required>
+                    </div>
+                    <div class="mb-4">
+                        <label for="reg-password" class="block text-gray-700 mb-2">Password</label>
+                        <input type="password" id="reg-password" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="••••••••" required>
+                    </div>
+                    <div class="mb-6">
+                        <label for="reg-confirm-password" class="block text-gray-700 mb-2">Confirm Password</label>
+                        <input type="password" id="reg-confirm-password" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="••••••••" required>
+                    </div>
+                    <button type="submit" class="w-full gradient-bg text-white py-2 px-4 rounded-lg hover:opacity-90 transition font-medium">
+                        Register
+                    </button>
+                </form>
+                <div class="mt-4 text-center">
+                    <p class="text-gray-600">Already have an account?
+                        <a href="#" id="open-login" class="text-purple-600 hover:text-purple-800">Login</a>
+                    </p>
+                </div>
+            </div>
         </div>
-    </section>
+    </div>
 
-    <!-- Active Elections -->
-        <section id="elections" class="mb-12">
-        <div class="flex justify-between items-center mb-6">
-            <h2 class="text-2xl font-bold text-gray-800">Active Elections</h2>
-        </div>
-        <div id="poll-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <!-- Poll cards load dynamically here -->
-        </div>
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8">
+        <!-- Hero Section -->
+        <section class="gradient-bg text-white rounded-xl p-8 mb-10 shadow-lg">
+            <div class="max-w-3xl mx-auto text-center">
+                <h2 class="text-3xl md:text-4xl font-bold mb-4">Make Your Voice Heard</h2>
+                <p class="text-lg md:text-xl mb-6">Participate in our secure online voting system. Your vote matters in shaping the future.</p>
+                <div class="flex flex-col sm:flex-row justify-center gap-4">
+                    <button class="bg-white text-purple-600 px-6 py-3 rounded-full font-medium hover:bg-purple-100 transition">
+                        View Current Elections
+                    </button>
+                    <button class="border-2 border-white text-white px-6 py-3 rounded-full font-medium hover:bg-white hover:text-purple-600 transition">
+                        How It Works
+                    </button>
+                </div>
+            </div>
         </section>
-    <!-- Ended Polls -->
-            <section id="ended-polls" class="mb-12">
+
+        <!-- Active Election Section -->
+        <section class="mb-12">
             <div class="flex justify-between items-center mb-6">
-                <h2 class="text-2xl font-bold text-gray-800">Ended Elections</h2>
+                <h2 class="text-2xl font-bold text-gray-800">Active Elections</h2>
+                <a href="#" class="text-purple-600 hover:text-purple-800 flex items-center">
+                    View all <i class="fas fa-chevron-right ml-1"></i>
+                </a>
             </div>
+
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-
-        <!-- Fake ended poll cards -->
-                <div class="bg-white/90 rounded-xl shadow p-6 border card-hover">
-                <h3 class="text-lg font-bold text-gray-800 mb-2">Science Club Election 2024</h3>
-                <p class="text-sm text-gray-600 mb-2">
-                    <i class="fas fa-calendar-alt text-red-500 mr-2"></i> Oct 1 – Oct 10, 2024
-                </p>
-                <p class="text-xs font-medium text-green-700 bg-green-50 px-3 py-1 inline-block rounded-full">Completed</p>
+                <!-- Election Card 1 -->
+                <div class="bg-white rounded-xl shadow-md overflow-hidden transition duration-300 card-hover">
+                    <div class="p-6">
+                        <div class="flex justify-between items-start mb-4">
+                            <div>
+                                <span class="inline-block bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full uppercase font-semibold">Active</span>
+                                <span class="inline-block bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded-full uppercase font-semibold ml-2">National</span>
+                            </div>
+                            <div class="text-gray-500 text-sm">
+                                <i class="fas fa-clock mr-1"></i> 2 days left
+                            </div>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">Student Union Election 2025</h3>
+                        <p class="text-gray-600 mb-4">Elect your student representatives for the academic year 2025-2026.</p>
+                        
+                        <div class="mb-4">
+                            <div class="flex justify-between text-sm text-gray-500 mb-1">
+                                <span>Start Date</span>
+                                <span>End Date</span>
+                            </div>
+                            <div class="flex justify-between text-sm font-medium">
+                                <span>Oct 15, 2025</span>
+                                <span>Oct 20, 2025</span>
+                            </div>
+                        </div>
+                        
+                        <button class="w-full gradient-bg text-white py-2 px-4 rounded-lg hover:opacity-90 transition font-medium">
+                            View Candidates
+                        </button>
+                    </div>
                 </div>
 
-                <div class="bg-white/90 rounded-xl shadow p-6 border card-hover">
-                <h3 class="text-lg font-bold text-gray-800 mb-2">President Election 2023</h3>
-                <p class="text-sm text-gray-600 mb-2">
-                    <i class="fas fa-calendar-alt text-red-500 mr-2"></i> Nov 5 – Nov 9, 2023
-                </p>
-                <p class="text-xs font-medium text-green-700 bg-green-50 px-3 py-1 inline-block rounded-full">Completed</p>
+                <!-- Election Card 2 -->
+                <div class="bg-white rounded-xl shadow-md overflow-hidden transition duration-300 card-hover">
+                    <div class="p-6">
+                        <div class="flex justify-between items-start mb-4">
+                            <div>
+                                <span class="inline-block bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full uppercase font-semibold">Active</span>
+                                <span class="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full uppercase font-semibold ml-2">Department</span>
+                            </div>
+                            <div class="text-gray-500 text-sm">
+                                <i class="fas fa-clock mr-1"></i> 5 days left
+                            </div>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">Computer Science Dept. Head</h3>
+                        <p class="text-gray-600 mb-4">Vote for the next head of the Computer Science Department.</p>
+                        
+                        <div class="mb-4">
+                            <div class="flex justify-between text-sm text-gray-500 mb-1">
+                                <span>Start Date</span>
+                                <span>End Date</span>
+                            </div>
+                            <div class="flex justify-between text-sm font-medium">
+                                <span>Oct 10, 2025</span>
+                                <span>Oct 25, 2025</span>
+                            </div>
+                        </div>
+                        
+                        <button class="w-full gradient-bg text-white py-2 px-4 rounded-lg hover:opacity-90 transition font-medium">
+                            View Candidates
+                        </button>
+                    </div>
                 </div>
 
-                <div class="bg-white/90 rounded-xl shadow p-6 border card-hover">
-                <h3 class="text-lg font-bold text-gray-800 mb-2">Debate Team Election 2024</h3>
-                <p class="text-sm text-gray-600 mb-2">
-                    <i class="fas fa-calendar-alt text-red-500 mr-2"></i> May 12 – May 14, 2024
-                </p>
-                <p class="text-xs font-medium text-green-700 bg-green-50 px-3 py-1 inline-block rounded-full">Completed</p>
+                <!-- Election Card 3 -->
+                <div class="bg-white rounded-xl shadow-md overflow-hidden transition duration-300 card-hover">
+                    <div class="p-6">
+                        <div class="flex justify-between items-start mb-4">
+                            <div>
+                                <span class="inline-block bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded-full uppercase font-semibold">Upcoming</span>
+                                <span class="inline-block bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded-full uppercase font-semibold ml-2">National</span>
+                            </div>
+                            <div class="text-gray-500 text-sm">
+                                <i class="fas fa-clock mr-1"></i> Starts in 3 days
+                            </div>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">National Youth Council</h3>
+                        <p class="text-gray-600 mb-4">Elect representatives for the National Youth Council 2026.</p>
+                        
+                        <div class="mb-4">
+                            <div class="flex justify-between text-sm text-gray-500 mb-1">
+                                <span>Start Date</span>
+                                <span>End Date</span>
+                            </div>
+                            <div class="flex justify-between text-sm font-medium">
+                                <span>Oct 25, 2025</span>
+                                <span>Nov 5, 2025</span>
+                            </div>
+                        </div>
+                        
+                        <button class="w-full bg-gray-200 text-gray-700 py-2 px-4 rounded-lg font-medium cursor-not-allowed" disabled>
+                            Coming Soon
+                        </button>
+                    </div>
                 </div>
             </div>
-            </section>
-
-        <!-- Ended Poll Results -->
-<section id="ended-results" class="mb-12">
-  <div class="flex justify-between items-center mb-6">
-    <h2 class="text-2xl font-bold text-gray-800">Results for Ended Elections</h2>
-  </div>
-  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-    <!-- Science Club Election Result -->
-    <div class="bg-white/85 rounded-xl shadow p-6 border card-hover">
-      <h3 class="text-lg font-bold text-gray-800 mb-2">Science Club Election 2024</h3>
-      <p class="text-sm text-gray-600 mb-1">
-        <i class="fas fa-calendar-alt text-red-500 mr-2"></i> Oct 1 – Oct 10, 2024
-      </p>
-      <div class="bg-green-50 px-4 py-2 rounded-lg my-2">
-        <span class="font-bold text-green-700"><i class="fas fa-trophy mr-1"></i> Winner: </span>
-        <span class="font-semibold">Samantha Tran</span>
-      </div>
-      <ul class="text-sm mt-4">
-        <li><strong>1st:</strong> Samantha Tran — 68 votes</li>
-        <li><strong>2nd:</strong> Emily Park — 52 votes</li>
-        <li><strong>3rd:</strong> Kevin Zhou — 37 votes</li>
-      </ul>
-    </div>
-
-    <!-- President Election Result -->
-    <div class="bg-white/85 rounded-xl shadow p-6 border card-hover">
-      <h3 class="text-lg font-bold text-gray-800 mb-2">President Election 2023</h3>
-      <p class="text-sm text-gray-600 mb-1">
-        <i class="fas fa-calendar-alt text-red-500 mr-2"></i> Nov 5 – Nov 9, 2023
-      </p>
-      <div class="bg-green-50 px-4 py-2 rounded-lg my-2">
-        <span class="font-bold text-green-700"><i class="fas fa-trophy mr-1"></i> Winner: </span>
-        <span class="font-semibold">Maria Johnson</span>
-      </div>
-      <ul class="text-sm mt-4">
-        <li><strong>1st:</strong> Maria Johnson — 120 votes</li>
-        <li><strong>2nd:</strong> David Kim — 95 votes</li>
-        <li><strong>3rd:</strong> Hannah Smith — 81 votes</li>
-      </ul>
-    </div>
-
-    <!-- Debate Team Election Result -->
-        <div class="bg-white/85 rounded-xl shadow p-6 border card-hover">
-          <h3 class="text-lg font-bold text-gray-800 mb-2">Debate Team Election 2024</h3>
-            <p class="text-sm text-gray-600 mb-1">
-                <i class="fas fa-calendar-alt text-red-500 mr-2"></i> May 12 – May 14, 2024
-            </p>
-            <div class="bg-green-50 px-4 py-2 rounded-lg my-2">
-                <span class="font-bold text-green-700"><i class="fas fa-trophy mr-1"></i> Winner: </span>
-                <span class="font-semibold">John Smith</span>
-            </div>
-            <ul class="text-sm mt-4">
-                <li><strong>1st:</strong> John Smith — 44 votes</li>
-                <li><strong>2nd:</strong> Priya Patel — 34 votes</li>
-                <li><strong>3rd:</strong> Alex Davis — 19 votes</li>
-            </ul>
-            </div>
-        </div>
         </section>
-    <!-- Student Council -->
-    <section id="council" class="mb-12">
-        <h2 class="text-2xl font-bold text-gray-800 mb-6">Student Council</h2>
-        <div id="council-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <!-- Council members will load dynamically here -->
-        </div>
-    </section>
-</main>
 
-<!-- Footer -->
-<footer class="bg-gray-800 text-white py-12">
-    <div class="container mx-auto px-4">
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
-            <div>
-                <h3 class="text-xl font-bold mb-4 flex items-center">
-                    <i class="fas fa-vote-yea mr-2"></i> VoteEasy
-                </h3>
-                <p class="text-gray-400">Secure online voting platform for organizations and institutions.</p>
+        <!-- Voting Booth Section -->
+        <section class="mb-12 bg-white rounded-xl shadow-md overflow-hidden">
+            <div class="md:flex">
+                <div class="md:w-1/3 gradient-bg text-white p-8 flex flex-col justify-center">
+                    <h2 class="text-2xl font-bold mb-4">Student Union Election 2025</h2>
+                    <p class="mb-6">Cast your vote for the student representatives. Your vote is confidential and secure.</p>
+                    
+                    <div class="mb-6">
+                        <div class="flex items-center mb-2">
+                            <div class="w-8 h-8 rounded-full bg-purple-200 flex items-center justify-center mr-3">
+                                <i class="fas fa-user-check text-purple-700"></i>
+                            </div>
+                            <span>Verified voters only</span>
+                        </div>
+                        <div class="flex items-center mb-2">
+                            <div class="w-8 h-8 rounded-full bg-purple-200 flex items-center justify-center mr-3">
+                                <i class="fas fa-lock text-purple-700"></i>
+                            </div>
+                            <span>Secure voting system</span>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="w-8 h-8 rounded-full bg-purple-200 flex items-center justify-center mr-3">
+                                <i class="fas fa-shield-alt text-purple-700"></i>
+                            </div>
+                            <span>Anonymous voting</span>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-purple-800 bg-opacity-50 rounded-lg p-4">
+                        <h4 class="font-bold mb-2">Voting Instructions</h4>
+                        <ol class="list-decimal list-inside text-sm space-y-1">
+                            <li>Log in to your account</li>
+                            <li>Select your preferred candidate</li>
+                            <li>Review your selection</li>
+                            <li>Submit your vote</li>
+                            <li>You'll receive a confirmation</li>
+                        </ol>
+                    </div>
+                </div>
+                
+                <div class="md:w-2/3 p-8">
+                    <!-- Login Required Message (shown when not logged in) -->
+                    <div class="login-section text-center py-12">
+                        <div class="w-20 h-20 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                            <i class="fas fa-lock text-purple-600 text-3xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-800 mb-4">Login Required to Vote</h3>
+                        <p class="text-gray-600 mb-6">Please log in to your account to participate in the voting process.</p>
+                        <button id="vote-login-btn" class="gradient-bg text-white px-6 py-3 rounded-lg font-medium hover:opacity-90 transition">
+                            Login to Vote
+                        </button>
+                    </div>
+
+                    <!-- Voting Interface (shown when logged in) -->
+                    <div class="user-section">
+                        <h3 class="text-xl font-bold text-gray-800 mb-6">Candidates for President</h3>
+                        
+                        <div class="space-y-6">
+                            <!-- Candidate 1 -->
+                            <div class="border border-gray-200 rounded-lg p-4 hover:border-purple-300 transition candidate-card" data-candidate="1">
+                                <div class="flex items-center">
+                                    <div class="mr-4">
+                                        <div class="w-16 h-16 rounded-full bg-purple-100 flex items-center justify-center text-purple-600 text-2xl font-bold">
+                                            JS
+                                        </div>
+                                    </div>
+                                    <div class="flex-grow">
+                                        <h4 class="font-bold text-lg">John Smith</h4>
+                                        <p class="text-gray-600 mb-2">Computer Science Major</p>
+                                        <div class="flex items-center text-sm text-gray-500">
+                                            <i class="fas fa-bullhorn mr-1"></i>
+                                            <span>"Empowering students through transparent leadership"</span>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <button class="vote-btn bg-gray-100 text-gray-700 px-4 py-2 rounded-lg font-medium hover:bg-gray-200 transition" data-candidate-id="1" data-candidate-name="John Smith">
+                                            Select
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Candidate 2 -->
+                            <div class="border border-gray-200 rounded-lg p-4 hover:border-purple-300 transition candidate-card" data-candidate="2">
+                                <div class="flex items-center">
+                                    <div class="mr-4">
+                                        <div class="w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 text-2xl font-bold">
+                                            MJ
+                                        </div>
+                                    </div>
+                                    <div class="flex-grow">
+                                        <h4 class="font-bold text-lg">Maria Johnson</h4>
+                                        <p class="text-gray-600 mb-2">Political Science Major</p>
+                                        <div class="flex items-center text-sm text-gray-500">
+                                            <i class="fas fa-bullhorn mr-1"></i>
+                                            <span>"Building bridges between students and administration"</span>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <button class="vote-btn bg-gray-100 text-gray-700 px-4 py-2 rounded-lg font-medium hover:bg-gray-200 transition" data-candidate-id="2" data-candidate-name="Maria Johnson">
+                                            Select
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Candidate 3 -->
+                            <div class="border border-gray-200 rounded-lg p-4 hover:border-purple-300 transition candidate-card" data-candidate="3">
+                                <div class="flex items-center">
+                                    <div class="mr-4">
+                                        <div class="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center text-green-600 text-2xl font-bold">
+                                            AD
+                                        </div>
+                                    </div>
+                                    <div class="flex-grow">
+                                        <h4 class="font-bold text-lg">Alex Davis</h4>
+                                        <p class="text-gray-600 mb-2">Engineering Major</p>
+                                        <div class="flex items-center text-sm text-gray-500">
+                                            <i class="fas fa-bullhorn mr-1"></i>
+                                            <span>"Innovative solutions for student challenges"</span>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <button class="vote-btn bg-gray-100 text-gray-700 px-4 py-2 rounded-lg font-medium hover:bg-gray-200 transition" data-candidate-id="3" data-candidate-name="Alex Davis">
+                                            Select
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Selected candidate confirmation -->
+                        <div id="selected-candidate" class="mt-8 p-4 border border-purple-200 bg-purple-50 rounded-lg hidden">
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <h4 class="font-bold text-purple-800">You have selected:</h4>
+                                    <p id="selected-candidate-name" class="text-lg font-medium"></p>
+                                </div>
+                                <div>
+                                    <button id="change-selection" class="text-purple-600 hover:text-purple-800 mr-4">
+                                        Change
+                                    </button>
+                                    <button id="submit-vote" class="gradient-bg text-white px-4 py-2 rounded-lg font-medium hover:opacity-90 transition">
+                                        Submit Vote
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Already Voted Message -->
+                        <div id="already-voted" class="text-center py-12 hidden">
+                            <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                                <i class="fas fa-check-circle text-green-500 text-3xl"></i>
+                            </div>
+                            <h3 class="text-xl font-bold text-gray-800 mb-4">You Have Already Voted</h3>
+                            <p class="text-gray-600 mb-6">Thank you for participating in the Student Union Election 2025. Your vote has been recorded.</p>
+                            <p class="text-sm text-gray-500">You voted for: <span id="voted-candidate" class="font-medium"></span></p>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div>
-                <h4 class="font-bold mb-4">Quick Links</h4>
-                <ul class="space-y-2">
-                    <li><a href="#" class="text-gray-400 hover:text-white transition">Home</a></li>
-                    <li><a href="poll.html" class="text-gray-400 hover:text-white transition">Elections</a></li>
-                    <li><a href="results.html" class="text-gray-400 hover:text-white transition">Results</a></li>
-                    <li><a href="about.html" class="text-gray-400 hover:text-white transition">About Us</a></li>
-                </ul>
-            </div>
-            <div>
-                <h4 class="font-bold mb-4">Legal</h4>
-                <ul class="space-y-2">
-                    <li><a href="privacy_policy.html" class="text-gray-400 hover:text-white transition">Privacy Policy</a></li>
-                    <li><a href="tos.html" class="text-gray-400 hover:text-white transition">Terms of Service</a></li>
-                </ul>
-            </div>
-            <div>
-                <h4 class="font-bold mb-4">Contact Us</h4>
-                <ul class="space-y-2">
-                    <li class="flex items-center">
-                        <i class="fas fa-envelope mr-2 text-gray-400"></i>
-                        <span>support@voteeasy.com</span>
-                    </li>
-                    <li class="flex items-center">
-                        <i class="fas fa-phone mr-2 text-gray-400"></i>
-                        <span>+1 (555) 123-4567</span>
-                    </li>
-                    <li class="flex items-center">
-                        <i class="fas fa-map-marker-alt mr-2 text-gray-400"></i>
-                        <span>123 Voting St, Democracy City</span>
-                    </li>
-                </ul>
+        </section>
+
+        <!-- Vote Confirmation Modal (hidden by default) -->
+        <div id="vote-confirmation-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+            <div class="bg-white rounded-xl shadow-xl w-full max-w-md p-8 text-center">
+                <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <i class="fas fa-check text-green-500 text-3xl"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-gray-800 mb-4">Vote Submitted Successfully!</h3>
+                <p class="text-gray-600 mb-6">Thank you for participating in the Student Union Election 2025. Your vote has been recorded securely.</p>
+                <button id="close-confirmation-modal" class="gradient-bg text-white px-6 py-2 rounded-lg font-medium hover:opacity-90 transition">
+                    Close
+                </button>
             </div>
         </div>
-        <div class="border-t border-gray-700 mt-8 pt-8 text-center text-gray-400">
-            <p>&copy; 2025 VoteEasy. All rights reserved.</p>
-        </div>
-    </div>
-</footer>
-<!-- ================= LOGIN / SIGNUP POPUP ================= -->
-<div id="popupOverlay"
-  class="hidden fixed inset-0 w-full h-full bg-black/60 flex items-center justify-center z-50">
-  <div class="bg-white rounded-xl shadow-lg w-full max-w-4xl p-8 relative flex">
-    <!-- Close -->
-    <button onclick="hidePopup()" class="absolute top-3 right-3 text-gray-500 hover:text-gray-700">✖</button>
+    </main>
 
-    <!-- Login (Left Half) -->
-    <div class="w-1/2 pr-6 border-r">
-      <h2 class="text-xl font-bold mb-4 text-purple-700">Login</h2>
-      <form id="loginForm" class="space-y-4">
-        <div>
-          <label for="loginUsername" class="block text-sm font-medium">Username</label>
-          <input id="loginUsername" type="username" required
-            class="w-full border rounded px-3 py-2 focus:outline-none">
-        </div>
-        <div>
-          <label for="loginPassword" class="block text-sm font-medium">Password</label>
-          <div class="flex items-center border rounded">
-            <input id="loginPassword" type="password" required
-              class="w-full px-3 py-2 focus:outline-none">
-            <span class="px-2 cursor-pointer" onclick="togglePassword('loginPassword')">👁️</span>
-          </div>
-        </div>
-        <button type="submit"
-          class="w-full bg-purple-600 text-white rounded px-4 py-2 font-medium hover:bg-purple-700">
-          Login
-        </button>
-      </form>
-    </div>
-
-    <!-- Sign Up (Right Half) -->
-    <div class="w-1/2 pl-6">
-      <h2 class="text-xl font-bold mb-4 text-green-700">Sign Up</h2>
-      <form id="signupForm" class="space-y-4">
-        <div>
-          <label for="signupUsername" class="block text-sm font-medium">Username</label>
-          <input id="signupUsername" type="username" required
-            class="w-full border rounded px-3 py-2 focus:outline-none">
-        </div>
-        <div>
-          <label for="signupPassword" class="block text-sm font-medium">Password</label>
-          <div class="flex items-center border rounded">
-            <input id="signupPassword" type="password" required
-              class="w-full px-3 py-2 focus:outline-none">
-            <span class="px-2 cursor-pointer" onclick="togglePassword('signupPassword')">👁️</span>
-          </div>
-        </div>
-        <div>
-          <label for="confirmPassword" class="block text-sm font-medium">Confirm Password</label>
-          <input id="confirmPassword" type="password" required
-            class="w-full border rounded px-3 py-2 focus:outline-none">
-        </div>
-        <button type="submit"
-          class="w-full bg-green-600 text-white rounded px-4 py-2 font-medium hover:bg-green-700">
-          Sign Up
-        </button>
-      </form>
-    </div>
-  </div>
-</div>
-
-<script>
-// ================= MOBILE MENU =================
-const mobileBtn = document.getElementById('mobile-menu-btn');
-if (mobileBtn) {
-  mobileBtn.addEventListener('click', function () {
-    const menu = document.getElementById('mobile-menu');
-    if (menu) menu.classList.toggle('hidden');
-  });
-}
-
-// ================= FETCH DATA =================
-document.addEventListener("DOMContentLoaded", function () {
-// ================= CHECK SESSION =================
-async function checkSession() {
-  try {
-    const res = await fetch("backend/me.php");
-    const data = await res.json();
-
-    if (data.loggedIn) {
-      document.getElementById("user-email").textContent = data.email;
-      document.getElementById("login-btn").classList.add("hidden");
-      document.querySelector(".user-section").classList.remove("hidden");
-    } else {
-      document.getElementById("login-btn").classList.remove("hidden");
-      document.querySelector(".user-section").classList.add("hidden");
-    }
-  } catch (err) {
-    console.error("Session check failed:", err);
-  }
-}
-
-// ================= FETCH DATA =================
-document.addEventListener("DOMContentLoaded", function () {
-  // Run session check first
-  checkSession();
-
-  // Fetch active polls
-  fetch('backend/poll.php?action=list')
-    .then(res => res.json())
-    .then(polls => {
-      const pollContainer = document.getElementById('poll-list');
-      if (pollContainer) {
-        pollContainer.innerHTML = '';
-        polls.forEach(poll => {
-          pollContainer.innerHTML += `
-            <div class="bg-white/90 rounded-xl shadow p-6 border card-hover">
-              <h3 class="text-lg font-bold text-gray-800 mb-2">${poll.title}</h3>
-              <p class="text-sm text-gray-600 mb-2">
-                <i class="fas fa-calendar-alt text-purple-500 mr-2"></i> ${poll.start_date} → ${poll.end_date}
-              </p>
-              <button class="w-full bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white py-3 px-4 rounded-lg text-sm font-medium shadow-sm transition"
-                onclick="viewPoll(${poll.id})">View Candidates</button>
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-12">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <h3 class="text-xl font-bold mb-4 flex items-center">
+                        <i class="fas fa-vote-yea mr-2"></i> VoteEasy
+                    </h3>
+                    <p class="text-gray-400">Secure online voting platform for organizations and institutions.</p>
+                </div>
+                <div>
+                    <h4 class="font-bold mb-4">Quick Links</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-white transition">Home</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition">Elections</a></li>
+                        <li><a href="result.html" class="text-gray-400 hover:text-white transition">Results</a></li>
+                        <li><a href="about.html" class="text-gray-400 hover:text-white transition">About Us</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-bold mb-4">Legal</h4>
+                    <ul class="space-y-2">
+                        <li><a href="privacy_policy.html" class="text-gray-400 hover:text-white transition">Privacy Policy</a></li>
+                        <li><a href="tos.html" class="text-gray-400 hover:text-white transition">Terms of Service</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-bold mb-4">Contact Us</h4>
+                    <ul class="space-y-2">
+                        <li class="flex items-center">
+                            <i class="fas fa-envelope mr-2 text-gray-400"></i>
+                            <span>support@voteeasy.com</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-phone mr-2 text-gray-400"></i>
+                            <span>+1 (555) 123-4567</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-map-marker-alt mr-2 text-gray-400"></i>
+                            <span>123 Voting St, Democracy City</span>
+                        </li>
+                    </ul>
+                </div>
             </div>
-          `;
-        });
-      }
-    })
-    .catch(err => console.error('Poll fetch error:', err));
+            <div class="border-t border-gray-700 mt-8 pt-8 text-center text-gray-400">
+                <p>&copy; 2025 VoteEasy. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+// User state management
+let userState = {
+    isLoggedIn: false,
+    username: '',
+    hasVoted: false,
+    votedCandidate: ''
+};
+
+document.addEventListener('DOMContentLoaded', function() {
+    initializeEventListeners();
+    checkLoginState();
 });
 
-  // Fetch student council
-  fetch('backend/council.php?action=list')
-    .then(res => res.json())
-    .then(members => {
-      const councilContainer = document.getElementById('council-list');
-      if (councilContainer) {
-        councilContainer.innerHTML = '';
-        members.forEach(member => {
-          councilContainer.innerHTML += `
-            <div class="bg-white rounded-xl shadow-md p-4 card-hover">
-              <h3 class="text-lg font-bold text-gray-800">${member.name}</h3>
-              <p class="text-gray-600">${member.position}</p>
-            </div>
-          `;
+function initializeEventListeners() {
+    // Mobile menu toggle
+    document.getElementById('mobile-menu-btn').addEventListener('click', () => {
+        document.getElementById('mobile-menu').classList.toggle('hidden');
+    });
+
+    // Open/close login modal
+    document.getElementById('login-btn').addEventListener('click', () => {
+        document.getElementById('login-modal').classList.remove('hidden');
+    });
+    document.getElementById('vote-login-btn').addEventListener('click', () => {
+        document.getElementById('login-modal').classList.remove('hidden');
+    });
+    document.getElementById('close-login-modal').addEventListener('click', () => {
+        document.getElementById('login-modal').classList.add('hidden');
+    });
+
+    // Open register modal
+    document.getElementById('open-register').addEventListener('click', (e) => {
+        e.preventDefault();
+        document.getElementById('login-modal').classList.add('hidden');
+        document.getElementById('register-modal').classList.remove('hidden');
+    });
+    document.getElementById('close-register-modal').addEventListener('click', () => {
+        document.getElementById('register-modal').classList.add('hidden');
+    });
+    document.getElementById('open-login').addEventListener('click', (e) => {
+        e.preventDefault();
+        document.getElementById('register-modal').classList.add('hidden');
+        document.getElementById('login-modal').classList.remove('hidden');
+    });
+
+    // Login form submission
+    document.getElementById('login-form').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const username = document.getElementById('login-username').value.trim();
+        const password = document.getElementById('login-password').value.trim();
+
+        let res = await fetch('backend/auth.php?action=login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password })
         });
-      }
-    })
-    .catch(err => console.error('Council fetch error:', err));
 
-  // Restore auth UI on load
-  restoreSession();
-});
-
-// ================= POPUP (OPEN/CLOSE) =================
-function showPopup() {
-  const el = document.getElementById('popupOverlay');
-  if (!el) return;
-  el.classList.remove('hidden');
-  el.style.display = "flex";      // force visible
-  el.style.visibility = "visible";
-  el.style.opacity = 1;
-  document.body.style.overflow = 'hidden';
-}
-function hidePopup() {
-  const el = document.getElementById('popupOverlay');
-  if (!el) return;
-  el.classList.add('hidden');
-  el.style.display = "none";      // force hidden
-  el.style.visibility = "hidden";
-  el.style.opacity = 0;
-  document.body.style.overflow = 'auto';
-}
-const overlayEl = document.getElementById('popupOverlay');
-if (overlayEl) {
-  overlayEl.addEventListener('click', (e) => { if (e.target === e.currentTarget) hidePopup(); });
-}
-document.addEventListener('keydown', (e) => { if (e.key === 'Escape') hidePopup(); });
-
-// ================= INPUT UX =================
-function togglePassword(fieldId) {
-  const field = document.getElementById(fieldId);
-  if (!field) return;
-  const toggle = field.nextElementSibling;
-  if (field.type === 'password') {
-    field.type = 'text';
-    if (toggle) toggle.textContent = '🙈';
-  } else {
-    field.type = 'password';
-    if (toggle) toggle.textContent = '👁️';
-  }
-}
-document.querySelectorAll('input').forEach(input => {
-  input.addEventListener('focus', () => input.parentElement && (input.parentElement.style.transform = 'scale(1.02)'));
-  input.addEventListener('blur', () => input.parentElement && (input.parentElement.style.transform = 'scale(1)'));
-});
-
-const USERS_KEY = 've_users';
-const SESSION_KEY = 've_session';
-
-function loadUsers() {
-  try { return JSON.parse(localStorage.getItem(USERS_KEY)) || {}; }
-  catch { return {}; }
-}
-function saveUsers(users) {
-  localStorage.setItem(USERS_KEY, JSON.stringify(users));
-}
-function setSession(email) {
-  localStorage.setItem(SESSION_KEY, email);
-}
-function clearSession() {
-  localStorage.removeItem(SESSION_KEY);
-}
-function getSessionEmail() {
-  return localStorage.getItem(SESSION_KEY) || null;
-}
-
-// Web Crypto helpers for salted SHA-256
-function uint8ToB64(arr) {
-  let s = '';
-  arr.forEach(b => s += String.fromCharCode(b));
-  return btoa(s);
-}
-function genSaltB64() {
-  const bytes = new Uint8Array(16);
-  crypto.getRandomValues(bytes);
-  return uint8ToB64(bytes);
-}
-async function hashPassword(password, saltB64) {
-  const enc = new TextEncoder();
-  const data = enc.encode(`${password}:${saltB64}`);
-  const buf = await crypto.subtle.digest('SHA-256', data);
-  return uint8ToB64(new Uint8Array(buf));
-}
-
-// UI helpers
-function updateAuthUI(user) {
-  const loginBtn = document.getElementById('login-btn');
-  const userSection = document.querySelector('.user-section');
-  const userEmailEl = document.getElementById('user-email');
-
-  if (user) {
-    if (userEmailEl) userEmailEl.textContent = user.username || user.email;
-    if (loginBtn) loginBtn.classList.add('hidden');
-    if (userSection) userSection.classList.remove('hidden');
-  } else {
-    if (userEmailEl) userEmailEl.textContent = '';
-    if (loginBtn) loginBtn.classList.remove('hidden');
-    if (userSection) userSection.classList.add('hidden');
-  }
-}
-
-function restoreSession() {
-  const email = getSessionEmail();
-  const users = loadUsers();
-  const user = email ? users[email.toLowerCase()] : null;
-  updateAuthUI(user || null);
-}
-
-// ============ SIGNUP ============
-document.getElementById("signupForm").addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const email = document.getElementById("signupEmail").value.trim();
-    const password = document.getElementById("signupPassword").value;
-    const confirmPassword = document.getElementById("confirmPassword").value;
-
-    if (password !== confirmPassword) {
-        return alert("Passwords do not match!");
-    }
-
-    try {
-        const res = await fetch("backend/register.php", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ email, password })
-        });
-        const data = await res.json();
+        let data = await res.json();
         if (data.success) {
-            alert("Account created! Please log in.");
+            userState.isLoggedIn = true;
+            userState.username = username;
+            sessionStorage.setItem('loggedInUser', username);
+            updateUIAfterLogin();
+            document.getElementById('login-modal').classList.add('hidden');
         } else {
-            alert(data.message);
+            alert(data.message || 'Invalid username or password.');
         }
-    } catch (err) {
-        console.error("Signup error:", err);
-        alert("Server error, try again later.");
-    }
-});
+    });
 
-// ============ LOGIN ============
-document.getElementById("loginForm").addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const email = document.getElementById("loginEmail").value.trim();
-    const password = document.getElementById("loginPassword").value;
+    // Register form submission
+    document.getElementById('register-form').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const username = document.getElementById('reg-username').value.trim();
+        const password = document.getElementById('reg-password').value.trim();
+        const confirmPassword = document.getElementById('reg-confirm-password').value.trim();
 
-    try {
-        const res = await fetch("backend/login.php", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ email, password })
+        if (password !== confirmPassword) {
+            alert('Passwords do not match!');
+            return;
+        }
+
+        let res = await fetch('backend/auth.php?action=register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password })
         });
-        const data = await res.json();
 
+        let data = await res.json();
         if (data.success) {
-            document.getElementById("user-email").textContent = data.email;
-            document.getElementById("login-btn").classList.add("hidden");
-            document.querySelector(".user-section").classList.remove("hidden");
-            hidePopup();
+            alert('Registration successful! Please log in.');
+            document.getElementById('register-modal').classList.add('hidden');
+            document.getElementById('login-modal').classList.remove('hidden');
         } else {
-            alert(data.message);
+            alert(data.message || 'Registration failed.');
         }
-    } catch (err) {
-        console.error("Login error:", err);
-        alert("Server error, try again later.");
-    }
-});
+    });
 
-// ============ LOGOUT ============
-document.getElementById("logout-btn").addEventListener("click", async () => {
-    await fetch("backend/logout.php", { method: "POST" });
-    document.getElementById("login-btn").classList.remove("hidden");
-    document.querySelector(".user-section").classList.add("hidden");
-});
+    // Logout
+    document.getElementById('logout-btn').addEventListener('click', () => {
+        userState.isLoggedIn = false;
+        userState.username = '';
+        sessionStorage.removeItem('loggedInUser');
+        updateUIAfterLogout();
+    });
+}
+
+// Restore session
+function checkLoginState() {
+    const savedUser = sessionStorage.getItem('loggedInUser');
+    if (savedUser) {
+        userState.isLoggedIn = true;
+        userState.username = savedUser;
+        updateUIAfterLogin();
+    }
+}
+
+// Update UI
+function updateUIAfterLogin() {
+    document.body.classList.remove('user-logged-out');
+    document.body.classList.add('user-logged-in');
+    document.getElementById('user-email').textContent = userState.username;
+}
+function updateUIAfterLogout() {
+    document.body.classList.remove('user-logged-in');
+    document.body.classList.add('user-logged-out');
+}
 </script>
 </body>
 </html>
