@@ -230,87 +230,49 @@
 <canvas id="confetti-canvas" class="hidden"></canvas>
 
 <!-- Header -->
+<!-- Header -->
 <header class="gradient-bg text-white shadow-lg">
-    <div class="container mx-auto px-4 py-4">
-        <div class="flex justify-between items-center">
-            <div class="flex items-center space-x-2">
-                <i class="fas fa-vote-yea text-2xl"></i>
-                <h1 class="text-2xl font-bold">VoteEasy</h1>
-            </div>
-            <nav class="hidden md:flex space-x-6">
-                <a href="#" class="hover:text-purple-200 transition">Home</a>
-                <a href="poll.html" class="hover:text-purple-200 transition">Elections</a>
-                <a href="results.html" class="hover:text-purple-200 transition">Results</a>
-                <a href="about.html" class="hover:text-purple-200 transition">About Us</a>
-                <a href="admin.php" class="hover:text-yellow-300 font-semibold">Admin</a>
-            </nav>
-                
-            <button class="demo-trigger" onclick="showPopup()">Show Login/Signup</button>
-                <div id="popupOverlay" class="popup-overlay hidden">
-                    <div class="popup-container">
-                        <button class="close-btn" onclick="hidePopup()">&times;</button>
-                        
-                        <div class="tab-container">
-                            <button class="tab active" data-tab="login">Login</button>
-                            <button class="tab" data-tab="signup">Sign Up</button>
-                        </div>
+  <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+    
+    <!-- Logo -->
+    <div class="flex items-center space-x-2">
+      <i class="fas fa-vote-yea text-2xl"></i>
+      <h1 class="text-2xl font-bold">VoteEasy</h1>
+    </div>
 
-                        <div class="form-container">
-                            <!-- Login Form -->
-                            <form class="form active" id="loginForm">
-                                <div class="form-group">
-                                    <label for="loginEmail">Email</label>
-                                    <input type="email" id="loginEmail" placeholder="Enter your email" required>
-                                </div>
-                        
-                                <div class="form-group">
-                                    <label for="loginPassword">Password</label>
-                                    <input type="password" id="loginPassword" placeholder="Enter your password" required>
-                                    <button type="button" class="password-toggle" onclick="togglePassword('loginPassword')">👁️</button>
-                                </div>
+    <!-- Desktop Navigation -->
+    <nav class="hidden md:flex space-x-6">
+      <a href="index.html" class="hover:text-purple-200 transition">Home</a>
+      <a href="poll.html" class="hover:text-purple-200 transition">Elections</a>
+      <a href="results.html" class="hover:text-purple-200 transition">Results</a>
+      <a href="about.html" class="hover:text-purple-200 transition">About Us</a>
+      <a href="admin.php" class="hover:text-yellow-300 font-semibold">Admin</a>
+    </nav>
 
-                                <div class="forgot-password">
-                                    <a href="#" onclick="alert('Password reset functionality would go here!')">Forgot Password?</a>
-                                </div>
+    <!-- Right Login/Signup Button -->
+    <button class="hidden md:inline-block bg-white text-purple-600 px-4 py-2 rounded-lg font-semibold shadow hover:bg-purple-100 transition"
+      onclick="showPopup()">
+      Login / Sign Up
+    </button>
 
-                                <button type="submit" class="submit-btn">Sign In</button>
-                            </form>
+    <!-- Mobile Hamburger -->
+    <button id="mobile-menu-btn" class="md:hidden text-white text-2xl focus:outline-none">
+      <i class="fas fa-bars"></i>
+    </button>
+  </div>
 
-                            <!-- Signup Form -->
-                            <form class="form" id="signupForm">
-                                <div class="form-group">
-                                    <label for="signupName">Full Name</label>
-                                    <input type="text" id="signupName" placeholder="Enter your full name" required>
-                                </div>
-
-                                <div class="form-group">
-                                    <label for="signupEmail">Email</label>
-                                    <input type="email" id="signupEmail" placeholder="Enter your email" required>
-                                </div>
-                        
-                                <div class="form-group">
-                                    <label for="signupPassword">Password</label>
-                                    <input type="password" id="signupPassword" placeholder="Create a password" required>
-                                    <button type="button" class="password-toggle" onclick="togglePassword('signupPassword')">👁️</button>
-                                </div>
-
-                                <div class="form-group">
-                                    <label for="confirmPassword">Confirm Password</label>
-                                    <input type="password" id="confirmPassword" placeholder="Confirm your password" required>
-                                    <button type="button" class="password-toggle" onclick="togglePassword('confirmPassword')">👁️</button>
-                                </div>
-
-                                <button type="submit" class="submit-btn">Create Account</button>
-
-                                <div class="terms">
-                                    By creating an account, you agree to our <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+  <!-- Mobile Menu -->
+  <div id="mobile-menu" class="hidden md:hidden bg-purple-800 px-4 py-4 space-y-3">
+    <a href="index.html" class="block py-2 hover:text-purple-200 transition">Home</a>
+    <a href="poll.html" class="block py-2 hover:text-purple-200 transition">Elections</a>
+    <a href="results.html" class="block py-2 hover:text-purple-200 transition">Results</a>
+    <a href="about.html" class="block py-2 hover:text-purple-200 transition">About Us</a>
+    <a href="admin.php" class="block py-2 text-yellow-300 font-semibold">Admin</a>
+    <button class="w-full bg-white text-purple-600 px-4 py-2 rounded-lg font-semibold shadow hover:bg-purple-100 transition"
+      onclick="showPopup()">
+      Login / Sign Up
+    </button>
+  </div>
 </header>
 
 <!-- Mobile menu -->
