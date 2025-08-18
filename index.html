@@ -231,34 +231,49 @@
 
 <!-- Header -->
 <header class="gradient-bg text-white shadow-lg">
-    <div class="container mx-auto px-4 py-4">
-        <div class="flex justify-between items-center">
-            <div class="flex items-center space-x-2">
-                <i class="fas fa-vote-yea text-2xl"></i>
-                <h1 class="text-2xl font-bold">VoteEasy</h1>
-            </div>
-            <nav class="hidden md:flex space-x-6">
-                <a href="index.html" class="hover:text-purple-200 transition">Home</a>
-                <a href="poll.html" class="hover:text-purple-200 transition">Elections</a>
-                <a href="result.html" class="hover:text-purple-200 transition">Results</a>
-                <a href="about.html" class="text-yellow-300 font-semibold">About</a>
-                <a href="admin_dashboard.php" class="hover:text-yellow-300 transition">Admin</a>
-            </nav>
-            <div class="flex items-center space-x-4">
-                <div class="login-section">
-                    <button id="login-btn" class="bg-white text-purple-600 px-4 py-2 rounded-full font-medium hover:bg-purple-100 transition">
-                        Login
-                    </button>
-                </div>
-                <div class="user-section flex items-center space-x-4">
-                    <span class="text-purple-100">Welcome, <span id="user-email"></span></span>
-                    <button id="logout-btn" class="bg-purple-800 text-white px-4 py-2 rounded-full font-medium hover:bg-purple-900 transition">Logout</button>
-                </div>
-                <button class="md:hidden text-2xl" id="mobile-menu-btn"><i class="fas fa-bars"></i></button>
-            </div>
+  <div class="container mx-auto px-4 py-4">
+    <div class="flex justify-between items-center">
+      
+      <!-- Logo -->
+      <div class="flex items-center space-x-2">
+        <i class="fas fa-vote-yea text-2xl"></i>
+        <h1 class="text-2xl font-bold">VoteEasy</h1>
+      </div>
+
+      <!-- Nav Links -->
+      <nav class="hidden md:flex space-x-6">
+        <a href="index.html" class="hover:text-purple-200 transition">Home</a>
+        <a href="poll.html" class="hover:text-purple-200 transition">Elections</a>
+        <a href="result.html" class="hover:text-purple-200 transition">Results</a>
+        <a href="about.html" class="hover:text-purple-200 transition">About</a>
+        <a href="admin_dashboard.php" class="hover:text-yellow-300 font-semibold">Admin</a>
+      </nav>
+
+      <!-- Right Actions -->
+      <div class="flex items-center space-x-4">
+        
+        <!-- Login button (default shown) -->
+        <button id="login-btn" 
+          class="bg-white text-purple-600 px-4 py-2 rounded-full font-medium hover:bg-purple-100 transition">
+          Login / Sign Up
+        </button>
+
+        <!-- User section (hidden until login) -->
+        <div id="user-section" class="hidden flex items-center space-x-4">
+          <span class="text-purple-100">Welcome, <span id="user-email"></span></span>
+          <button id="logout-btn" class="bg-purple-800 text-white px-4 py-2 rounded-full font-medium hover:bg-purple-900 transition">
+            Logout
+          </button>
         </div>
+
+        <!-- Mobile Menu Button -->
+        <button class="md:hidden text-2xl" id="mobile-menu-btn">
+          <i class="fas fa-bars"></i>
+        </button>
+      </div>
     </div>
-</header>   
+  </div>
+</header>
 
 <!-- Mobile menu -->
 <div id="mobile-menu" class="hidden md:hidden bg-purple-800 px-4 py-2">
@@ -539,6 +554,79 @@ function togglePassword(fieldId) {
 document.querySelectorAll('input').forEach(input => {
     input.addEventListener('focus', () => input.parentElement.style.transform = 'scale(1.02)');
     input.addEventListener('blur', () => input.parentElement.style.transform = 'scale(1)');
+});
+
+// ================= LOGIN / SIGNUP / LOGOUT =================
+
+// Login form submit
+document.getElementById("loginForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const email = document.getElementById("loginEmail").value;
+    const password = document.getElementById("loginPassword").value;
+
+    try {
+        const res = await fetch("backend/login.php", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, password })
+        });
+        const data = await res.json();
+
+        if (data.success) {
+            document.getElementById("user-email").textContent = data.email;
+            document.getElementById("login-btn").classList.add("hidden");
+            document.getElementById("user-section").classList.remove("hidden");
+            hidePopup();
+        } else {
+            alert(data.message || "Invalid credentials");
+        }
+    } catch (err) {
+        console.error("Login error:", err);
+        alert("Server error. Please try again later.");
+    }
+});
+
+// Signup form submit
+document.getElementById("signupForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const email = document.getElementById("signupEmail").value;
+    const password = document.getElementById("signupPassword").value;
+    const confirmPassword = document.getElementById("confirmPassword").value;
+
+    if (password !== confirmPassword) {
+        alert("Passwords do not match!");
+        return;
+    }
+
+    try {
+        const res = await fetch("backend/register.php", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, password })
+        });
+        const data = await res.json();
+
+        if (data.success) {
+            alert("Account created successfully! Please log in.");
+            document.querySelector('[data-tab="login"]').click();
+        } else {
+            alert(data.message || "Registration failed");
+        }
+    } catch (err) {
+        console.error("Signup error:", err);
+        alert("Server error. Please try again later.");
+    }
+});
+
+// Logout button
+document.getElementById("logout-btn").addEventListener("click", async () => {
+    try {
+        await fetch("backend/logout.php", { method: "POST" });
+    } catch (err) {
+        console.error("Logout error:", err);
+    }
+    document.getElementById("login-btn").classList.remove("hidden");
+    document.getElementById("user-section").classList.add("hidden");
 });
 </script>
 </body>
