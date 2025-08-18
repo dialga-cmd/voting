@@ -106,7 +106,7 @@
                 </button>
             </div>
             <div class="p-6">
-                <form id="login-form">
+                <form id="login-form" class="space-y-4">
                     <div class="mb-4">
                         <label for="login-username" class="block text-gray-700 mb-2">Username</label>
                         <input type="text" id="login-username" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="username" required>
@@ -138,7 +138,7 @@
                 </button>
             </div>
             <div class="p-6">
-                <form id="register-form">
+                <form id="register-form" class="space-y-4">
                     <div class="mb-4">
                         <label for="reg-username" class="block text-gray-700 mb-2">Username</label>
                         <input type="text" id="reg-username" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="username" required>
@@ -527,9 +527,41 @@ let userState = {
     votedCandidate: ''
 };
 
-document.addEventListener('DOMContentLoaded', function() {
-    initializeEventListeners();
-    checkLoginState();
+document.addEventListener("DOMContentLoaded", () => {
+  const regForm = document.getElementById("register-form");
+  if (regForm) {
+    regForm.addEventListener("submit", async function(e) {
+      e.preventDefault();
+      const username = document.getElementById("reg-username").value.trim();
+      const password = document.getElementById("reg-password").value.trim();
+      const confirmPassword = document.getElementById("reg-confirm-password").value.trim();
+
+      if (password !== confirmPassword) {
+        alert("Passwords do not match!");
+        return;
+      }
+
+      try {
+        let res = await fetch("backend/auth.php?action=register", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username, password })
+        });
+
+        let data = await res.json();
+        if (data.success) {
+          alert("Registration successful! Please log in.");
+          document.getElementById("register-modal").classList.add("hidden");
+          document.getElementById("login-modal").classList.remove("hidden");
+        } else {
+          alert(data.message || "Registration failed.");
+        }
+      } catch (err) {
+        console.error("Signup error:", err);
+        alert("Server error. Please try again later.");
+      }
+    });
+  }
 });
 
 function initializeEventListeners() {
