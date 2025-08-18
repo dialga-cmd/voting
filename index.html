@@ -459,12 +459,12 @@
 
     <!-- Tabs -->
     <div class="flex justify-center mb-6 space-x-6">
-      <button class="tab active font-medium" data-tab="login">Login</button>
-      <button class="tab font-medium" data-tab="signup">Sign Up</button>
+      <button type="button" class="tab active font-medium" data-tab="login">Login</button>
+      <button type="button" class="tab font-medium" data-tab="signup">Sign Up</button>
     </div>
 
     <!-- Login Form -->
-    <form id="loginForm" class="form active space-y-4">
+    <form id="loginForm" class="form space-y-4">
       <div>
         <label for="loginEmail" class="block text-sm font-medium">Email</label>
         <input id="loginEmail" type="email" required
@@ -593,23 +593,24 @@ document.addEventListener('keydown', (e) => {
 
 // Tab switching
 document.querySelectorAll('.tab').forEach(tab => {
-    tab.addEventListener('click', () => {
-        const tabName = tab.dataset.tab;
+  tab.addEventListener('click', () => {
+    const tabName = tab.dataset.tab;
 
-        // update tab buttons
-        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-        tab.classList.add('active');
+    // Reset tab buttons
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
 
-        // hide all forms
-        document.querySelectorAll('.form').forEach(f => f.classList.add('hidden'));
+    // Hide all forms
+    document.querySelectorAll('.form').forEach(f => f.classList.add('hidden'));
 
-        // show only the selected one
-        const activeForm = document.getElementById(tabName + "Form");
-        if (activeForm) {
-            activeForm.classList.remove("hidden");
-        }
-    });
+    // Show correct form
+    const formToShow = document.getElementById(tabName + "Form");
+    if (formToShow) {
+      formToShow.classList.remove("hidden");
+    }
+  });
 });
+
 
 // Password toggle
 function togglePassword(fieldId) {
