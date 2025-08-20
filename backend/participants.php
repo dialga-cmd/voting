@@ -30,7 +30,7 @@ switch ($action) {
             exit;
         }
 
-        $stmt = $db->prepare("INSERT INTO users (name, email, role, poll_id) VALUES (?, ?, 'user', ?)");
+        $stmt = $db->prepare("INSERT INTO users (username, email, poll_id) VALUES (?, ?, 'user', ?)");
         $saved = $stmt->execute([$name, $email, $poll_id]);
 
         echo json_encode(["status" => $saved ? "success" : "error"]);

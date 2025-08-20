@@ -47,7 +47,7 @@ try {
     CREATE TABLE IF NOT EXISTS participants (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         poll_id INTEGER,
-        name TEXT NOT NULL,
+        username TEXT NOT NULL,
         email TEXT,
         FOREIGN KEY(poll_id) REFERENCES polls(id)
     );
