@@ -85,8 +85,6 @@ $totalCouncil = $conn->query("SELECT COUNT(*) FROM student_council")->fetchColum
   <a href="#dashboard" class="nav-link active"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
   <a href="#polls" class="nav-link"><i class="fas fa-poll"></i> Manage Polls</a>
   <a href="#participants" class="nav-link"><i class="fas fa-users"></i> Participants</a>
-  <a href="#council" class="nav-link"><i class="fas fa-user-tie"></i> Student Council</a>
-  <a href="#results" class="nav-link"><i class="fas fa-chart-bar"></i> Results</a>
   <form action="../index.html" method="get" style="margin-top:32px">
     <button class="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</button>
   </form>
@@ -154,24 +152,6 @@ $totalCouncil = $conn->query("SELECT COUNT(*) FROM student_council")->fetchColum
     </form>
     <div id="participantsList"></div>
   </section>
-
-  <!-- Council Panel -->
-  <section id="council" class="panel animate-fade-in">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
-      <span class="panel-header"><i class="fas fa-user-tie"></i> Student Council</span>
-      <button id="showCouncilFormBtn" class="action-btn">+ Add Member</button>
-    </div>
-    <div id="councilForm" class="hidden" style="margin-bottom:14px;">
-      <form id="addCouncilForm" style="display:flex;gap:14px;flex-wrap:wrap;align-items:center;">
-        <input type="text" name="name" required placeholder="Full Name">
-        <input type="text" name="position" required placeholder="Position">
-        <button type="submit" class="action-btn">Add</button>
-        <button type="button" id="closeCouncilFormBtn" style="background:#efefee;border:1px solid #dcdcdc;color:#333;">Cancel</button>
-      </form>
-    </div>
-    <div id="councilTable"></div>
-  </section>
-
 </main>
 
 <script>
@@ -290,25 +270,6 @@ function deleteParticipant(id) {
   }).then(res=>res.json()).then(()=>{loadParticipants();updateStatCounts();});
 }
 
-// --- Council ---
-function loadCouncilMembers() {
-  const box=document.getElementById('councilTable');
-  box.innerHTML = '<div class="text-gray-500 py-2"><i class="fas fa-spinner fa-spin mr-2"></i>Loading…</div>';
-  fetch('council.php?action=list')
-    .then(res=>res.json())
-    .then(data=>{
-      if (!data.length) { box.innerHTML = '<p class="text-gray-500">No members yet.</p>'; return;}
-      let html = data.map(mem=>`
-        <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #f2f2f2;padding:8px 0;">
-          <div>
-            <span class="font-semibold">${mem.name}</span> <span class="text-sm text-gray-500 ml-2">${mem.position}</span>
-          </div>
-          <button onclick="deleteCouncil(${mem.id})" class="delete-btn"><i class="fas fa-trash"></i> Remove</button>
-        </div>
-      `).join('');
-      box.innerHTML = html;
-    });
-}
 document.getElementById('showCouncilFormBtn').onclick = function(){ document.getElementById('councilForm').classList.remove('hidden'); };
 document.getElementById('closeCouncilFormBtn').onclick = function(){ document.getElementById('councilForm').classList.add('hidden'); };
 document.getElementById('addCouncilForm').addEventListener('submit', function(e){
