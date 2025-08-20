@@ -1,5 +1,5 @@
 <?php
-$db_file = __DIR__ . "/../voting.db"; // Fixed path to go up one level from backend folder
+$db_file = __DIR__ . "/voting.db"; // Fixed path to go up one level from backend folder
 
 try {
     $conn = new PDO("sqlite:$db_file");

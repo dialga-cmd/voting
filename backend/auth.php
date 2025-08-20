@@ -1,7 +1,7 @@
 <?php
 session_start();
 header('Content-Type: application/json');
-require_once 'db.php'; // your PDO connection file
+require_once 'db.php';
 
 $input = json_decode(file_get_contents("php://input"), true);
 $action = $_GET['action'] ?? '';

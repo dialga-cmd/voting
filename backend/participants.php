@@ -14,7 +14,6 @@ if ($action === 'list') {
             $stmt->execute([$poll_id]);
             $participants = $stmt->fetchAll(PDO::FETCH_ASSOC);
         } else {
-            // fallback: return all if poll_id not specified
             $stmt = $conn->query("SELECT * FROM participants");
             $participants = $stmt->fetchAll(PDO::FETCH_ASSOC);
         }
@@ -57,6 +56,38 @@ elseif ($action === 'delete') {
         }
     } else {
         echo json_encode(["success" => false, "message" => "ID missing"]);
+    }
+}
+
+elseif ($action === 'vote') {
+    $data = json_decode(file_get_contents("php://input"), true);
+    $user_id = $data['user_id'] ?? null; // current logged-in user
+    $candidate_id = $data['candidate_id'] ?? null;
+
+    if ($user_id && $candidate_id) {
+        try {
+            // check if user already voted
+            $check = $conn->prepare("SELECT COUNT(*) FROM votes WHERE user_id = ?");
+            $check->execute([$user_id]);
+            if ($check->fetchColumn() > 0) {
+                echo json_encode(["success" => false, "message" => "You have already voted."]);
+                exit;
+            }
+
+            // insert vote
+            $stmt = $conn->prepare("INSERT INTO votes (user_id, candidate_id) VALUES (?, ?)");
+            $stmt->execute([$user_id, $candidate_id]);
+
+            // increment candidate vote count
+            $stmt = $conn->prepare("UPDATE candidates SET votes = votes + 1 WHERE id = ?");
+            $stmt->execute([$candidate_id]);
+
+            echo json_encode(["success" => true, "message" => "Vote submitted successfully."]);
+        } catch (Exception $e) {
+            echo json_encode(["success" => false, "message" => $e->getMessage()]);
+        }
+    } else {
+        echo json_encode(["success" => false, "message" => "Missing fields"]);
     }
 }
 

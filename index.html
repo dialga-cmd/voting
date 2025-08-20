@@ -778,6 +778,7 @@ function updateUIAfterLogout() {
     document.body.classList.remove('user-logged-in');
     document.body.classList.add('user-logged-out');
 }
+
 // ================= FETCH POLLS =================
 async function loadPolls() {
     try {
@@ -808,31 +809,127 @@ async function loadPolls() {
     }
 }
 
-// ================= FETCH AND DELETE PARTICIPANTS =================
-function loadParticipants(pollId) {
-    fetch(`backend/participants.php?action=list&poll_id=${pollId}`)
-      .then(res => res.json())
-      .then(data => {
-          const container = document.getElementById("participants-list");
-          if (container) {
-              container.innerHTML = "";
-              if (data.length === 0) {
-                  container.innerHTML = "<p>No participants yet.</p>";
-              } else {
-                  data.forEach(p => {
-                      container.innerHTML += `
-                          <div class="p-3 border-b">
-                              <strong>${p.name}</strong> (${p.email})
-                              <button onclick="deleteParticipant(${p.id}, ${pollId})" class="text-red-500 ml-2">Remove</button>
-                          </div>
-                      `;
-                  });
-              }
-          }
-      })
-      .catch(err => console.error("Participant fetch error:", err));
+// ================= FETCH CANDIDATES FOR A POLL =================
+async function loadCandidates(pollId) {
+    try {
+        let res = await fetch(`backend/participants.php?action=list&poll_id=${pollId}`);
+        let candidates = await res.json();
+
+        const container = document.querySelector(".user-section .space-y-6");
+        container.innerHTML = ""; // clear previous
+
+        if (!candidates || candidates.length === 0) {
+            container.innerHTML = `<p class="text-gray-600">No candidates available for this poll.</p>`;
+            return;
+        }
+
+        candidates.forEach(candidate => {
+            // Generate initials from name
+            let initials = candidate.name.split(" ")
+                .map(word => word[0])
+                .join("")
+                .toUpperCase();
+
+            container.innerHTML += `
+                <div class="border border-gray-200 rounded-lg p-4 hover:border-purple-300 transition candidate-card" data-candidate="${candidate.id}">
+                    <div class="flex items-center">
+                        <div class="mr-4">
+                            <div class="w-16 h-16 rounded-full bg-purple-100 flex items-center justify-center text-purple-600 text-2xl font-bold">
+                                ${initials}
+                            </div>
+                        </div>
+                        <div class="flex-grow">
+                            <h4 class="font-bold text-lg">${candidate.name}</h4>
+                            <p class="text-gray-600 mb-2">${candidate.email || ""}</p>
+                        </div>
+                        <div>
+                            <button 
+                                class="vote-btn bg-gray-100 text-gray-700 px-4 py-2 rounded-lg font-medium hover:bg-gray-200 transition"
+                                data-candidate-id="${candidate.id}" 
+                                data-candidate-name="${candidate.name}">
+                                Select
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+
+        attachVoteHandlers();
+    } catch (err) {
+        console.error("Error loading candidates:", err);
+    }
 }
 
+// ================== HANDLE VOTE SELECTION ==================
+function attachVoteHandlers() {
+    document.querySelectorAll(".vote-btn").forEach(btn => {
+        btn.addEventListener("click", function () {
+            const candidateId = this.dataset.candidateId;
+            const candidateName = this.dataset.candidateName;
+
+            document.getElementById("selected-candidate").classList.remove("hidden");
+            document.getElementById("selected-candidate-name").textContent = candidateName;
+
+            // Save selection to dataset
+            document.getElementById("submit-vote").dataset.candidateId = candidateId;
+        });
+    });
+
+            // Change selection
+            document.getElementById("change-selection").addEventListener("click", function () {
+                document.getElementById("selected-candidate").classList.add("hidden");
+            });
+
+            // Submit vote
+            document.getElementById("submit-vote").addEventListener("click", async function () {
+                const candidateId = this.dataset.candidateId;
+                if (!candidateId) return alert("No candidate selected!");
+
+                try {
+                    let res = await fetch("backend/votes.php?action=vote", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ candidate_id: candidateId })
+                    });
+                    let data = await res.json();
+
+                    if (data.success) {
+                        document.getElementById("vote-confirmation-modal").classList.remove("hidden");
+                    } else {
+                        alert(data.message || "Vote failed");
+                    }
+                } catch (err) {
+                    console.error("Vote error:", err);
+                }
+            });
+
+            // Close modal
+            document.getElementById("close-confirmation-modal").addEventListener("click", () => {
+                document.getElementById("vote-confirmation-modal").classList.add("hidden");
+            });
+        }
+
+// ================= INITIALIZE =================
+document.addEventListener("DOMContentLoaded", async () => {
+    try {
+        // Fetch active polls from backend
+        const res = await fetch("backend/poll.php?action=list");
+        const polls = await res.json();
+
+        if (polls.length > 0) {
+            // Pick the first poll (or filter by active dates if you want)
+            const activePoll = polls[0]; 
+            loadCandidates(activePoll.id); 
+        } else {
+            console.warn("No polls found.");
+        }
+    } catch (err) {
+        console.error("Error fetching polls:", err);
+    }
+});
+
+// ================= DELETE PARTICIPANT =================
 function deleteParticipant(id, pollId) {
     fetch(`backend/participants.php?action=delete&id=${id}`)
       .then(res => res.json())
