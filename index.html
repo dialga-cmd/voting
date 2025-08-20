@@ -520,72 +520,128 @@
 
     <script>
         // User state management
-        let userState = {
-            isLoggedIn: false,
-            username: '',
-            hasVoted: false,
-            votedCandidate: ''
-        };
+let userState = {
+    isLoggedIn: false,
+    username: '',
+    hasVoted: false,
+    votedCandidate: ''
+};
 
-        document.addEventListener('DOMContentLoaded', function() {
-            initializeEventListeners();
-            async function checkLoginState() {
-                try {
-                    let res = await fetch('backend/me.php');
-                    let data = await res.json();
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM Content Loaded'); // Debug log
+    initializeEventListeners();
+    checkLoginState(); // This was missing!
+});
 
-                    if (data.success) {
-                        userState.isLoggedIn = true;
-                        userState.username = data.username;
-                        sessionStorage.setItem('loggedInUser', data.username);
-                        updateUIAfterLogin();
-                    } else {
-                        updateUIAfterLogout();
-                    }
-                } catch (err) {
-                    console.error("Session check error:", err);
-                }
-            }
+// Session check function
+async function checkLoginState() {
+    console.log('Checking login state...'); // Debug log
+    try {
+        let res = await fetch('backend/me.php');
+        let data = await res.json();
+
+        if (data.success) {
+            userState.isLoggedIn = true;
+            userState.username = data.username;
+            sessionStorage.setItem('loggedInUser', data.username);
+            updateUIAfterLogin();
+        } else {
+            updateUIAfterLogout();
+        }
+    } catch (err) {
+        console.error("Session check error:", err);
+        // Fallback to sessionStorage check
+        const savedUser = sessionStorage.getItem('loggedInUser');
+        if (savedUser) {
+            userState.isLoggedIn = true;
+            userState.username = savedUser;
+            updateUIAfterLogin();
+        } else {
+            updateUIAfterLogout();
+        }
+    }
+}
+
+function initializeEventListeners() {
+    console.log('Initializing event listeners...'); // Debug log
+    
+    // Mobile menu toggle
+    const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+    if (mobileMenuBtn) {
+        mobileMenuBtn.addEventListener('click', () => {
+            document.getElementById('mobile-menu').classList.toggle('hidden');
         });
+    }
 
-        function initializeEventListeners() {
-            // Mobile menu toggle
-            document.getElementById('mobile-menu-btn').addEventListener('click', () => {
-                document.getElementById('mobile-menu').classList.toggle('hidden');
-            });
+    // Login button listeners
+    const loginBtn = document.getElementById('login-btn');
+    const voteLoginBtn = document.getElementById('vote-login-btn');
+    const closeLoginModal = document.getElementById('close-login-modal');
+    
+    if (loginBtn) {
+        loginBtn.addEventListener('click', () => {
+            console.log('Login button clicked'); // Debug log
+            document.getElementById('login-modal').classList.remove('hidden');
+        });
+    }
+    
+    if (voteLoginBtn) {
+        voteLoginBtn.addEventListener('click', () => {
+            console.log('Vote login button clicked'); // Debug log
+            document.getElementById('login-modal').classList.remove('hidden');
+        });
+    }
+    
+    if (closeLoginModal) {
+        closeLoginModal.addEventListener('click', () => {
+            document.getElementById('login-modal').classList.add('hidden');
+        });
+    }
 
-            // Open/close login modal
-            document.getElementById('login-btn').addEventListener('click', () => {
-                document.getElementById('login-modal').classList.remove('hidden');
-            });
-            document.getElementById('vote-login-btn').addEventListener('click', () => {
-                document.getElementById('login-modal').classList.remove('hidden');
-            });
-            document.getElementById('close-login-modal').addEventListener('click', () => {
-                document.getElementById('login-modal').classList.add('hidden');
-            });
+    // Register modal listeners
+    const openRegister = document.getElementById('open-register');
+    const closeRegisterModal = document.getElementById('close-register-modal');
+    const openLogin = document.getElementById('open-login');
+    
+    if (openRegister) {
+        openRegister.addEventListener('click', (e) => {
+            e.preventDefault();
+            console.log('Open register clicked'); // Debug log
+            document.getElementById('login-modal').classList.add('hidden');
+            document.getElementById('register-modal').classList.remove('hidden');
+        });
+    }
+    
+    if (closeRegisterModal) {
+        closeRegisterModal.addEventListener('click', () => {
+            document.getElementById('register-modal').classList.add('hidden');
+        });
+    }
+    
+    if (openLogin) {
+        openLogin.addEventListener('click', (e) => {
+            e.preventDefault();
+            document.getElementById('register-modal').classList.add('hidden');
+            document.getElementById('login-modal').classList.remove('hidden');
+        });
+    }
 
-            // Open register modal
-            document.getElementById('open-register').addEventListener('click', (e) => {
-                e.preventDefault();
-                document.getElementById('login-modal').classList.add('hidden');
-                document.getElementById('register-modal').classList.remove('hidden');
-            });
-            document.getElementById('close-register-modal').addEventListener('click', () => {
-                document.getElementById('register-modal').classList.add('hidden');
-            });
-            document.getElementById('open-login').addEventListener('click', (e) => {
-                e.preventDefault();
-                document.getElementById('register-modal').classList.add('hidden');
-                document.getElementById('login-modal').classList.remove('hidden');
-            });
+    // ================= LOGIN FORM =================
+    const loginForm = document.getElementById('login-form');
+    if (loginForm) {
+        loginForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            console.log('Login form submitted'); // Debug log
+            
+            const username = document.getElementById('login-username').value.trim();
+            const password = document.getElementById('login-password').value.trim();
 
-            // ================= LOGIN =================
-            document.getElementById('login-form').addEventListener('submit', async function(e) {
-                e.preventDefault();
-                const username = document.getElementById('login-username').value.trim();
-                const password = document.getElementById('login-password').value.trim();
+            if (!username || !password) {
+                alert('Please fill in all fields');
+                return;
+            }
 
+            try {
                 let res = await fetch('backend/login.php', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -593,29 +649,53 @@
                 });
 
                 let data = await res.json();
+                console.log('Login response:', data); // Debug log
+                
                 if (data.success) {
                     userState.isLoggedIn = true;
                     userState.username = data.username;
                     sessionStorage.setItem('loggedInUser', data.username);
                     updateUIAfterLogin();
                     document.getElementById('login-modal').classList.add('hidden');
+                    // Clear form
+                    loginForm.reset();
                 } else {
                     alert(data.message || 'Invalid username or password.');
                 }
-            });
+            } catch (error) {
+                console.error('Login error:', error);
+                alert('Login failed. Please check your connection and try again.');
+            }
+        });
+    }
 
-            // ================= REGISTER =================
-            document.getElementById('register-form').addEventListener('submit', async function(e) {
-                e.preventDefault();
-                const username = document.getElementById('reg-username').value.trim();
-                const password = document.getElementById('reg-password').value.trim();
-                const confirmPassword = document.getElementById('reg-confirm-password').value.trim();
+    // ================= REGISTER FORM =================
+    const registerForm = document.getElementById('register-form');
+    if (registerForm) {
+        registerForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            console.log('Register form submitted'); // Debug log
+            
+            const username = document.getElementById('reg-username').value.trim();
+            const password = document.getElementById('reg-password').value.trim();
+            const confirmPassword = document.getElementById('reg-confirm-password').value.trim();
 
-                if (password !== confirmPassword) {
-                    alert('Passwords do not match!');
-                    return;
-                }
+            if (!username || !password || !confirmPassword) {
+                alert('Please fill in all fields');
+                return;
+            }
 
+            if (password !== confirmPassword) {
+                alert('Passwords do not match!');
+                return;
+            }
+
+            if (password.length < 6) {
+                alert('Password must be at least 6 characters long');
+                return;
+            }
+
+            try {
                 let res = await fetch('backend/register.php', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -623,6 +703,8 @@
                 });
 
                 let data = await res.json();
+                console.log('Register response:', data); // Debug log
+                
                 if (data.success) {
                     // Auto-login after registration
                     userState.isLoggedIn = true;
@@ -630,41 +712,75 @@
                     sessionStorage.setItem('loggedInUser', data.username);
                     updateUIAfterLogin();
                     document.getElementById('register-modal').classList.add('hidden');
+                    // Clear form
+                    registerForm.reset();
                 } else {
                     alert(data.message || 'Registration failed.');
                 }
-            });
-
-            // ================= LOGOUT =================
-            document.getElementById('logout-btn').addEventListener('click', async () => {
-                await fetch('backend/logout.php', { method: 'POST' });
-                userState.isLoggedIn = false;
-                userState.username = '';
-                sessionStorage.removeItem('loggedInUser');
-                updateUIAfterLogout();
-            });
-        }
-
-        // Restore session
-        function checkLoginState() {
-            const savedUser = sessionStorage.getItem('loggedInUser');
-            if (savedUser) {
-                userState.isLoggedIn = true;
-                userState.username = savedUser;
-                updateUIAfterLogin();
+            } catch (error) {
+                console.error('Register error:', error);
+                alert('Registration failed. Please check your connection and try again.');
             }
-        }
+        });
+    }
 
-        // Update UI
-        function updateUIAfterLogin() {
-            document.body.classList.remove('user-logged-out');
-            document.body.classList.add('user-logged-in');
-            document.getElementById('user-email').textContent = userState.username;
-        }
-        function updateUIAfterLogout() {
-            document.body.classList.remove('user-logged-in');
-            document.body.classList.add('user-logged-out');
-        }
+    // ================= LOGOUT =================
+    const logoutBtn = document.getElementById('logout-btn');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', async () => {
+            console.log('Logout clicked'); // Debug log
+            try {
+                await fetch('backend/logout.php', { method: 'POST' });
+            } catch (error) {
+                console.error('Logout error:', error);
+            }
+            
+            userState.isLoggedIn = false;
+            userState.username = '';
+            userState.hasVoted = false;
+            userState.votedCandidate = '';
+            sessionStorage.removeItem('loggedInUser');
+            updateUIAfterLogout();
+        });
+    }
+
+    // Close modals when clicking outside
+    const loginModal = document.getElementById('login-modal');
+    const registerModal = document.getElementById('register-modal');
+    
+    if (loginModal) {
+        loginModal.addEventListener('click', (e) => {
+            if (e.target === loginModal) {
+                loginModal.classList.add('hidden');
+            }
+        });
+    }
+    
+    if (registerModal) {
+        registerModal.addEventListener('click', (e) => {
+            if (e.target === registerModal) {
+                registerModal.classList.add('hidden');
+            }
+        });
+    }
+}
+
+// Update UI functions
+function updateUIAfterLogin() {
+    console.log('Updating UI after login for:', userState.username); // Debug log
+    document.body.classList.remove('user-logged-out');
+    document.body.classList.add('user-logged-in');
+    const userEmailElement = document.getElementById('user-email');
+    if (userEmailElement) {
+        userEmailElement.textContent = userState.username;
+    }
+}
+
+function updateUIAfterLogout() {
+    console.log('Updating UI after logout'); // Debug log
+    document.body.classList.remove('user-logged-in');
+    document.body.classList.add('user-logged-out');
+}
 </script>
 </body>
 </html>
