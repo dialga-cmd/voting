@@ -203,11 +203,11 @@
     </div>
 </section>
 
-<div class="md:flex gap-8 mt-8">
+<div class="md:flex gap-8 mt-8 mb-16">
     <!-- Left Gradient Info Box -->
     <div class="md:w-1/3">
         <div class="bg-gradient-to-br from-purple-600 to-indigo-600 text-white rounded-2xl p-6 shadow-lg">
-            <h3 id="left-poll-title" class="text-xl font-bold mb-2">Loading Poll...</h3>
+            <h3 id="left-poll-title" class="text-xl font-bold mb-2">Please select a poll to vote</h3>
             <p class="text-sm text-purple-100 mb-4">Why choose us for hosting elections and poll?</p>
 
             <ul class="space-y-3 mb-6">
@@ -355,7 +355,7 @@ let userState = {
 document.addEventListener('DOMContentLoaded', function() {
     console.log('DOM Content Loaded'); // Debug log
     initializeEventListeners();
-    checkLoginState(); // This was missing!
+    checkLoginState();
 });
 
 document.addEventListener("DOMContentLoaded", async () => {
