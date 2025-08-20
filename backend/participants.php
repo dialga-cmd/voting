@@ -12,10 +12,10 @@ switch ($action) {
     case 'list':
         $poll_id = $_GET['poll_id'] ?? null;
         if ($poll_id) {
-            $stmt = $db->prepare("SELECT id, name, email FROM users WHERE role = 'user' AND poll_id = ?");
+            $stmt = $db->prepare("SELECT id, username FROM users WHERE role = 'username' AND poll_id = ?");
             $stmt->execute([$poll_id]);
         } else {
-            $stmt = $db->query("SELECT id, name, email FROM users WHERE role = 'user'");
+            $stmt = $db->query("SELECT id, name, email FROM users WHERE role = 'username'");
         }
         echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
         break;
