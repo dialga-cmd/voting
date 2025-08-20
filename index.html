@@ -182,154 +182,27 @@
             </div>
         </section>
 
-        <!-- Active Election Section -->
+        <!-- Active Elections Section -->
         <section class="mb-12">
             <div class="flex justify-between items-center mb-6">
                 <h2 class="text-2xl font-bold text-gray-800">Active Elections</h2>
                 <a href="#" class="text-purple-600 hover:text-purple-800 flex items-center">
-                    View all <i class="fas fa-chevron-right ml-1"></i>
+                View all <i class="fas fa-chevron-right ml-1"></i>
                 </a>
             </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <!-- Election Card 1 -->
-                <div class="bg-white rounded-xl shadow-md overflow-hidden transition duration-300 card-hover">
-                    <div class="p-6">
-                        <div class="flex justify-between items-start mb-4">
-                            <div>
-                                <span class="inline-block bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full uppercase font-semibold">Active</span>
-                                <span class="inline-block bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded-full uppercase font-semibold ml-2">National</span>
-                            </div>
-                            <div class="text-gray-500 text-sm">
-                                <i class="fas fa-clock mr-1"></i> 2 days left
-                            </div>
-                        </div>
-                        <h3 class="text-xl font-bold text-gray-800 mb-2">Student Union Election 2025</h3>
-                        <p class="text-gray-600 mb-4">Elect your student representatives for the academic year 2025-2026.</p>
-                        
-                        <div class="mb-4">
-                            <div class="flex justify-between text-sm text-gray-500 mb-1">
-                                <span>Start Date</span>
-                                <span>End Date</span>
-                            </div>
-                            <div class="flex justify-between text-sm font-medium">
-                                <span>Oct 15, 2025</span>
-                                <span>Oct 20, 2025</span>
-                            </div>
-                        </div>
-                        
-                        <button class="w-full gradient-bg text-white py-2 px-4 rounded-lg hover:opacity-90 transition font-medium">
-                            View Candidates
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Election Card 2 -->
-                <div class="bg-white rounded-xl shadow-md overflow-hidden transition duration-300 card-hover">
-                    <div class="p-6">
-                        <div class="flex justify-between items-start mb-4">
-                            <div>
-                                <span class="inline-block bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full uppercase font-semibold">Active</span>
-                                <span class="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full uppercase font-semibold ml-2">Department</span>
-                            </div>
-                            <div class="text-gray-500 text-sm">
-                                <i class="fas fa-clock mr-1"></i> 5 days left
-                            </div>
-                        </div>
-                        <h3 class="text-xl font-bold text-gray-800 mb-2">Computer Science Dept. Head</h3>
-                        <p class="text-gray-600 mb-4">Vote for the next head of the Computer Science Department.</p>
-                        
-                        <div class="mb-4">
-                            <div class="flex justify-between text-sm text-gray-500 mb-1">
-                                <span>Start Date</span>
-                                <span>End Date</span>
-                            </div>
-                            <div class="flex justify-between text-sm font-medium">
-                                <span>Oct 10, 2025</span>
-                                <span>Oct 25, 2025</span>
-                            </div>
-                        </div>
-                        
-                        <button class="w-full gradient-bg text-white py-2 px-4 rounded-lg hover:opacity-90 transition font-medium">
-                            View Candidates
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Election Card 3 -->
-                <div class="bg-white rounded-xl shadow-md overflow-hidden transition duration-300 card-hover">
-                    <div class="p-6">
-                        <div class="flex justify-between items-start mb-4">
-                            <div>
-                                <span class="inline-block bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded-full uppercase font-semibold">Upcoming</span>
-                                <span class="inline-block bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded-full uppercase font-semibold ml-2">National</span>
-                            </div>
-                            <div class="text-gray-500 text-sm">
-                                <i class="fas fa-clock mr-1"></i> Starts in 3 days
-                            </div>
-                        </div>
-                        <h3 class="text-xl font-bold text-gray-800 mb-2">National Youth Council</h3>
-                        <p class="text-gray-600 mb-4">Elect representatives for the National Youth Council 2026.</p>
-                        
-                        <div class="mb-4">
-                            <div class="flex justify-between text-sm text-gray-500 mb-1">
-                                <span>Start Date</span>
-                                <span>End Date</span>
-                            </div>
-                            <div class="flex justify-between text-sm font-medium">
-                                <span>Oct 25, 2025</span>
-                                <span>Nov 5, 2025</span>
-                            </div>
-                        </div>
-                        
-                        <button class="w-full bg-gray-200 text-gray-700 py-2 px-4 rounded-lg font-medium cursor-not-allowed" disabled>
-                            Coming Soon
-                        </button>
-                    </div>
-                </div>
+            <div id="elections-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Polls will be injected here -->
             </div>
         </section>
 
-        <!-- Voting Booth Section -->
-        <section class="mb-12 bg-white rounded-xl shadow-md overflow-hidden">
-            <div class="md:flex">
-                <div class="md:w-1/3 gradient-bg text-white p-8 flex flex-col justify-center">
-                    <h2 class="text-2xl font-bold mb-4">Student Union Election 2025</h2>
-                    <p class="mb-6">Cast your vote for the student representatives. Your vote is confidential and secure.</p>
-                    
-                    <div class="mb-6">
-                        <div class="flex items-center mb-2">
-                            <div class="w-8 h-8 rounded-full bg-purple-200 flex items-center justify-center mr-3">
-                                <i class="fas fa-user-check text-purple-700"></i>
-                            </div>
-                            <span>Verified voters only</span>
-                        </div>
-                        <div class="flex items-center mb-2">
-                            <div class="w-8 h-8 rounded-full bg-purple-200 flex items-center justify-center mr-3">
-                                <i class="fas fa-lock text-purple-700"></i>
-                            </div>
-                            <span>Secure voting system</span>
-                        </div>
-                        <div class="flex items-center">
-                            <div class="w-8 h-8 rounded-full bg-purple-200 flex items-center justify-center mr-3">
-                                <i class="fas fa-shield-alt text-purple-700"></i>
-                            </div>
-                            <span>Anonymous voting</span>
-                        </div>
-                    </div>
-                    
-                    <div class="bg-purple-800 bg-opacity-50 rounded-lg p-4">
-                        <h4 class="font-bold mb-2">Voting Instructions</h4>
-                        <ol class="list-decimal list-inside text-sm space-y-1">
-                            <li>Log in to your account</li>
-                            <li>Select your preferred candidate</li>
-                            <li>Review your selection</li>
-                            <li>Submit your vote</li>
-                            <li>You'll receive a confirmation</li>
-                        </ol>
-                    </div>
-                </div>
-                
+        <!-- Participants Section -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">Participants</h2>
+            <div id="participants-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Participants will be injected here -->
+            </div>
+        </section>
+
                 <div class="md:w-2/3 p-8">
                     <!-- Login Required Message (shown when not logged in) -->
                     <div class="login-section text-center py-12">
@@ -344,128 +217,59 @@
                     </div>
 
                     <!-- Voting Interface (shown when logged in) -->
-                    <div class="user-section">
-                        <h3 class="text-xl font-bold text-gray-800 mb-6">Candidates for President</h3>
-                        
-                        <div class="space-y-6">
-                            <!-- Candidate 1 -->
-                            <div class="border border-gray-200 rounded-lg p-4 hover:border-purple-300 transition candidate-card" data-candidate="1">
-                                <div class="flex items-center">
-                                    <div class="mr-4">
-                                        <div class="w-16 h-16 rounded-full bg-purple-100 flex items-center justify-center text-purple-600 text-2xl font-bold">
-                                            JS
-                                        </div>
-                                    </div>
-                                    <div class="flex-grow">
-                                        <h4 class="font-bold text-lg">John Smith</h4>
-                                        <p class="text-gray-600 mb-2">Computer Science Major</p>
-                                        <div class="flex items-center text-sm text-gray-500">
-                                            <i class="fas fa-bullhorn mr-1"></i>
-                                            <span>"Empowering students through transparent leadership"</span>
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <button class="vote-btn bg-gray-100 text-gray-700 px-4 py-2 rounded-lg font-medium hover:bg-gray-200 transition" data-candidate-id="1" data-candidate-name="John Smith">
-                                            Select
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <!-- Candidate 2 -->
-                            <div class="border border-gray-200 rounded-lg p-4 hover:border-purple-300 transition candidate-card" data-candidate="2">
-                                <div class="flex items-center">
-                                    <div class="mr-4">
-                                        <div class="w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 text-2xl font-bold">
-                                            MJ
-                                        </div>
-                                    </div>
-                                    <div class="flex-grow">
-                                        <h4 class="font-bold text-lg">Maria Johnson</h4>
-                                        <p class="text-gray-600 mb-2">Political Science Major</p>
-                                        <div class="flex items-center text-sm text-gray-500">
-                                            <i class="fas fa-bullhorn mr-1"></i>
-                                            <span>"Building bridges between students and administration"</span>
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <button class="vote-btn bg-gray-100 text-gray-700 px-4 py-2 rounded-lg font-medium hover:bg-gray-200 transition" data-candidate-id="2" data-candidate-name="Maria Johnson">
-                                            Select
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <!-- Candidate 3 -->
-                            <div class="border border-gray-200 rounded-lg p-4 hover:border-purple-300 transition candidate-card" data-candidate="3">
-                                <div class="flex items-center">
-                                    <div class="mr-4">
-                                        <div class="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center text-green-600 text-2xl font-bold">
-                                            AD
-                                        </div>
-                                    </div>
-                                    <div class="flex-grow">
-                                        <h4 class="font-bold text-lg">Alex Davis</h4>
-                                        <p class="text-gray-600 mb-2">Engineering Major</p>
-                                        <div class="flex items-center text-sm text-gray-500">
-                                            <i class="fas fa-bullhorn mr-1"></i>
-                                            <span>"Innovative solutions for student challenges"</span>
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <button class="vote-btn bg-gray-100 text-gray-700 px-4 py-2 rounded-lg font-medium hover:bg-gray-200 transition" data-candidate-id="3" data-candidate-name="Alex Davis">
-                                            Select
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Selected candidate confirmation -->
-                        <div id="selected-candidate" class="mt-8 p-4 border border-purple-200 bg-purple-50 rounded-lg hidden">
-                            <div class="flex justify-between items-center">
-                                <div>
-                                    <h4 class="font-bold text-purple-800">You have selected:</h4>
-                                    <p id="selected-candidate-name" class="text-lg font-medium"></p>
-                                </div>
-                                <div>
-                                    <button id="change-selection" class="text-purple-600 hover:text-purple-800 mr-4">
-                                        Change
-                                    </button>
-                                    <button id="submit-vote" class="gradient-bg text-white px-4 py-2 rounded-lg font-medium hover:opacity-90 transition">
-                                        Submit Vote
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
+                    <h3 id="poll-title" class="text-2xl font-bold text-gray-800 mb-2"></h3>
+                        <p id="poll-dates" class="text-sm text-gray-600"></p>
+                    </div>
 
-                        <!-- Already Voted Message -->
-                        <div id="already-voted" class="text-center py-12 hidden">
-                            <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                                <i class="fas fa-check-circle text-green-500 text-3xl"></i>
+
+                    <!-- Candidates list -->
+                    <div id="candidates-container" class="space-y-6"></div>
+
+
+                    <!-- Selected candidate confirmation -->
+                    <div id="selected-candidate" class="mt-8 p-4 border border-purple-200 bg-purple-50 rounded-lg hidden">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <h4 class="font-bold text-purple-800">You have selected:</h4>
+                                <p id="selected-candidate-name" class="text-lg font-medium"></p>
                             </div>
-                            <h3 class="text-xl font-bold text-gray-800 mb-4">You Have Already Voted</h3>
-                            <p class="text-gray-600 mb-6">Thank you for participating in the Student Union Election 2025. Your vote has been recorded.</p>
-                            <p class="text-sm text-gray-500">You voted for: <span id="voted-candidate" class="font-medium"></span></p>
+                       <div>
+                            <button id="change-selection" class="text-purple-600 hover:text-purple-800 mr-4">
+                                    Change
+                            </button>
+                                <button id="submit-vote" class="gradient-bg text-white px-4 py-2 rounded-lg font-medium hover:opacity-90 transition">
+                                            Submit Vote
+                                </button>
+                            </div>
                         </div>
                     </div>
-                </div>
-            </div>
-        </section>
 
-        <!-- Vote Confirmation Modal (hidden by default) -->
-        <div id="vote-confirmation-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
-            <div class="bg-white rounded-xl shadow-xl w-full max-w-md p-8 text-center">
-                <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+
+                    <!-- Already Voted Message -->
+                    <div id="already-voted" class="text-center py-12 hidden">
+                    <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <i class="fas fa-check-circle text-green-500 text-3xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-800 mb-4">You Have Already Voted</h3>
+                    <p class="text-gray-600 mb-6">Thank you for participating in the Student Union Election 2025. Your vote has been recorded.</p>
+                    <p class="text-sm text-gray-500">You voted for: <span id="voted-candidate" class="font-medium"></span></p>
+                    </div>
+                    </div>
+
+
+                    <!-- Vote Confirmation Modal (hidden by default) -->
+                    <div id="vote-confirmation-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+                    <div class="bg-white rounded-xl shadow-xl w-full max-w-md p-8 text-center">
+                    <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
                     <i class="fas fa-check text-green-500 text-3xl"></i>
-                </div>
-                <h3 class="text-2xl font-bold text-gray-800 mb-4">Vote Submitted Successfully!</h3>
-                <p class="text-gray-600 mb-6">Thank you for participating in the Student Union Election 2025. Your vote has been recorded securely.</p>
-                <button id="close-confirmation-modal" class="gradient-bg text-white px-6 py-2 rounded-lg font-medium hover:opacity-90 transition">
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-800 mb-4">Vote Submitted Successfully!</h3>
+                    <p class="text-gray-600 mb-6">Thank you for participating in the Student Union Election 2025. Your vote has been recorded securely.</p>
+                    <button id="close-confirmation-modal" class="gradient-bg text-white px-6 py-2 rounded-lg font-medium hover:opacity-90 transition">
                     Close
-                </button>
-            </div>
-        </div>
+                    </button>
+                    </div>
+                    </div>
     </main>
 
     <!-- Footer -->
@@ -519,6 +323,7 @@
     </footer>
 
     <script>
+        // User state management
 let userState = {
     isLoggedIn: false,
     username: '',
@@ -527,14 +332,14 @@ let userState = {
 };
 
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('DOM Content Loaded');
+    console.log('DOM Content Loaded'); // Debug log
     initializeEventListeners();
-    checkLoginState();
+    checkLoginState(); // This was missing!
 });
 
 // Session check function
 async function checkLoginState() {
-    console.log('Checking login state...');
+    console.log('Checking login state...'); // Debug log
     try {
         let res = await fetch('backend/me.php');
         let data = await res.json();
@@ -549,6 +354,7 @@ async function checkLoginState() {
         }
     } catch (err) {
         console.error("Session check error:", err);
+        // Fallback to sessionStorage check
         const savedUser = sessionStorage.getItem('loggedInUser');
         if (savedUser) {
             userState.isLoggedIn = true;
@@ -563,7 +369,7 @@ async function checkLoginState() {
 function initializeEventListeners() {
     console.log('Initializing event listeners...'); // Debug log
     
-    // =================== MOBILE VIEW ===================
+    // Mobile menu toggle
     const mobileMenuBtn = document.getElementById('mobile-menu-btn');
     if (mobileMenuBtn) {
         mobileMenuBtn.addEventListener('click', () => {
@@ -571,7 +377,7 @@ function initializeEventListeners() {
         });
     }
 
-    // =================== LOGIN MODAL ===================
+    // Login button listeners
     const loginBtn = document.getElementById('login-btn');
     const voteLoginBtn = document.getElementById('vote-login-btn');
     const closeLoginModal = document.getElementById('close-login-modal');
@@ -596,7 +402,7 @@ function initializeEventListeners() {
         });
     }
 
-    // ====================== REGISTER MODEL ======================
+    // Register modal listeners
     const openRegister = document.getElementById('open-register');
     const closeRegisterModal = document.getElementById('close-register-modal');
     const openLogin = document.getElementById('open-login');
@@ -629,7 +435,7 @@ function initializeEventListeners() {
     if (loginForm) {
         loginForm.addEventListener('submit', async function(e) {
             e.preventDefault();
-            console.log('Login form submitted');
+            console.log('Login form submitted'); // Debug log
             
             const username = document.getElementById('login-username').value.trim();
             const password = document.getElementById('login-password').value.trim();
@@ -647,7 +453,7 @@ function initializeEventListeners() {
                 });
 
                 let data = await res.json();
-                console.log('Login response:', data);
+                console.log('Login response:', data); // Debug log
                 
                 if (data.success) {
                     userState.isLoggedIn = true;
@@ -655,6 +461,7 @@ function initializeEventListeners() {
                     sessionStorage.setItem('loggedInUser', data.username);
                     updateUIAfterLogin();
                     document.getElementById('login-modal').classList.add('hidden');
+                    // Clear form
                     loginForm.reset();
                 } else {
                     alert(data.message || 'Invalid username or password.');
@@ -741,7 +548,7 @@ function initializeEventListeners() {
         });
     }
 
-    // ================= MODAL CLOSE =================
+    // Close modals when clicking outside
     const loginModal = document.getElementById('login-modal');
     const registerModal = document.getElementById('register-modal');
     
@@ -762,7 +569,7 @@ function initializeEventListeners() {
     }
 }
 
-// ================= UPDATE UI =================
+// Update UI functions
 function updateUIAfterLogin() {
     console.log('Updating UI after login for:', userState.username); // Debug log
     document.body.classList.remove('user-logged-out');
@@ -779,167 +586,71 @@ function updateUIAfterLogout() {
     document.body.classList.add('user-logged-out');
 }
 
-// ================= FETCH POLLS =================
-async function loadPolls() {
-    try {
-        let res = await fetch('backend/poll.php');
-        let polls = await res.json();
+// ================= FETCH POLL + CANDIDATES =================
+document.addEventListener("DOMContentLoaded", async () => {
+  try {
+    // Fetch latest poll
+    let pollRes = await fetch("backend/poll.php?action=list");
+    let polls = await pollRes.json();
+    if (!polls || polls.length === 0) return;
 
-        const container = document.getElementById('elections-container');
+    let poll = polls[polls.length - 1]; // show latest poll
+    document.getElementById("poll-title").textContent = poll.title;
+    document.getElementById("poll-dates").textContent = `${poll.start_date} → ${poll.end_date}`;
+
+    // Fetch participants (candidates)
+    let partRes = await fetch(`backend/participants.php?action=list&poll_id=${poll.id}`);
+    let participants = await partRes.json();
+
+    const container = document.getElementById("candidates-container");
+    container.innerHTML = "";
+
+    participants.forEach(p => {
+      const initials = p.name.split(" ").map(n => n[0]).join("").toUpperCase();
+      container.innerHTML += `
+        <div class="border border-gray-200 rounded-lg p-4 hover:border-purple-300 transition candidate-card" data-candidate="${p.id}">
+          <div class="flex items-center">
+            <div class="mr-4">
+              <div class="w-16 h-16 rounded-full bg-purple-100 flex items-center justify-center text-purple-600 text-2xl font-bold">
+                ${initials}
+              </div>
+            </div>
+            <div class="flex-grow">
+              <h4 class="font-bold text-lg">${p.name}</h4>
+              <p class="text-gray-600 mb-2">Participant</p>
+            </div>
+            <div>
+              <button class="vote-btn bg-gray-100 text-gray-700 px-4 py-2 rounded-lg font-medium hover:bg-gray-200 transition" data-candidate-id="${p.id}" data-candidate-name="${p.name}">
+                Select
+              </button>
+            </div>
+          </div>
+        </div>`;
+    });
+  } catch (err) {
+    console.error("Error loading poll/candidates:", err);
+  }
+});
+
+// ================= FETCH COUNCIL MEMBERS =================
+async function loadCouncil() {
+    try {
+        let res = await fetch('backend/council.php');
+        let council = await res.json();
+
+        const container = document.getElementById('council-container');
         container.innerHTML = '';
 
-        polls.forEach(poll => {
+        council.forEach(member => {
             container.innerHTML += `
-                <div class="bg-white rounded-xl shadow-md overflow-hidden transition duration-300 card-hover">
-                    <div class="p-6">
-                        <h3 class="text-xl font-bold text-gray-800 mb-2">${poll.title}</h3>
-                        <p class="text-gray-600 mb-4">${poll.description}</p>
-                        <div class="flex justify-between text-sm font-medium mb-4">
-                            <span>${poll.start_date}</span>
-                            <span>${poll.end_date}</span>
-                        </div>
-                        <button class="w-full gradient-bg text-white py-2 px-4 rounded-lg hover:opacity-90 transition font-medium">
-                            View Candidates
-                        </button>
-                    </div>
+                <div class="bg-white rounded-xl shadow-md p-4">
+                    <h4 class="font-bold">${member.name}</h4>
+                    <p class="text-gray-600">${member.position}</p>
                 </div>`;
         });
     } catch (err) {
-        console.error("Error loading polls:", err);
+        console.error("Error loading council:", err);
     }
-}
-
-// ================= FETCH CANDIDATES FOR A POLL =================
-async function loadCandidates(pollId) {
-    try {
-        let res = await fetch(`backend/participants.php?action=list&poll_id=${pollId}`);
-        let candidates = await res.json();
-
-        const container = document.querySelector(".user-section .space-y-6");
-        container.innerHTML = ""; // clear previous
-
-        if (!candidates || candidates.length === 0) {
-            container.innerHTML = `<p class="text-gray-600">No candidates available for this poll.</p>`;
-            return;
-        }
-
-        candidates.forEach(candidate => {
-            // Generate initials from name
-            let initials = candidate.name.split(" ")
-                .map(word => word[0])
-                .join("")
-                .toUpperCase();
-
-            container.innerHTML += `
-                <div class="border border-gray-200 rounded-lg p-4 hover:border-purple-300 transition candidate-card" data-candidate="${candidate.id}">
-                    <div class="flex items-center">
-                        <div class="mr-4">
-                            <div class="w-16 h-16 rounded-full bg-purple-100 flex items-center justify-center text-purple-600 text-2xl font-bold">
-                                ${initials}
-                            </div>
-                        </div>
-                        <div class="flex-grow">
-                            <h4 class="font-bold text-lg">${candidate.name}</h4>
-                            <p class="text-gray-600 mb-2">${candidate.email || ""}</p>
-                        </div>
-                        <div>
-                            <button 
-                                class="vote-btn bg-gray-100 text-gray-700 px-4 py-2 rounded-lg font-medium hover:bg-gray-200 transition"
-                                data-candidate-id="${candidate.id}" 
-                                data-candidate-name="${candidate.name}">
-                                Select
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            `;
-        });
-
-        attachVoteHandlers();
-    } catch (err) {
-        console.error("Error loading candidates:", err);
-    }
-}
-
-// ================== HANDLE VOTE SELECTION ==================
-function attachVoteHandlers() {
-    document.querySelectorAll(".vote-btn").forEach(btn => {
-        btn.addEventListener("click", function () {
-            const candidateId = this.dataset.candidateId;
-            const candidateName = this.dataset.candidateName;
-
-            document.getElementById("selected-candidate").classList.remove("hidden");
-            document.getElementById("selected-candidate-name").textContent = candidateName;
-
-            // Save selection to dataset
-            document.getElementById("submit-vote").dataset.candidateId = candidateId;
-        });
-    });
-
-            // Change selection
-            document.getElementById("change-selection").addEventListener("click", function () {
-                document.getElementById("selected-candidate").classList.add("hidden");
-            });
-
-            // Submit vote
-            document.getElementById("submit-vote").addEventListener("click", async function () {
-                const candidateId = this.dataset.candidateId;
-                if (!candidateId) return alert("No candidate selected!");
-
-                try {
-                    let res = await fetch("backend/votes.php?action=vote", {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ candidate_id: candidateId })
-                    });
-                    let data = await res.json();
-
-                    if (data.success) {
-                        document.getElementById("vote-confirmation-modal").classList.remove("hidden");
-                    } else {
-                        alert(data.message || "Vote failed");
-                    }
-                } catch (err) {
-                    console.error("Vote error:", err);
-                }
-            });
-
-            // Close modal
-            document.getElementById("close-confirmation-modal").addEventListener("click", () => {
-                document.getElementById("vote-confirmation-modal").classList.add("hidden");
-            });
-        }
-
-// ================= INITIALIZE =================
-document.addEventListener("DOMContentLoaded", async () => {
-    try {
-        // Fetch active polls from backend
-        const res = await fetch("backend/poll.php?action=list");
-        const polls = await res.json();
-
-        if (polls.length > 0) {
-            // Pick the first poll (or filter by active dates if you want)
-            const activePoll = polls[0]; 
-            loadCandidates(activePoll.id); 
-        } else {
-            console.warn("No polls found.");
-        }
-    } catch (err) {
-        console.error("Error fetching polls:", err);
-    }
-});
-
-// ================= DELETE PARTICIPANT =================
-function deleteParticipant(id, pollId) {
-    fetch(`backend/participants.php?action=delete&id=${id}`)
-      .then(res => res.json())
-      .then(data => {
-          if (data.success) {
-              loadParticipants(pollId); // refresh only this poll's list
-          } else {
-              alert("Failed: " + data.message);
-          }
-      });
 }
 
 // ================= INIT LOAD =================
@@ -948,7 +659,6 @@ document.addEventListener('DOMContentLoaded', () => {
     loadParticipants();
     loadCouncil();
 });
-
 </script>
 </body>
 </html>
