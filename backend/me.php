@@ -1,15 +1,23 @@
 <?php
+// backend/me.php
 require_once "config.php";
 session_start();
 
 header("Content-Type: application/json");
+header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Methods: POST, GET, OPTIONS');
+header('Access-Control-Allow-Headers: Content-Type');
 
-if (isset($_SESSION["user_id"])) {
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    exit(0);
+}
+
+if (isset($_SESSION["user"]) && is_array($_SESSION["user"])) {
     echo json_encode([
         "success"  => true,
-        "id"       => $_SESSION["user_id"],
-        "username" => $_SESSION["username"],
-        "role"     => $_SESSION["role"]
+        "id"       => $_SESSION["user"]["id"],
+        "username" => $_SESSION["user"]["username"],
+        "role"     => $_SESSION["user"]["role"]
     ]);
 } else {
     echo json_encode([
@@ -17,3 +25,4 @@ if (isset($_SESSION["user_id"])) {
         "message" => "Not logged in"
     ]);
 }
+?>

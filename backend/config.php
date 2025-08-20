@@ -1,14 +1,14 @@
 <?php
-$db_file = __DIR__ . "/voting.db";
+$db_file = __DIR__ . "/../voting.db"; // Fixed path to go up one level from backend folder
 
 try {
     $conn = new PDO("sqlite:$db_file");
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-    // 🔐 Enforce foreign key constraints in SQLite
+    // Enforce foreign key constraints in SQLite
     $conn->exec("PRAGMA foreign_keys = ON;");
 
-    // ✅ Create all necessary tables
+    // Create all necessary tables
     $conn->exec("
     CREATE TABLE IF NOT EXISTS polls (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -19,9 +19,9 @@ try {
 
     CREATE TABLE IF NOT EXISTS users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        username TEXT UNIQUE,
-        password TEXT,
-        role TEXT DEFAULT 'user', -- user or admin
+        username TEXT UNIQUE NOT NULL,
+        password TEXT NOT NULL,
+        role TEXT DEFAULT 'user',
         poll_id INTEGER,
         created_at TEXT DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (poll_id) REFERENCES polls(id) ON DELETE CASCADE
@@ -30,7 +30,7 @@ try {
     CREATE TABLE IF NOT EXISTS candidates (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         poll_id INTEGER,
-        name TEXT,
+        name TEXT NOT NULL,
         votes INTEGER DEFAULT 0,
         FOREIGN KEY(poll_id) REFERENCES polls(id) ON DELETE CASCADE
     );
@@ -47,11 +47,10 @@ try {
     CREATE TABLE IF NOT EXISTS participants (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         poll_id INTEGER,
-        name TEXT,
+        name TEXT NOT NULL,
         email TEXT,
         FOREIGN KEY(poll_id) REFERENCES polls(id)
     );
-
 
     CREATE TABLE IF NOT EXISTS student_council (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -60,7 +59,7 @@ try {
     );
     ");
 
-    // 📥 Insert default poll if none exists
+    // Insert default poll if none exists
     $stmt = $conn->query("SELECT COUNT(*) FROM polls");
     if ($stmt->fetchColumn() == 0) {
         $conn->exec("
@@ -69,8 +68,8 @@ try {
         ");
     }
 
-    // 📥 Insert default candidates if empty
-    $stmt = $conn->query("SELECT COUNT(*) FROM candidates");
+    // Insert default participants if empty
+    $stmt = $conn->query("SELECT COUNT(*) FROM participants");
     if ($stmt->fetchColumn() == 0) {
         $conn->exec("
             INSERT INTO participants (name, poll_id) VALUES
@@ -80,15 +79,16 @@ try {
         ");
     }
 
-    // 👨‍💼 Insert admin if none exists
+    // Insert admin if none exists - FIXED: Use username instead of email
     $checkAdmin = $conn->query("SELECT COUNT(*) FROM users WHERE role = 'admin'")->fetchColumn();
     if ($checkAdmin == 0) {
         $password = password_hash('admin123', PASSWORD_BCRYPT);
-        $conn->prepare("INSERT INTO users (email, password, role, poll_id) VALUES (?, ?, 'admin', NULL)")
-             ->execute(['admin@voteeasy.com', $password]);
+        $conn->prepare("INSERT INTO users (username, password, role, poll_id) VALUES (?, ?, 'admin', NULL)")
+             ->execute(['admin', $password]);
     }
 
 } catch (PDOException $e) {
-    die("Database error: " . $e->getMessage());
+    error_log("Database error: " . $e->getMessage());
+    die(json_encode(["success" => false, "message" => "Database connection failed"]));
 }
 ?>
