@@ -1,41 +1,37 @@
 <?php
 require_once "config.php";
-session_start();
-
-header("Content-Type: application/json");
-
-$data = json_decode(file_get_contents("php://input"), true);
-
-$username = trim($data["username"] ?? "");
-$password = trim($data["password"] ?? "");
-
-if (empty($username) || empty($password)) {
-    echo json_encode(["success" => false, "message" => "Missing username or password."]);
-    exit;
-}
+header('Content-Type: application/json');
 
 try {
-    // Check if username already exists
-    $stmt = $conn->prepare("SELECT COUNT(*) FROM users WHERE username = ?");
-    $stmt->execute([$username]);
-    if ($stmt->fetchColumn() > 0) {
-        echo json_encode(["success" => false, "message" => "Username already taken."]);
+    $input = json_decode(file_get_contents("php://input"), true);
+    $username = trim($input["username"] ?? "");
+    $password = trim($input["password"] ?? "");
+
+    if (!$username || !$password) {
+        echo json_encode(["success" => false, "message" => "Username and password required"]);
         exit;
     }
 
-    // Hash password
-    $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
+    // Check if username exists
+    $stmt = $conn->prepare("SELECT id FROM users WHERE username = ?");
+    $stmt->execute([$username]);
+    if ($stmt->fetch()) {
+        echo json_encode(["success" => false, "message" => "Username already exists"]);
+        exit;
+    }
 
     // Insert new user
+    $hashed = password_hash($password, PASSWORD_BCRYPT);
     $stmt = $conn->prepare("INSERT INTO users (username, password) VALUES (?, ?)");
-    $stmt->execute([$username, $hashedPassword]);
+    $stmt->execute([$username, $hashed]);
 
-    $userId = $conn->lastInsertId();
-
-    // Auto-login after registration
-    $_SESSION["user_id"] = $userId;
-    $_SESSION["username"] = $username;
-    $_SESSION["role"] = "user";
+    // Auto-login after signup
+    session_start();
+    $_SESSION["user"] = [
+        "id" => $conn->lastInsertId(),
+        "username" => $username,
+        "role" => "user"
+    ];
 
     echo json_encode(["success" => true, "username" => $username]);
 } catch (Exception $e) {
