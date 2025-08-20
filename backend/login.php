@@ -1,39 +1,33 @@
 <?php
 require_once "config.php";
 session_start();
+
 header("Content-Type: application/json");
 
-$raw = file_get_contents("php://input");
-$data = json_decode($raw, true);
-if (!is_array($data)) { $data = $_POST; }
+$data = json_decode(file_get_contents("php://input"), true);
 
 $username = trim($data["username"] ?? "");
-$password = $data["password"] ?? "";
+$password = trim($data["password"] ?? "");
 
-if (!$username || !$password) {
-    echo json_encode(["success" => false, "message" => "Username and password required."]);
+if (empty($username) || empty($password)) {
+    echo json_encode(["success" => false, "message" => "Missing username or password."]);
     exit;
 }
 
 try {
-    $stmt = $conn->prepare("SELECT id, username, password, role FROM users WHERE username = ?");
+    $stmt = $conn->prepare("SELECT * FROM users WHERE username = ?");
     $stmt->execute([$username]);
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    if (!$user || !password_verify($password, $user["password"])) {
-        echo json_encode(["success" => false, "message" => "Either username or password is wrong"]);
-        exit;
+    if ($user && password_verify($password, $user["password"])) {
+        $_SESSION["user_id"] = $user["id"];
+        $_SESSION["username"] = $user["username"];
+        $_SESSION["role"] = $user["role"];
+
+        echo json_encode(["success" => true, "username" => $user["username"]]);
+    } else {
+        echo json_encode(["success" => false, "message" => "Invalid username or password."]);
     }
-
-    $_SESSION["user_id"] = $user["id"];
-    $_SESSION["username"] = $user["username"];
-    $_SESSION["role"] = $user["role"];
-
-    echo json_encode([
-        "success" => true,
-        "username" => $_SESSION["username"],
-        "role" => $_SESSION["role"]
-    ]);
-} catch (Throwable $e) {
-    echo json_encode(["success" => false, "message" => "Server error: ".$e->getMessage()]);
+} catch (Exception $e) {
+    echo json_encode(["success" => false, "message" => "Server error: " . $e->getMessage()]);
 }

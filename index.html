@@ -519,132 +519,152 @@
     </footer>
 
     <script>
-// User state management
-let userState = {
-    isLoggedIn: false,
-    username: '',
-    hasVoted: false,
-    votedCandidate: ''
-};
+        // User state management
+        let userState = {
+            isLoggedIn: false,
+            username: '',
+            hasVoted: false,
+            votedCandidate: ''
+        };
 
-document.addEventListener('DOMContentLoaded', function() {
-    initializeEventListeners();
-    checkLoginState();
-});
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeEventListeners();
+            async function checkLoginState() {
+                try {
+                    let res = await fetch('backend/me.php');
+                    let data = await res.json();
 
-function initializeEventListeners() {
-    // Mobile menu toggle
-    document.getElementById('mobile-menu-btn').addEventListener('click', () => {
-        document.getElementById('mobile-menu').classList.toggle('hidden');
-    });
-
-    // Open/close login modal
-    document.getElementById('login-btn').addEventListener('click', () => {
-        document.getElementById('login-modal').classList.remove('hidden');
-    });
-    document.getElementById('vote-login-btn').addEventListener('click', () => {
-        document.getElementById('login-modal').classList.remove('hidden');
-    });
-    document.getElementById('close-login-modal').addEventListener('click', () => {
-        document.getElementById('login-modal').classList.add('hidden');
-    });
-
-    // Open register modal
-    document.getElementById('open-register').addEventListener('click', (e) => {
-        e.preventDefault();
-        document.getElementById('login-modal').classList.add('hidden');
-        document.getElementById('register-modal').classList.remove('hidden');
-    });
-    document.getElementById('close-register-modal').addEventListener('click', () => {
-        document.getElementById('register-modal').classList.add('hidden');
-    });
-    document.getElementById('open-login').addEventListener('click', (e) => {
-        e.preventDefault();
-        document.getElementById('register-modal').classList.add('hidden');
-        document.getElementById('login-modal').classList.remove('hidden');
-    });
-
-    // Login form submission
-    document.getElementById('login-form').addEventListener('submit', async function(e) {
-        e.preventDefault();
-        const username = document.getElementById('login-username').value.trim();
-        const password = document.getElementById('login-password').value.trim();
-
-        let res = await fetch('backend/auth.php?action=login', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username, password })
+                    if (data.success) {
+                        userState.isLoggedIn = true;
+                        userState.username = data.username;
+                        sessionStorage.setItem('loggedInUser', data.username);
+                        updateUIAfterLogin();
+                    } else {
+                        updateUIAfterLogout();
+                    }
+                } catch (err) {
+                    console.error("Session check error:", err);
+                }
+            }
         });
 
-        let data = await res.json();
-        if (data.success) {
-            userState.isLoggedIn = true;
-            userState.username = username;
-            sessionStorage.setItem('loggedInUser', username);
-            updateUIAfterLogin();
-            document.getElementById('login-modal').classList.add('hidden');
-        } else {
-            alert(data.message || 'Invalid username or password.');
+        function initializeEventListeners() {
+            // Mobile menu toggle
+            document.getElementById('mobile-menu-btn').addEventListener('click', () => {
+                document.getElementById('mobile-menu').classList.toggle('hidden');
+            });
+
+            // Open/close login modal
+            document.getElementById('login-btn').addEventListener('click', () => {
+                document.getElementById('login-modal').classList.remove('hidden');
+            });
+            document.getElementById('vote-login-btn').addEventListener('click', () => {
+                document.getElementById('login-modal').classList.remove('hidden');
+            });
+            document.getElementById('close-login-modal').addEventListener('click', () => {
+                document.getElementById('login-modal').classList.add('hidden');
+            });
+
+            // Open register modal
+            document.getElementById('open-register').addEventListener('click', (e) => {
+                e.preventDefault();
+                document.getElementById('login-modal').classList.add('hidden');
+                document.getElementById('register-modal').classList.remove('hidden');
+            });
+            document.getElementById('close-register-modal').addEventListener('click', () => {
+                document.getElementById('register-modal').classList.add('hidden');
+            });
+            document.getElementById('open-login').addEventListener('click', (e) => {
+                e.preventDefault();
+                document.getElementById('register-modal').classList.add('hidden');
+                document.getElementById('login-modal').classList.remove('hidden');
+            });
+
+            // ================= LOGIN =================
+            document.getElementById('login-form').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                const username = document.getElementById('login-username').value.trim();
+                const password = document.getElementById('login-password').value.trim();
+
+                let res = await fetch('backend/login.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+
+                let data = await res.json();
+                if (data.success) {
+                    userState.isLoggedIn = true;
+                    userState.username = data.username;
+                    sessionStorage.setItem('loggedInUser', data.username);
+                    updateUIAfterLogin();
+                    document.getElementById('login-modal').classList.add('hidden');
+                } else {
+                    alert(data.message || 'Invalid username or password.');
+                }
+            });
+
+            // ================= REGISTER =================
+            document.getElementById('register-form').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                const username = document.getElementById('reg-username').value.trim();
+                const password = document.getElementById('reg-password').value.trim();
+                const confirmPassword = document.getElementById('reg-confirm-password').value.trim();
+
+                if (password !== confirmPassword) {
+                    alert('Passwords do not match!');
+                    return;
+                }
+
+                let res = await fetch('backend/register.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+
+                let data = await res.json();
+                if (data.success) {
+                    // Auto-login after registration
+                    userState.isLoggedIn = true;
+                    userState.username = data.username;
+                    sessionStorage.setItem('loggedInUser', data.username);
+                    updateUIAfterLogin();
+                    document.getElementById('register-modal').classList.add('hidden');
+                } else {
+                    alert(data.message || 'Registration failed.');
+                }
+            });
+
+            // ================= LOGOUT =================
+            document.getElementById('logout-btn').addEventListener('click', async () => {
+                await fetch('backend/logout.php', { method: 'POST' });
+                userState.isLoggedIn = false;
+                userState.username = '';
+                sessionStorage.removeItem('loggedInUser');
+                updateUIAfterLogout();
+            });
         }
-    });
 
-    // Register form submission
-    document.getElementById('register-form').addEventListener('submit', async function(e) {
-        e.preventDefault();
-        const username = document.getElementById('reg-username').value.trim();
-        const password = document.getElementById('reg-password').value.trim();
-        const confirmPassword = document.getElementById('reg-confirm-password').value.trim();
-
-        if (password !== confirmPassword) {
-            alert('Passwords do not match!');
-            return;
+        // Restore session
+        function checkLoginState() {
+            const savedUser = sessionStorage.getItem('loggedInUser');
+            if (savedUser) {
+                userState.isLoggedIn = true;
+                userState.username = savedUser;
+                updateUIAfterLogin();
+            }
         }
 
-        let res = await fetch('backend/auth.php?action=register', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username, password })
-        });
-
-        let data = await res.json();
-        if (data.success) {
-            alert('Registration successful! Please log in.');
-            document.getElementById('register-modal').classList.add('hidden');
-            document.getElementById('login-modal').classList.remove('hidden');
-        } else {
-            alert(data.message || 'Registration failed.');
+        // Update UI
+        function updateUIAfterLogin() {
+            document.body.classList.remove('user-logged-out');
+            document.body.classList.add('user-logged-in');
+            document.getElementById('user-email').textContent = userState.username;
         }
-    });
-
-    // Logout
-    document.getElementById('logout-btn').addEventListener('click', () => {
-        userState.isLoggedIn = false;
-        userState.username = '';
-        sessionStorage.removeItem('loggedInUser');
-        updateUIAfterLogout();
-    });
-}
-
-// Restore session
-function checkLoginState() {
-    const savedUser = sessionStorage.getItem('loggedInUser');
-    if (savedUser) {
-        userState.isLoggedIn = true;
-        userState.username = savedUser;
-        updateUIAfterLogin();
-    }
-}
-
-// Update UI
-function updateUIAfterLogin() {
-    document.body.classList.remove('user-logged-out');
-    document.body.classList.add('user-logged-in');
-    document.getElementById('user-email').textContent = userState.username;
-}
-function updateUIAfterLogout() {
-    document.body.classList.remove('user-logged-in');
-    document.body.classList.add('user-logged-out');
-}
+        function updateUIAfterLogout() {
+            document.body.classList.remove('user-logged-in');
+            document.body.classList.add('user-logged-out');
+        }
 </script>
 </body>
 </html>

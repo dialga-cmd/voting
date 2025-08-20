@@ -1,40 +1,43 @@
 <?php
 require_once "config.php";
 session_start();
+
 header("Content-Type: application/json");
 
-$raw = file_get_contents("php://input");
-$data = json_decode($raw, true);
-if (!is_array($data)) { $data = $_POST; }
+$data = json_decode(file_get_contents("php://input"), true);
 
 $username = trim($data["username"] ?? "");
-$password = $data["password"] ?? "";
+$password = trim($data["password"] ?? "");
 
-if (!$username || !$password) {
-    echo json_encode(["success" => false, "message" => "Username and password are required."]);
+if (empty($username) || empty($password)) {
+    echo json_encode(["success" => false, "message" => "Missing username or password."]);
     exit;
 }
 
 try {
-    // check duplicate
-    $stmt = $conn->prepare("SELECT id FROM users WHERE username = ?");
+    // Check if username already exists
+    $stmt = $conn->prepare("SELECT COUNT(*) FROM users WHERE username = ?");
     $stmt->execute([$username]);
-    if ($stmt->fetch()) {
+    if ($stmt->fetchColumn() > 0) {
         echo json_encode(["success" => false, "message" => "Username already taken."]);
         exit;
     }
 
-    $hash = password_hash($password, PASSWORD_BCRYPT);
-    $stmt = $conn->prepare("INSERT INTO users (username, password, role) VALUES (?, ?, 'user')");
-    $stmt->execute([$username, $hash]);
+    // Hash password
+    $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
 
-    // auto-login
+    // Insert new user
+    $stmt = $conn->prepare("INSERT INTO users (username, password) VALUES (?, ?)");
+    $stmt->execute([$username, $hashedPassword]);
+
     $userId = $conn->lastInsertId();
+
+    // Auto-login after registration
     $_SESSION["user_id"] = $userId;
     $_SESSION["username"] = $username;
     $_SESSION["role"] = "user";
 
     echo json_encode(["success" => true, "username" => $username]);
-} catch (Throwable $e) {
-    echo json_encode(["success" => false, "message" => "Server error: ".$e->getMessage()]);
+} catch (Exception $e) {
+    echo json_encode(["success" => false, "message" => "Server error: " . $e->getMessage()]);
 }
