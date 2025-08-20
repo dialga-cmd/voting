@@ -519,7 +519,6 @@
     </footer>
 
     <script>
-        // User state management
 let userState = {
     isLoggedIn: false,
     username: '',
@@ -528,14 +527,14 @@ let userState = {
 };
 
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('DOM Content Loaded'); // Debug log
+    console.log('DOM Content Loaded');
     initializeEventListeners();
-    checkLoginState(); // This was missing!
+    checkLoginState();
 });
 
 // Session check function
 async function checkLoginState() {
-    console.log('Checking login state...'); // Debug log
+    console.log('Checking login state...');
     try {
         let res = await fetch('backend/me.php');
         let data = await res.json();
@@ -550,7 +549,6 @@ async function checkLoginState() {
         }
     } catch (err) {
         console.error("Session check error:", err);
-        // Fallback to sessionStorage check
         const savedUser = sessionStorage.getItem('loggedInUser');
         if (savedUser) {
             userState.isLoggedIn = true;
@@ -565,7 +563,7 @@ async function checkLoginState() {
 function initializeEventListeners() {
     console.log('Initializing event listeners...'); // Debug log
     
-    // Mobile menu toggle
+    // =================== MOBILE VIEW ===================
     const mobileMenuBtn = document.getElementById('mobile-menu-btn');
     if (mobileMenuBtn) {
         mobileMenuBtn.addEventListener('click', () => {
@@ -573,7 +571,7 @@ function initializeEventListeners() {
         });
     }
 
-    // Login button listeners
+    // =================== LOGIN MODAL ===================
     const loginBtn = document.getElementById('login-btn');
     const voteLoginBtn = document.getElementById('vote-login-btn');
     const closeLoginModal = document.getElementById('close-login-modal');
@@ -598,7 +596,7 @@ function initializeEventListeners() {
         });
     }
 
-    // Register modal listeners
+    // ====================== REGISTER MODEL ======================
     const openRegister = document.getElementById('open-register');
     const closeRegisterModal = document.getElementById('close-register-modal');
     const openLogin = document.getElementById('open-login');
@@ -631,7 +629,7 @@ function initializeEventListeners() {
     if (loginForm) {
         loginForm.addEventListener('submit', async function(e) {
             e.preventDefault();
-            console.log('Login form submitted'); // Debug log
+            console.log('Login form submitted');
             
             const username = document.getElementById('login-username').value.trim();
             const password = document.getElementById('login-password').value.trim();
@@ -649,7 +647,7 @@ function initializeEventListeners() {
                 });
 
                 let data = await res.json();
-                console.log('Login response:', data); // Debug log
+                console.log('Login response:', data);
                 
                 if (data.success) {
                     userState.isLoggedIn = true;
@@ -657,7 +655,6 @@ function initializeEventListeners() {
                     sessionStorage.setItem('loggedInUser', data.username);
                     updateUIAfterLogin();
                     document.getElementById('login-modal').classList.add('hidden');
-                    // Clear form
                     loginForm.reset();
                 } else {
                     alert(data.message || 'Invalid username or password.');
@@ -744,7 +741,7 @@ function initializeEventListeners() {
         });
     }
 
-    // Close modals when clicking outside
+    // ================= MODAL CLOSE =================
     const loginModal = document.getElementById('login-modal');
     const registerModal = document.getElementById('register-modal');
     
@@ -765,7 +762,7 @@ function initializeEventListeners() {
     }
 }
 
-// Update UI functions
+// ================= UPDATE UI =================
 function updateUIAfterLogin() {
     console.log('Updating UI after login for:', userState.username); // Debug log
     document.body.classList.remove('user-logged-out');
@@ -846,27 +843,6 @@ function deleteParticipant(id, pollId) {
               alert("Failed: " + data.message);
           }
       });
-}
-
-// ================= FETCH COUNCIL MEMBERS =================
-async function loadCouncil() {
-    try {
-        let res = await fetch('backend/council.php');
-        let council = await res.json();
-
-        const container = document.getElementById('council-container');
-        container.innerHTML = '';
-
-        council.forEach(member => {
-            container.innerHTML += `
-                <div class="bg-white rounded-xl shadow-md p-4">
-                    <h4 class="font-bold">${member.name}</h4>
-                    <p class="text-gray-600">${member.position}</p>
-                </div>`;
-        });
-    } catch (err) {
-        console.error("Error loading council:", err);
-    }
 }
 
 // ================= INIT LOAD =================
