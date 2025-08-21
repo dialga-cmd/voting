@@ -14,10 +14,10 @@ session_start();
 try {
     $input = json_decode(file_get_contents("php://input"), true);
     $user_id = $input['user_id'] ?? null;
-    $participants_id = $input['participants_id'] ?? null;
+    $participant_id = $input['candidate_id'] ?? null; // renamed but still received from frontend
     $poll_id = $input['poll_id'] ?? null;
 
-    if (!$user_id || !$participants_id || !$poll_id) {
+    if (!$user_id || !$participant_id || !$poll_id) {
         echo json_encode(["success" => false, "message" => "Missing required fields"]);
         exit;
     }
@@ -28,11 +28,11 @@ try {
         exit;
     }
 
-    // Check if user has already voted in this poll
+    // Check if user already voted in this poll
     $checkStmt = $conn->prepare("
         SELECT COUNT(*) 
         FROM votes v 
-        JOIN participants p ON v.participants_id = p.id 
+        JOIN participants p ON v.participant_id = p.id 
         WHERE v.user_id = ? AND p.poll_id = ?
     ");
     $checkStmt->execute([$user_id, $poll_id]);
@@ -42,40 +42,20 @@ try {
         exit;
     }
 
-    // Verify candidate exists and belongs to the correct poll
-    $candidateStmt = $conn->prepare("SELECT id FROM participants WHERE id = ? AND poll_id = ?");
-    $candidateStmt->execute([$participants_id, $poll_id]);
+    // Verify participant exists and belongs to the poll
+    $participantStmt = $conn->prepare("SELECT id FROM participants WHERE id = ? AND poll_id = ?");
+    $participantStmt->execute([$participant_id, $poll_id]);
     
-    if (!$candidateStmt->fetch()) {
-        echo json_encode(["success" => false, "message" => "Invalid candidate or poll"]);
+    if (!$participantStmt->fetch()) {
+        echo json_encode(["success" => false, "message" => "Invalid participant or poll"]);
         exit;
     }
 
-    // Begin transaction
-    $conn->beginTransaction();
+    // Insert vote
+    $voteStmt = $conn->prepare("INSERT INTO votes (user_id, participant_id, created_at) VALUES (?, ?, datetime('now'))");
+    $voteStmt->execute([$user_id, $participant_id]);
 
-    try {
-        // Insert the vote
-        $voteStmt = $conn->prepare("INSERT INTO votes (user_id, participants_id, created_at) VALUES (?, ?, datetime('now'))");
-        $voteStmt->execute([$user_id, $participants_id]);
-
-        // Increment candidate vote count (if candidates table has votes column)
-        $updateStmt = $conn->prepare("UPDATE participants SET votes = votes + 1 WHERE id = ?");
-        $updateStmt->execute([$participants_id]);
-
-        // Commit transaction
-        $conn->commit();
-
-        echo json_encode([
-            "success" => true, 
-            "message" => "Vote submitted successfully"
-        ]);
-
-    } catch (Exception $e) {
-        // Rollback transaction on error
-        $conn->rollBack();
-        throw $e;
-    }
+    echo json_encode(["success" => true, "message" => "Vote submitted successfully"]);
 
 } catch (Exception $e) {
     error_log("Submit vote error: " . $e->getMessage());
@@ -84,4 +64,5 @@ try {
         "message" => "Failed to submit vote: " . $e->getMessage()
     ]);
 }
+exit;
 ?>

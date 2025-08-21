@@ -1,14 +1,14 @@
 <?php
-$db_file = __DIR__ . "/voting.db"; // Fixed path to go up one level from backend folder
+$db_file = __DIR__ . "/voting.db";
 
 try {
     $conn = new PDO("sqlite:$db_file");
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-    // Enforce foreign key constraints in SQLite
+    // Enforce foreign key constraints
     $conn->exec("PRAGMA foreign_keys = ON;");
 
-    // Create all necessary tables
+    // Create tables
     $conn->exec("
     CREATE TABLE IF NOT EXISTS polls (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -27,22 +27,21 @@ try {
         FOREIGN KEY (poll_id) REFERENCES polls(id) ON DELETE CASCADE
     );
 
-    CREATE TABLE IF NOT EXISTS votes (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        user_id INTEGER,
-        participants_id INTEGER,
-        created_at TEXT DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE,
-        FOREIGN KEY(participants_id) REFERENCES participants(id) ON DELETE CASCADE
-    );
-
-
     CREATE TABLE IF NOT EXISTS participants (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         poll_id INTEGER,
         name TEXT NOT NULL,
         email TEXT,
-        FOREIGN KEY(poll_id) REFERENCES polls(id)
+        FOREIGN KEY(poll_id) REFERENCES polls(id) ON DELETE CASCADE
+    );
+
+    CREATE TABLE IF NOT EXISTS votes (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER,
+        participant_id INTEGER,
+        created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE,
+        FOREIGN KEY(participant_id) REFERENCES participants(id) ON DELETE CASCADE
     );
 
     CREATE TABLE IF NOT EXISTS student_council (
@@ -72,7 +71,7 @@ try {
         ");
     }
 
-    // Insert admin if none exists - FIXED: Use username instead of email
+    // Insert admin if none exists
     $checkAdmin = $conn->query("SELECT COUNT(*) FROM users WHERE role = 'admin'")->fetchColumn();
     if ($checkAdmin == 0) {
         $password = password_hash('admin123', PASSWORD_BCRYPT);
@@ -84,4 +83,3 @@ try {
     error_log("Database error: " . $e->getMessage());
     die(json_encode(["success" => false, "message" => "Database connection failed"]));
 }
-?>
