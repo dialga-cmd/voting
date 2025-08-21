@@ -292,6 +292,19 @@
     </div>
 </div>
 
+<!-- Login Required Modal -->
+<div id="login-required-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+  <div class="bg-white rounded-xl shadow-xl w-full max-w-md p-8 text-center">
+    <div class="w-20 h-20 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-6">
+      <i class="fas fa-exclamation-triangle text-yellow-500 text-3xl"></i>
+    </div>
+    <h3 class="text-2xl font-bold text-gray-800 mb-4">Login Required</h3>
+    <p class="text-gray-600 mb-6">You must log in before you can vote in this election.</p>
+    <button onclick="closeLoginRequiredModal()" class="gradient-bg text-white px-6 py-2 rounded-lg font-medium hover:opacity-90 transition">
+      OK
+    </button>
+  </div>
+</div>
 
     <!-- Footer -->
     <footer class="bg-gray-800 text-white py-12">
@@ -564,11 +577,11 @@ function initializeEventListeners() {
             let me = await meRes.json();
             let isLoggedIn = me.success && me.username;
 
-        if (!isLoggedIn) {
-            // Trigger the same login modal as top button
-            document.getElementById("login-btn").click();
+            if (!isLoggedIn) {
+            // Show modal instead of alert
+            document.getElementById("login-required-modal").classList.remove("hidden");
             return;
-        }
+            }
 
             // If logged in → continue to load poll
             loadPoll(pollId, title, start, end);
@@ -576,6 +589,10 @@ function initializeEventListeners() {
             console.error("Error in handleViewAndVote:", err);
         }
     }
+
+    function closeLoginRequiredModal() {
+    document.getElementById("login-required-modal").classList.add("hidden");
+}
 
 
     // If logged in → continue to load poll
