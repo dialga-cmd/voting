@@ -1,6 +1,15 @@
 <?php
+// backend/login.php
 require_once "config.php";
 header('Content-Type: application/json');
+header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Methods: POST, GET, OPTIONS');
+header('Access-Control-Allow-Headers: Content-Type');
+
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    exit(0);
+}
+
 session_start();
 
 try {
@@ -13,7 +22,7 @@ try {
         exit;
     }
 
-    $stmt = $conn->prepare("SELECT * FROM users WHERE username = ?");
+    $stmt = $conn->prepare("SELECT id, username, password, role FROM users WHERE username = ?");
     $stmt->execute([$username]);
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -28,5 +37,7 @@ try {
         echo json_encode(["success" => false, "message" => "Invalid username or password"]);
     }
 } catch (Exception $e) {
-    echo json_encode(["success" => false, "message" => "Server error: " . $e->getMessage()]);
+    error_log("Login error: " . $e->getMessage());
+    echo json_encode(["success" => false, "message" => "Server error occurred"]);
 }
+?>
