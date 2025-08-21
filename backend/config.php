@@ -41,8 +41,9 @@ try {
         candidate_id INTEGER,
         created_at TEXT DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE,
-        FOREIGN KEY(candidate_id) REFERENCES candidates(id) ON DELETE CASCADE
+        FOREIGN KEY(candidate_id) REFERENCES participants(id) ON DELETE CASCADE
     );
+
 
     CREATE TABLE IF NOT EXISTS participants (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
