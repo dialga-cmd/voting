@@ -27,14 +27,6 @@ try {
         FOREIGN KEY (poll_id) REFERENCES polls(id) ON DELETE CASCADE
     );
 
-    CREATE TABLE IF NOT EXISTS candidates (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        poll_id INTEGER,
-        name TEXT NOT NULL,
-        votes INTEGER DEFAULT 0,
-        FOREIGN KEY(poll_id) REFERENCES polls(id) ON DELETE CASCADE
-    );
-
     CREATE TABLE IF NOT EXISTS votes (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         user_id INTEGER,
