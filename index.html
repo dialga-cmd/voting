@@ -183,128 +183,132 @@
         </section>
 
         <!-- Active Elections Section -->
-<section class="mb-12">
-    <div class="flex justify-between items-center mb-6">
-        <h2 class="text-2xl font-bold text-gray-800">Active Elections</h2>
-        <a href="#" class="text-purple-600 hover:text-purple-800 flex items-center">
-            View all <i class="fas fa-chevron-right ml-1"></i>
-        </a>
-    </div>
-    <div id="elections-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <!-- Polls will be injected dynamically -->
-    </div>
-</section>
-
-<!-- Participants Section -->
-<section class="mb-12">
-    <h2 class="text-2xl font-bold text-gray-800 mb-6">Participants</h2>
-    <div id="participants-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <!-- Participants will be injected dynamically -->
-    </div>
-</section>
-
-<div class="md:flex gap-8 mt-8 mb-16">
-    <!-- Left Gradient Info Box -->
-    <div class="md:w-1/3">
-        <div class="bg-gradient-to-br from-purple-600 to-indigo-600 text-white rounded-2xl p-6 shadow-lg">
-            <h3 id="left-poll-title" class="text-xl font-bold mb-2">Please select a poll to vote</h3>
-            <p class="text-sm text-purple-100 mb-4">Why choose us for hosting elections and poll?</p>
-
-            <ul class="space-y-3 mb-6">
-                <li class="flex items-center"><i class="fas fa-user-check mr-2"></i> Verified voters only</li>
-                <li class="flex items-center"><i class="fas fa-lock mr-2"></i> Secure voting system</li>
-                <li class="flex items-center"><i class="fas fa-shield-alt mr-2"></i> Anonymous voting</li>
-            </ul>
-
-            <div class="bg-purple-700 bg-opacity-50 rounded-lg p-4">
-                <h4 class="font-bold mb-2">Voting Instructions</h4>
-                <ol class="list-decimal list-inside text-sm text-purple-100 space-y-1">
-                    <li>Log in to your account</li>
-                    <li>Select your preferred candidate</li>
-                    <li>Review your selection</li>
-                    <li>Submit your vote</li>
-                    <li>You'll receive a confirmation</li>
-                </ol>
+        <section class="mb-12">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-800">Active Elections</h2>
+                <a href="#" class="text-purple-600 hover:text-purple-800 flex items-center">
+                    View all <i class="fas fa-chevron-right ml-1"></i>
+                </a>
             </div>
-        </div>
-    </div>
-
-    <!-- Right Voting Interface -->
-    <div class="md:w-2/3 p-8">
-        <!-- Login Required -->
-        <div class="login-section text-center py-12" id="login-required">
-            <div class="w-20 h-20 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                <i class="fas fa-lock text-purple-600 text-3xl"></i>
+            <div id="elections-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Polls will be injected dynamically -->
             </div>
-            <h3 class="text-xl font-bold text-gray-800 mb-4">Login Required to Vote</h3>
-            <p class="text-gray-600 mb-6">Please log in to your account to participate in the voting process.</p>
-            <button id="vote-login-btn" class="gradient-bg text-white px-6 py-3 rounded-lg font-medium hover:opacity-90 transition">
-                Login to Vote
-            </button>
-        </div>
+        </section>
 
-        <!-- Voting Interface (shown when logged in) -->
-        <div id="voting-interface" class="hidden">
-            <h3 id="poll-title" class="text-2xl font-bold text-gray-800 mb-2"></h3>
-            <p id="poll-dates" class="text-sm text-gray-600"></p>
+        <div class="md:flex gap-8 mt-8 mb-16">
+            <!-- Left Gradient Info Box -->
+            <div class="md:w-1/3">
+                <div class="bg-gradient-to-br from-purple-600 to-indigo-600 text-white rounded-2xl p-6 shadow-lg">
+                    <h3 id="left-poll-title" class="text-xl font-bold mb-2">Please select a poll to vote</h3>
+                    <p class="text-sm text-purple-100 mb-4">Why choose us for hosting elections and poll?</p>
 
-            <!-- Candidates -->
-            <div id="candidates-container" class="space-y-6 mt-6"></div>
+                    <ul class="space-y-3 mb-6">
+                        <li class="flex items-center"><i class="fas fa-user-check mr-2"></i> Verified voters only</li>
+                        <li class="flex items-center"><i class="fas fa-lock mr-2"></i> Secure voting system</li>
+                        <li class="flex items-center"><i class="fas fa-shield-alt mr-2"></i> Anonymous voting</li>
+                    </ul>
 
-            <!-- Selected Candidate -->
-            <div id="selected-candidate" class="mt-8 p-4 border border-purple-200 bg-purple-50 rounded-lg hidden">
-                <div class="flex justify-between items-center">
-                    <div>
-                        <h4 class="font-bold text-purple-800">You have selected:</h4>
-                        <p id="selected-candidate-name" class="text-lg font-medium"></p>
-                    </div>
-                    <div>
-                        <button id="change-selection" class="text-purple-600 hover:text-purple-800 mr-4">Change</button>
-                        <button id="submit-vote" class="gradient-bg text-white px-4 py-2 rounded-lg font-medium hover:opacity-90 transition">Submit Vote</button>
+                    <div class="bg-purple-700 bg-opacity-50 rounded-lg p-4">
+                        <h4 class="font-bold mb-2">Voting Instructions</h4>
+                        <ol class="list-decimal list-inside text-sm text-purple-100 space-y-1">
+                            <li>Log in to your account</li>
+                            <li>Select your preferred candidate</li>
+                            <li>Review your selection</li>
+                            <li>Submit your vote</li>
+                            <li>You'll receive a confirmation</li>
+                        </ol>
                     </div>
                 </div>
             </div>
 
-            <!-- Already Voted -->
-            <div id="already-voted" class="text-center py-12 hidden">
+            <!-- Right Voting Interface -->
+            <div class="md:w-2/3 p-8">
+                <!-- Login Required -->
+                <div id="login-required" class="text-center py-12">
+                    <div class="w-20 h-20 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <i class="fas fa-lock text-purple-600 text-3xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-800 mb-4">Select an Election to View Candidates</h3>
+                    <p class="text-gray-600 mb-6">Choose an active election from the list above to see candidates and vote.</p>
+                </div>
+
+                <!-- Voting Interface (shown when poll selected) -->
+                <div id="voting-interface" class="hidden">
+                    <h3 id="poll-title" class="text-2xl font-bold text-gray-800 mb-2"></h3>
+                    <p id="poll-dates" class="text-sm text-gray-600"></p>
+
+                    <!-- Login Required Message for Poll -->
+                    <div id="poll-login-required" class="text-center py-12 user-logged-out">
+                        <div class="w-20 h-20 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                            <i class="fas fa-lock text-yellow-600 text-3xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-800 mb-4">Login Required to Vote</h3>
+                        <p class="text-gray-600 mb-6">Please log in to your account to participate in this election.</p>
+                        <button id="vote-login-btn" class="gradient-bg text-white px-6 py-3 rounded-lg font-medium hover:opacity-90 transition">
+                            Login to Vote
+                        </button>
+                    </div>
+
+                    <!-- Candidates (shown when logged in) -->
+                    <div id="candidates-section" class="user-logged-in mt-6">
+                        <div id="candidates-container" class="space-y-6"></div>
+
+                        <!-- Selected Candidate -->
+                        <div id="selected-candidate" class="mt-8 p-4 border border-purple-200 bg-purple-50 rounded-lg hidden">
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <h4 class="font-bold text-purple-800">You have selected:</h4>
+                                    <p id="selected-candidate-name" class="text-lg font-medium"></p>
+                                </div>
+                                <div>
+                                    <button id="change-selection" class="text-purple-600 hover:text-purple-800 mr-4">Change</button>
+                                    <button id="submit-vote" class="gradient-bg text-white px-4 py-2 rounded-lg font-medium hover:opacity-90 transition">Submit Vote</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Already Voted -->
+                        <div id="already-voted" class="text-center py-12 hidden">
+                            <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                                <i class="fas fa-check-circle text-green-500 text-3xl"></i>
+                            </div>
+                            <h3 class="text-xl font-bold text-gray-800 mb-4">You Have Already Voted</h3>
+                            <p class="text-gray-600 mb-6">Thank you for participating. Your vote has been recorded.</p>
+                            <p class="text-sm text-gray-500">You voted for: <span id="voted-candidate" class="font-medium"></span></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Vote Confirmation Modal -->
+        <div id="vote-confirmation-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+            <div class="bg-white rounded-xl shadow-xl w-full max-w-md p-8 text-center">
                 <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                    <i class="fas fa-check-circle text-green-500 text-3xl"></i>
+                    <i class="fas fa-check text-green-500 text-3xl"></i>
                 </div>
-                <h3 class="text-xl font-bold text-gray-800 mb-4">You Have Already Voted</h3>
-                <p class="text-gray-600 mb-6">Thank you for participating. Your vote has been recorded.</p>
-                <p class="text-sm text-gray-500">You voted for: <span id="voted-candidate" class="font-medium"></span></p>
+                <h3 class="text-2xl font-bold text-gray-800 mb-4">Vote Submitted Successfully!</h3>
+                <p class="text-gray-600 mb-6">Thank you for participating in the election. Your vote has been recorded securely.</p>
+                <button id="close-confirmation-modal" class="gradient-bg text-white px-6 py-2 rounded-lg font-medium hover:opacity-90 transition">
+                    Close
+                </button>
             </div>
         </div>
-    </div>
-</div>
 
-<!-- Vote Confirmation Modal -->
-<div id="vote-confirmation-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
-    <div class="bg-white rounded-xl shadow-xl w-full max-w-md p-8 text-center">
-        <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-            <i class="fas fa-check text-green-500 text-3xl"></i>
+        <!-- Login Required Modal -->
+        <div id="login-required-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+            <div class="bg-white rounded-xl shadow-xl w-full max-w-md p-8 text-center">
+                <div class="w-20 h-20 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <i class="fas fa-exclamation-triangle text-yellow-500 text-3xl"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-gray-800 mb-4">Login Required</h3>
+                <p class="text-gray-600 mb-6">You must log in before you can vote in this election.</p>
+                <button id="close-login-required-modal" class="gradient-bg text-white px-6 py-2 rounded-lg font-medium hover:opacity-90 transition">
+                    OK
+                </button>
+            </div>
         </div>
-        <h3 class="text-2xl font-bold text-gray-800 mb-4">Vote Submitted Successfully!</h3>
-        <p class="text-gray-600 mb-6">Thank you for participating in the Student Union Election. Your vote has been recorded securely.</p>
-        <button id="close-confirmation-modal" class="gradient-bg text-white px-6 py-2 rounded-lg font-medium hover:opacity-90 transition">
-            Close
-        </button>
-    </div>
-</div>
-
-<!-- Login Required Modal -->
-<div id="login-required-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
-  <div class="bg-white rounded-xl shadow-xl w-full max-w-md p-8 text-center">
-    <div class="w-20 h-20 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-6">
-      <i class="fas fa-exclamation-triangle text-yellow-500 text-3xl"></i>
-    </div>
-    <h3 class="text-2xl font-bold text-gray-800 mb-4">Login Required</h3>
-    <p class="text-gray-600 mb-6">You must log in before you can vote in this election.</p>
-    <button onclick="closeLoginRequiredModal()" class="gradient-bg text-white px-6 py-2 rounded-lg font-medium hover:opacity-90 transition">
-      OK
-    </button>
-  </div>
-</div>
+    </main>
 
     <!-- Footer -->
     <footer class="bg-gray-800 text-white py-12">
@@ -357,181 +361,334 @@
     </footer>
 
     <script>
-        // User state management
-let userState = {
-    isLoggedIn: false,
-    username: '',
-    hasVoted: false,
-    votedCandidate: ''
-};
+        // Global state
+        let userState = {
+            isLoggedIn: false,
+            username: '',
+            userId: null,
+            hasVoted: false,
+            votedCandidate: '',
+            selectedPollId: null
+        };
 
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('DOM Content Loaded'); // Debug log
-    initializeEventListeners();
-    checkLoginState();
-});
+        // Initialize everything when DOM loads
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM Content Loaded');
+            initializeEventListeners();
+            checkLoginState();
+            loadElections();
+        });
 
-document.addEventListener("DOMContentLoaded", async () => {
-  try {
-    // Fetch active elections
-    const pollRes = await fetch("backend/poll.php?action=list");
-    const polls = await pollRes.json();
+        // ================= SESSION CHECK =================
+        async function checkLoginState() {
+            console.log('Checking login state...');
+            try {
+                let res = await fetch('backend/me.php');
+                let data = await res.json();
 
-    const electionsContainer = document.getElementById("elections-container");
-    electionsContainer.innerHTML = "";
-
-    polls.forEach(poll => {
-      electionsContainer.insertAdjacentHTML("beforeend", `
-        <div class="border border-gray-200 rounded-lg p-6 hover:shadow-md transition">
-          <h3 class="font-bold text-lg text-gray-800 mb-2">${poll.title}</h3>
-          <p class="text-sm text-gray-600 mb-4">${poll.start_date} → ${poll.end_date}</p>
-          <button onclick="handleViewAndVote(${poll.id}, '${poll.title}', '${poll.start_date}', '${poll.end_date}')" 
-            class="gradient-bg text-white px-4 py-2 rounded-lg hover:opacity-90 transition">
-            View & Vote
-            </button>
-        </div>
-      `);
-    });
-  } catch (err) {
-    console.error("Failed to load polls:", err);
-  }
-});
-
-async function loadPoll(pollId, title, start, end) {
-  // Update poll details
-  document.getElementById("poll-title").textContent = title;
-  document.getElementById("poll-dates").textContent = `${start} → ${end}`;
-  document.getElementById("voting-interface").classList.remove("hidden");
-  document.getElementById("login-required").classList.add("hidden");
-  document.getElementById("left-poll-title").textContent = title;
-
-  // Fetch participants
-  const res = await fetch(`backend/participants.php?action=list&poll_id=${pollId}`);
-  const participants = await res.json();
-
-  const container = document.getElementById("candidates-container");
-  container.innerHTML = "";
-
-  participants.forEach(p => {
-    container.insertAdjacentHTML("beforeend", `
-      <div class="border border-gray-200 rounded-lg p-4 flex justify-between items-center hover:border-purple-300 transition">
-        <div class="flex items-center">
-          <div class="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center text-purple-600 font-bold mr-4">
-            ${p.name.charAt(0).toUpperCase()}
-          </div>
-          <div>
-            <h4 class="font-bold">${p.name}</h4>
-            <p class="text-gray-600 text-sm">Participant</p>
-          </div>
-        </div>
-        <button class="vote-btn bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition"
-          data-candidate-id="${p.id}" data-candidate-name="${p.name}">
-          Select
-        </button>
-      </div>
-    `);
-  });
-}
-
-// Session check function
-async function checkLoginState() {
-    console.log('Checking login state...'); // Debug log
-    try {
-        let res = await fetch('backend/me.php');
-        let data = await res.json();
-
-        if (data.success) {
-            userState.isLoggedIn = true;
-            userState.username = data.username;
-            sessionStorage.setItem('loggedInUser', data.username);
-            updateUIAfterLogin();
-        } else {
-            updateUIAfterLogout();
+                if (data.success) {
+                    userState.isLoggedIn = true;
+                    userState.username = data.username;
+                    userState.userId = data.id;
+                    updateUIAfterLogin();
+                } else {
+                    updateUIAfterLogout();
+                }
+            } catch (err) {
+                console.error("Session check error:", err);
+                updateUIAfterLogout();
+            }
         }
-    } catch (err) {
-        console.error("Session check error:", err);
-        // Fallback to sessionStorage check
-        const savedUser = sessionStorage.getItem('loggedInUser');
-        if (savedUser) {
-            userState.isLoggedIn = true;
-            userState.username = savedUser;
-            updateUIAfterLogin();
-        } else {
-            updateUIAfterLogout();
+
+        // ================= LOAD ELECTIONS =================
+        async function loadElections() {
+            try {
+                const pollRes = await fetch("backend/poll.php?action=list");
+                const polls = await pollRes.json();
+
+                const electionsContainer = document.getElementById("elections-container");
+                electionsContainer.innerHTML = "";
+
+                if (polls.length === 0) {
+                    electionsContainer.innerHTML = '<p class="text-gray-500 text-center col-span-3">No active elections at the moment.</p>';
+                    return;
+                }
+
+                polls.forEach(poll => {
+                    electionsContainer.insertAdjacentHTML("beforeend", `
+                        <div class="border border-gray-200 rounded-lg p-6 hover:shadow-md transition">
+                            <h3 class="font-bold text-lg text-gray-800 mb-2">${poll.title}</h3>
+                            <p class="text-sm text-gray-600 mb-4">${poll.start_date} → ${poll.end_date}</p>
+                            <button onclick="handleViewAndVote(${poll.id}, '${poll.title}', '${poll.start_date}', '${poll.end_date}')" 
+                                class="gradient-bg text-white px-4 py-2 rounded-lg hover:opacity-90 transition">
+                                View & Vote
+                            </button>
+                        </div>
+                    `);
+                });
+            } catch (err) {
+                console.error("Failed to load polls:", err);
+                document.getElementById("elections-container").innerHTML = '<p class="text-red-500 text-center col-span-3">Failed to load elections. Please try again later.</p>';
+            }
         }
-    }
-}
 
-function initializeEventListeners() {
-    console.log('Initializing event listeners...'); // Debug log
-    
-    // Mobile menu toggle
-    const mobileMenuBtn = document.getElementById('mobile-menu-btn');
-    if (mobileMenuBtn) {
-        mobileMenuBtn.addEventListener('click', () => {
-            document.getElementById('mobile-menu').classList.toggle('hidden');
-        });
-    }
+        // ================= VIEW AND VOTE HANDLER =================
+        async function handleViewAndVote(pollId, title, start, end) {
+            console.log('handleViewAndVote called:', pollId, title);
+            
+            // Update the selected poll
+            userState.selectedPollId = pollId;
+            
+            // Show the voting interface
+            document.getElementById("voting-interface").classList.remove("hidden");
+            document.getElementById("login-required").classList.add("hidden");
+            
+            // Update poll details
+            document.getElementById("poll-title").textContent = title;
+            document.getElementById("poll-dates").textContent = `${start} → ${end}`;
+            document.getElementById("left-poll-title").textContent = title;
+            
+            // Check login state and show appropriate content
+            if (!userState.isLoggedIn) {
+                // User not logged in - show login required message
+                document.getElementById("poll-login-required").classList.remove("hidden");
+                document.getElementById("candidates-section").classList.add("hidden");
+                return;
+            }
+            
+            // User is logged in - check if they already voted
+            try {
+                await checkIfAlreadyVoted(pollId);
+                await loadPollCandidates(pollId);
+            } catch (error) {
+                console.error('Error loading poll data:', error);
+                alert('Error loading poll data. Please try again.');
+            }
+        }
 
-    // Login button listeners
-    const loginBtn = document.getElementById('login-btn');
-    const voteLoginBtn = document.getElementById('vote-login-btn');
-    const closeLoginModal = document.getElementById('close-login-modal');
-    
-    if (loginBtn) {
-        loginBtn.addEventListener('click', () => {
-            console.log('Login button clicked'); // Debug log
-            document.getElementById('login-modal').classList.remove('hidden');
-        });
-    }
-    
-    if (voteLoginBtn) {
-        voteLoginBtn.addEventListener('click', () => {
-            console.log('Vote login button clicked'); // Debug log
-            document.getElementById('login-modal').classList.remove('hidden');
-        });
-    }
-    
-    if (closeLoginModal) {
-        closeLoginModal.addEventListener('click', () => {
-            document.getElementById('login-modal').classList.add('hidden');
-        });
-    }
+        // ================= CHECK IF USER ALREADY VOTED =================
+        async function checkIfAlreadyVoted(pollId) {
+            try {
+                // Check if user has already voted in this poll
+                const response = await fetch('backend/check_vote.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        user_id: userState.userId,
+                        poll_id: pollId 
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.hasVoted) {
+                    userState.hasVoted = true;
+                    userState.votedCandidate = data.votedCandidate;
+                    
+                    // Show already voted message
+                    document.getElementById("already-voted").classList.remove("hidden");
+                    document.getElementById("candidates-container").style.display = "none";
+                    document.getElementById("voted-candidate").textContent = data.votedCandidate;
+                } else {
+                    userState.hasVoted = false;
+                    document.getElementById("already-voted").classList.add("hidden");
+                    document.getElementById("candidates-container").style.display = "block";
+                }
+            } catch (error) {
+                console.error('Error checking vote status:', error);
+                // If there's an error, assume they haven't voted yet
+                userState.hasVoted = false;
+                document.getElementById("already-voted").classList.add("hidden");
+                document.getElementById("candidates-container").style.display = "block";
+            }
+        }
 
-    // Register modal listeners
-    const openRegister = document.getElementById('open-register');
-    const closeRegisterModal = document.getElementById('close-register-modal');
-    const openLogin = document.getElementById('open-login');
-    
-    if (openRegister) {
-        openRegister.addEventListener('click', (e) => {
+        // ================= LOAD POLL CANDIDATES =================
+        async function loadPollCandidates(pollId) {
+            try {
+                const response = await fetch(`backend/participants.php?action=list&poll_id=${pollId}`);
+                const participants = await response.json();
+
+                const container = document.getElementById("candidates-container");
+                container.innerHTML = "";
+
+                if (participants.length === 0) {
+                    container.innerHTML = '<p class="text-gray-500 text-center">No candidates available for this poll.</p>';
+                    return;
+                }
+
+                participants.forEach(participant => {
+                    const initials = participant.name.split(" ").map(n => n[0]).join("").toUpperCase();
+                    container.insertAdjacentHTML("beforeend", `
+                        <div class="border border-gray-200 rounded-lg p-4 flex justify-between items-center hover:border-purple-300 transition candidate-card" data-candidate-id="${participant.id}">
+                            <div class="flex items-center">
+                                <div class="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center text-purple-600 font-bold mr-4">
+                                    ${initials}
+                                </div>
+                                <div>
+                                    <h4 class="font-bold">${participant.name}</h4>
+                                    <p class="text-gray-600 text-sm">Candidate</p>
+                                </div>
+                            </div>
+                            <button class="vote-btn bg-purple-100 text-purple-700 px-4 py-2 rounded-lg hover:bg-purple-200 transition"
+                                data-candidate-id="${participant.id}" data-candidate-name="${participant.name}">
+                                Select
+                            </button>
+                        </div>
+                    `);
+                });
+
+                // Hide already voted message and show candidates
+                document.getElementById("poll-login-required").classList.add("hidden");
+                document.getElementById("candidates-section").classList.remove("hidden");
+                
+            } catch (error) {
+                console.error('Error loading candidates:', error);
+                document.getElementById("candidates-container").innerHTML = '<p class="text-red-500 text-center">Error loading candidates. Please try again.</p>';
+            }
+        }
+
+        // ================= EVENT LISTENERS =================
+        function initializeEventListeners() {
+            console.log('Initializing event listeners...');
+            
+            // Mobile menu toggle
+            const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+            if (mobileMenuBtn) {
+                mobileMenuBtn.addEventListener('click', () => {
+                    document.getElementById('mobile-menu').classList.toggle('hidden');
+                });
+            }
+
+            // Login button listeners
+            const loginBtn = document.getElementById('login-btn');
+            const voteLoginBtn = document.getElementById('vote-login-btn');
+            const closeLoginModal = document.getElementById('close-login-modal');
+            
+            if (loginBtn) {
+                loginBtn.addEventListener('click', () => {
+                    document.getElementById('login-modal').classList.remove('hidden');
+                });
+            }
+            
+            if (voteLoginBtn) {
+                voteLoginBtn.addEventListener('click', () => {
+                    document.getElementById('login-modal').classList.remove('hidden');
+                });
+            }
+            
+            if (closeLoginModal) {
+                closeLoginModal.addEventListener('click', () => {
+                    document.getElementById('login-modal').classList.add('hidden');
+                });
+            }
+
+            // Register modal listeners
+            const openRegister = document.getElementById('open-register');
+            const closeRegisterModal = document.getElementById('close-register-modal');
+            const openLogin = document.getElementById('open-login');
+            
+            if (openRegister) {
+                openRegister.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    document.getElementById('login-modal').classList.add('hidden');
+                    document.getElementById('register-modal').classList.remove('hidden');
+                });
+            }
+            
+            if (closeRegisterModal) {
+                closeRegisterModal.addEventListener('click', () => {
+                    document.getElementById('register-modal').classList.add('hidden');
+                });
+            }
+            
+            if (openLogin) {
+                openLogin.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    document.getElementById('register-modal').classList.add('hidden');
+                    document.getElementById('login-modal').classList.remove('hidden');
+                });
+            }
+
+            // Login form handler
+            const loginForm = document.getElementById('login-form');
+            if (loginForm) {
+                loginForm.addEventListener('submit', handleLogin);
+            }
+
+            // Register form handler
+            const registerForm = document.getElementById('register-form');
+            if (registerForm) {
+                registerForm.addEventListener('submit', handleRegister);
+            }
+
+            // Logout handler
+            const logoutBtn = document.getElementById('logout-btn');
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', handleLogout);
+            }
+
+            // Vote selection handler
+            document.addEventListener('click', handleVoteSelection);
+
+            // Vote submission handler
+            const submitVoteBtn = document.getElementById('submit-vote');
+            if (submitVoteBtn) {
+                submitVoteBtn.addEventListener('click', handleVoteSubmission);
+            }
+
+            // Change selection handler
+            const changeSelectionBtn = document.getElementById('change-selection');
+            if (changeSelectionBtn) {
+                changeSelectionBtn.addEventListener('click', () => {
+                    document.getElementById('selected-candidate').classList.add('hidden');
+                    // Remove selected state from all candidates
+                    document.querySelectorAll('.candidate-card').forEach(card => {
+                        card.classList.remove('candidate-selected');
+                    });
+                });
+            }
+
+            // Modal close handlers
+            const closeConfirmationModal = document.getElementById('close-confirmation-modal');
+            if (closeConfirmationModal) {
+                closeConfirmationModal.addEventListener('click', () => {
+                    document.getElementById('vote-confirmation-modal').classList.add('hidden');
+                });
+            }
+
+            const closeLoginRequiredModal = document.getElementById('close-login-required-modal');
+            if (closeLoginRequiredModal) {
+                closeLoginRequiredModal.addEventListener('click', () => {
+                    document.getElementById('login-required-modal').classList.add('hidden');
+                });
+            }
+
+            // Close modals when clicking outside
+            const loginModal = document.getElementById('login-modal');
+            const registerModal = document.getElementById('register-modal');
+            
+            if (loginModal) {
+                loginModal.addEventListener('click', (e) => {
+                    if (e.target === loginModal) {
+                        loginModal.classList.add('hidden');
+                    }
+                });
+            }
+            
+            if (registerModal) {
+                registerModal.addEventListener('click', (e) => {
+                    if (e.target === registerModal) {
+                        registerModal.classList.add('hidden');
+                    }
+                });
+            }
+        }
+
+        // ================= LOGIN HANDLER =================
+        async function handleLogin(e) {
             e.preventDefault();
-            console.log('Open register clicked'); // Debug log
-            document.getElementById('login-modal').classList.add('hidden');
-            document.getElementById('register-modal').classList.remove('hidden');
-        });
-    }
-    
-    if (closeRegisterModal) {
-        closeRegisterModal.addEventListener('click', () => {
-            document.getElementById('register-modal').classList.add('hidden');
-        });
-    }
-    
-    if (openLogin) {
-        openLogin.addEventListener('click', (e) => {
-            e.preventDefault();
-            document.getElementById('register-modal').classList.add('hidden');
-            document.getElementById('login-modal').classList.remove('hidden');
-        });
-    }
-
-    // ================= LOGIN FORM =================
-    const loginForm = document.getElementById('login-form');
-    if (loginForm) {
-        loginForm.addEventListener('submit', async function(e) {
-            e.preventDefault();
-            console.log('Login form submitted'); // Debug log
+            console.log('Login form submitted');
             
             const username = document.getElementById('login-username').value.trim();
             const password = document.getElementById('login-password').value.trim();
@@ -549,16 +706,23 @@ function initializeEventListeners() {
                 });
 
                 let data = await res.json();
-                console.log('Login response:', data); // Debug log
+                console.log('Login response:', data);
                 
                 if (data.success) {
                     userState.isLoggedIn = true;
                     userState.username = data.username;
-                    sessionStorage.setItem('loggedInUser', data.username);
+                    userState.userId = data.id || null;
                     updateUIAfterLogin();
                     document.getElementById('login-modal').classList.add('hidden');
-                    // Clear form
-                    loginForm.reset();
+                    document.getElementById('login-form').reset();
+                    
+                    // If user was trying to vote, reload the poll
+                    if (userState.selectedPollId) {
+                        const pollTitle = document.getElementById('poll-title').textContent;
+                        const pollDates = document.getElementById('poll-dates').textContent;
+                        const [start, end] = pollDates.split(' → ');
+                        handleViewAndVote(userState.selectedPollId, pollTitle, start, end);
+                    }
                 } else {
                     alert(data.message || 'Invalid username or password.');
                 }
@@ -566,45 +730,12 @@ function initializeEventListeners() {
                 console.error('Login error:', error);
                 alert('Login failed. Please check your connection and try again.');
             }
-        });
-    }
-
-    // ================= VIEW AND VOTE HANDLER =================
-    async function handleViewAndVote(pollId, title, start, end) {
-        try {
-            // Check login state
-            let meRes = await fetch("backend/me.php");
-            let me = await meRes.json();
-            let isLoggedIn = me.success && me.username;
-
-            if (!isLoggedIn) {
-            // Show modal instead of alert
-            document.getElementById("login-required-modal").classList.remove("hidden");
-            return;
-            }
-
-            // If logged in → continue to load poll
-            loadPoll(pollId, title, start, end);
-        } catch (err) {
-            console.error("Error in handleViewAndVote:", err);
         }
-    }
 
-    function closeLoginRequiredModal() {
-    document.getElementById("login-required-modal").classList.add("hidden");
-}
-
-
-    // If logged in → continue to load poll
-    loadPoll(pollId, title, start, end);
-    }
-
-    // ================= REGISTER FORM =================
-    const registerForm = document.getElementById('register-form');
-    if (registerForm) {
-        registerForm.addEventListener('submit', async function(e) {
+        // ================= REGISTER HANDLER =================
+        async function handleRegister(e) {
             e.preventDefault();
-            console.log('Register form submitted'); // Debug log
+            console.log('Register form submitted');
             
             const username = document.getElementById('reg-username').value.trim();
             const password = document.getElementById('reg-password').value.trim();
@@ -633,17 +764,24 @@ function initializeEventListeners() {
                 });
 
                 let data = await res.json();
-                console.log('Register response:', data); // Debug log
+                console.log('Register response:', data);
                 
                 if (data.success) {
                     // Auto-login after registration
                     userState.isLoggedIn = true;
                     userState.username = data.username;
-                    sessionStorage.setItem('loggedInUser', data.username);
+                    userState.userId = data.id || null;
                     updateUIAfterLogin();
                     document.getElementById('register-modal').classList.add('hidden');
-                    // Clear form
-                    registerForm.reset();
+                    document.getElementById('register-form').reset();
+                    
+                    // If user was trying to vote, reload the poll
+                    if (userState.selectedPollId) {
+                        const pollTitle = document.getElementById('poll-title').textContent;
+                        const pollDates = document.getElementById('poll-dates').textContent;
+                        const [start, end] = pollDates.split(' → ');
+                        handleViewAndVote(userState.selectedPollId, pollTitle, start, end);
+                    }
                 } else {
                     alert(data.message || 'Registration failed.');
                 }
@@ -651,162 +789,162 @@ function initializeEventListeners() {
                 console.error('Register error:', error);
                 alert('Registration failed. Please check your connection and try again.');
             }
-        });
-    }
+        }
 
-    // ================= LOGOUT =================
-    const logoutBtn = document.getElementById('logout-btn');
-    if (logoutBtn) {
-        logoutBtn.addEventListener('click', async () => {
-            console.log('Logout clicked'); // Debug log
+        // ================= LOGOUT HANDLER =================
+        async function handleLogout() {
+            console.log('Logout clicked');
             try {
                 await fetch('backend/logout.php', { method: 'POST' });
             } catch (error) {
                 console.error('Logout error:', error);
             }
             
+            // Reset user state
             userState.isLoggedIn = false;
             userState.username = '';
+            userState.userId = null;
             userState.hasVoted = false;
             userState.votedCandidate = '';
-            sessionStorage.removeItem('loggedInUser');
+            userState.selectedPollId = null;
+            
             updateUIAfterLogout();
-        });
-    }
-
-    // Close modals when clicking outside
-    const loginModal = document.getElementById('login-modal');
-    const registerModal = document.getElementById('register-modal');
-    
-    if (loginModal) {
-        loginModal.addEventListener('click', (e) => {
-            if (e.target === loginModal) {
-                loginModal.classList.add('hidden');
-            }
-        });
-    }
-    
-    if (registerModal) {
-        registerModal.addEventListener('click', (e) => {
-            if (e.target === registerModal) {
-                registerModal.classList.add('hidden');
-            }
-        });
-    }
-
-// Update UI functions
-function updateUIAfterLogin() {
-    console.log('Updating UI after login for:', userState.username); // Debug log
-    document.body.classList.remove('user-logged-out');
-    document.body.classList.add('user-logged-in');
-    const userEmailElement = document.getElementById('user-email');
-    if (userEmailElement) {
-        userEmailElement.textContent = userState.username;
-    }
-}
-
-function updateUIAfterLogout() {
-    console.log('Updating UI after logout'); // Debug log
-    document.body.classList.remove('user-logged-in');
-    document.body.classList.add('user-logged-out');
-}
-
-// ================= FETCH POLL + CANDIDATES =================
-document.addEventListener("DOMContentLoaded", async () => {
-  try {
-    // --- 1. Check session from backend ---
-    let meRes = await fetch("backend/me.php");
-    let me = await meRes.json();
-    let isLoggedIn = me.success && me.users && me.users.username;
-
-    const loginSection = document.querySelector(".login-section");
-    const loginBtn = document.getElementById("login-btn");
-    const userEmail = document.getElementById("user-email");
-
-    if (!isLoggedIn) {
-      // --- User not logged in ---
-      loginSection.classList.remove("hidden");
-      if (loginBtn) loginBtn.classList.remove("hidden");
-
-      // Clear poll details
-      document.getElementById("poll-title").textContent = "";
-      document.getElementById("poll-dates").textContent = "";
-      document.getElementById("candidates-container").innerHTML = "";
-      return;
-    } else {
-      // --- User logged in ---
-      loginSection.classList.add("hidden");
-      if (loginBtn) loginBtn.classList.add("hidden");
-      if (userEmail) userEmail.textContent = me.users.username;
-    }
-
-    // --- 2. Fetch latest poll ---
-    let pollRes = await fetch("backend/poll.php?action=list");
-    let polls = await pollRes.json();
-    if (!polls || polls.length === 0) return;
-
-    let poll = polls[polls.length - 1]; // latest poll
-    document.getElementById("poll-title").textContent = poll.title;
-    document.getElementById("poll-dates").textContent = `${poll.start_date} → ${poll.end_date}`;
-
-    // --- 3. Fetch participants (candidates) ---
-    let partRes = await fetch(`backend/participants.php?action=list&poll_id=${poll.id}`);
-    let participants = await partRes.json();
-
-    const container = document.getElementById("candidates-container");
-    container.innerHTML = "";
-
-    participants.forEach(p => {
-      const initials = p.username.split(" ").map(n => n[0]).join("").toUpperCase();
-      container.innerHTML += `
-        <div class="border border-gray-200 rounded-lg p-4 hover:border-purple-300 transition candidate-card" data-candidate="${p.id}">
-          <div class="flex items-center">
-            <div class="mr-4">
-              <div class="w-16 h-16 rounded-full bg-purple-100 flex items-center justify-center text-purple-600 text-2xl font-bold">
-                ${initials}
-              </div>
-            </div>
-            <div class="flex-grow">
-              <h4 class="font-bold text-lg">${p.username}</h4>
-              <p class="text-gray-600 mb-2">Participant</p>
-            </div>
-            <div>
-              <button class="vote-btn bg-gray-100 text-gray-700 px-4 py-2 rounded-lg font-medium hover:bg-gray-200 transition" 
-                      data-candidate-id="${p.id}" data-candidate-name="${p.username}">
-                Select
-              </button>
-            </div>
-          </div>
-        </div>`;
-    });
-  } catch (err) {
-    console.error("Error loading poll/candidates:", err);
-  }
-});
-
-// ================= VOTE SELECTION =================
-document.addEventListener("click", function(e) {
-    if (e.target.classList.contains("vote-btn")) {
-        const candidateId = e.target.getAttribute("data-candidate-id");
-        const candidateName = e.target.getAttribute("data-candidate-name");
-
-        // Deselect previously selected candidate
-        const selectedCandidate = document.querySelector(".selected-candidate");
-        if (selectedCandidate) {
-            selectedCandidate.classList.remove("selected-candidate");
+            
+            // Reset the voting interface
+            document.getElementById('voting-interface').classList.add('hidden');
+            document.getElementById('login-required').classList.remove('hidden');
         }
 
-        // Highlight selected candidate
-        e.target.closest(".candidate-card").classList.add("selected-candidate");
+        // ================= VOTE SELECTION HANDLER =================
+        function handleVoteSelection(e) {
+            if (e.target.classList.contains("vote-btn")) {
+                if (userState.hasVoted) {
+                    alert('You have already voted in this election.');
+                    return;
+                }
 
-        // Show selected candidate details
-        document.getElementById("selected-candidate-name").textContent = candidateName;
-        document.getElementById("selected-candidate").classList.remove("hidden");
+                const candidateId = e.target.getAttribute("data-candidate-id");
+                const candidateName = e.target.getAttribute("data-candidate-name");
 
-        // Store selection in user state
-        userState.votedCandidate = candidateName;
-    }
-});
-</script>
+                // Remove previous selection
+                document.querySelectorAll('.candidate-card').forEach(card => {
+                    card.classList.remove('candidate-selected');
+                });
+
+                // Highlight selected candidate
+                e.target.closest('.candidate-card').classList.add('candidate-selected');
+
+                // Show selected candidate details
+                document.getElementById("selected-candidate-name").textContent = candidateName;
+                document.getElementById("selected-candidate").classList.remove("hidden");
+
+                // Store selection
+                userState.selectedCandidateId = candidateId;
+                userState.selectedCandidateName = candidateName;
+            }
+        }
+
+        // ================= VOTE SUBMISSION HANDLER =================
+        async function handleVoteSubmission() {
+            if (!userState.selectedCandidateId || !userState.selectedPollId) {
+                alert('Please select a candidate first.');
+                return;
+            }
+
+            if (!userState.isLoggedIn) {
+                document.getElementById('login-required-modal').classList.remove('hidden');
+                return;
+            }
+
+            if (userState.hasVoted) {
+                alert('You have already voted in this election.');
+                return;
+            }
+
+            try {
+                const response = await fetch('backend/submit_vote.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        user_id: userState.userId,
+                        candidate_id: userState.selectedCandidateId,
+                        poll_id: userState.selectedPollId
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // Update user state
+                    userState.hasVoted = true;
+                    userState.votedCandidate = userState.selectedCandidateName;
+
+                    // Show success modal
+                    document.getElementById('vote-confirmation-modal').classList.remove('hidden');
+
+                    // Hide voting interface and show already voted message
+                    document.getElementById('candidates-container').style.display = 'none';
+                    document.getElementById('selected-candidate').classList.add('hidden');
+                    document.getElementById('already-voted').classList.remove('hidden');
+                    document.getElementById('voted-candidate').textContent = userState.votedCandidate;
+
+                } else {
+                    alert(data.message || 'Failed to submit vote. Please try again.');
+                }
+            } catch (error) {
+                console.error('Vote submission error:', error);
+                alert('Failed to submit vote. Please check your connection and try again.');
+            }
+        }
+
+        // ================= UI UPDATE FUNCTIONS =================
+        function updateUIAfterLogin() {
+            console.log('Updating UI after login for:', userState.username);
+            document.body.classList.remove('user-logged-out');
+            document.body.classList.add('user-logged-in');
+            const userEmailElement = document.getElementById('user-email');
+            if (userEmailElement) {
+                userEmailElement.textContent = userState.username;
+            }
+        }
+
+        function updateUIAfterLogout() {
+            console.log('Updating UI after logout');
+            document.body.classList.remove('user-logged-in');
+            document.body.classList.add('user-logged-out');
+        }
+
+        // Make handleViewAndVote globally accessible
+        window.handleViewAndVote = handleViewAndVote;
+                // ================= LOGIN REQUIRED MODAL =================
+        function showLoginRequiredModal() {
+            const modal = document.getElementById("login-required-modal");
+            if (modal) {
+                modal.classList.remove("hidden");
+            } else {
+                alert("You must log in first to vote.");
+            }
+        }
+
+        function closeLoginRequiredModal() {
+            document.getElementById("login-required-modal")?.classList.add("hidden");
+        }
+
+        document.getElementById("close-login-required-modal")?.addEventListener("click", closeLoginRequiredModal);
+    </script>
+
+    <!-- Login Required Modal -->
+    <div id="login-required-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-xl shadow-xl w-full max-w-md p-8 text-center">
+            <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                <i class="fas fa-exclamation text-red-500 text-2xl"></i>
+            </div>
+            <h3 class="text-xl font-bold text-gray-800 mb-4">Login Required</h3>
+            <p class="text-gray-600 mb-6">You must log in before you can view and vote in elections.</p>
+            <button id="close-login-required-modal" class="gradient-bg text-white px-6 py-2 rounded-lg font-medium hover:opacity-90 transition">
+                OK
+            </button>
+        </div>
+    </div>
 </body>
 </html>
