@@ -558,16 +558,25 @@ function initializeEventListeners() {
 
     // ================= VIEW AND VOTE HANDLER =================
     async function handleViewAndVote(pollId, title, start, end) {
-    // Check login state
-    let meRes = await fetch("backend/me.php");
-    let me = await meRes.json();
-    let isLoggedIn = me.success && me.username;
+        try {
+            // Check login state
+            let meRes = await fetch("backend/me.php");
+            let me = await meRes.json();
+            let isLoggedIn = me.success && me.username;
 
-    if (!isLoggedIn) {
-        // Open login modal if not logged in
-        document.getElementById("login-modal").classList.remove("hidden");
-        return;
+        if (!isLoggedIn) {
+            // Trigger the same login modal as top button
+            document.getElementById("login-btn").click();
+            return;
+        }
+
+            // If logged in → continue to load poll
+            loadPoll(pollId, title, start, end);
+        } catch (err) {
+            console.error("Error in handleViewAndVote:", err);
+        }
     }
+
 
     // If logged in → continue to load poll
     loadPoll(pollId, title, start, end);
@@ -667,7 +676,6 @@ function initializeEventListeners() {
             }
         });
     }
-}
 
 // Update UI functions
 function updateUIAfterLogin() {
