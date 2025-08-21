@@ -60,7 +60,7 @@ try {
         $voteStmt->execute([$user_id, $candidate_id]);
 
         // Increment candidate vote count (if candidates table has votes column)
-        $updateStmt = $conn->prepare("UPDATE candidates SET votes = votes + 1 WHERE id = ?");
+        $updateStmt = $conn->prepare("UPDATE participants SET votes = votes + 1 WHERE id = ?");
         $updateStmt->execute([$candidate_id]);
 
         // Commit transaction
