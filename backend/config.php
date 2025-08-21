@@ -30,10 +30,10 @@ try {
     CREATE TABLE IF NOT EXISTS votes (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         user_id INTEGER,
-        candidate_id INTEGER,
+        participants_id INTEGER,
         created_at TEXT DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE,
-        FOREIGN KEY(candidate_id) REFERENCES participants(id) ON DELETE CASCADE
+        FOREIGN KEY(participants_id) REFERENCES participants(id) ON DELETE CASCADE
     );
 
 

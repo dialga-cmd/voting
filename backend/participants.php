@@ -86,7 +86,7 @@ elseif ($action === 'remove' || $action === 'delete') {
 
         try {
             // Delete votes first (due to foreign key constraints)
-            $deleteVotes = $conn->prepare("DELETE FROM votes WHERE candidate_id = ?");
+            $deleteVotes = $conn->prepare("DELETE FROM votes WHERE participants_id = ?");
             $deleteVotes->execute([$id]);
 
             // Delete participant

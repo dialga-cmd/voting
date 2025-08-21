@@ -8,7 +8,7 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $candidate_id = intval($_POST['candidate_id'] ?? 0);
+    $participants_id = intval($_POST['participants_id'] ?? 0);
     $user_id = $_SESSION['user_id'];
 
     $stmt = $conn->prepare("SELECT id FROM votes WHERE user_id=?");
@@ -20,11 +20,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $conn->beginTransaction();
     try {
-        $stmt = $conn->prepare("INSERT INTO votes (user_id, candidate_id) VALUES (?, ?)");
-        $stmt->execute([$user_id, $candidate_id]);
+        $stmt = $conn->prepare("INSERT INTO votes (user_id, participants_id) VALUES (?, ?)");
+        $stmt->execute([$user_id, $participants_id]);
 
         $stmt = $conn->prepare("UPDATE candidates SET votes = votes + 1 WHERE id=?");
-        $stmt->execute([$candidate_id]);
+        $stmt->execute([$participants_id]);
 
         $conn->commit();
         echo json_encode(["status" => "success", "message" => "Vote submitted"]);

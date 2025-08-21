@@ -59,7 +59,7 @@ switch ($action) {
 
             try {
                 // Delete votes first
-                $db->prepare("DELETE FROM votes WHERE candidate_id IN (SELECT id FROM participants WHERE poll_id = ?)")->execute([$id]);
+                $db->prepare("DELETE FROM votes WHERE participants_id IN (SELECT id FROM participants WHERE poll_id = ?)")->execute([$id]);
                 
                 // Delete participants
                 $db->prepare("DELETE FROM participants WHERE poll_id = ?")->execute([$id]);

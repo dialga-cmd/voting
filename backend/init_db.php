@@ -32,10 +32,10 @@ CREATE TABLE IF NOT EXISTS votes (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     poll_id INTEGER NOT NULL,
     participant_email TEXT NOT NULL,
-    candidate_id INTEGER NOT NULL,
+    participants_id INTEGER NOT NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (poll_id) REFERENCES polls(id) ON DELETE CASCADE,
-    FOREIGN KEY (candidate_id) REFERENCES candidates(id) ON DELETE CASCADE
+    FOREIGN KEY (participants_id) REFERENCES candidates(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS student_council (

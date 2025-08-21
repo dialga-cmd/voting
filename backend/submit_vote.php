@@ -14,10 +14,10 @@ session_start();
 try {
     $input = json_decode(file_get_contents("php://input"), true);
     $user_id = $input['user_id'] ?? null;
-    $candidate_id = $input['candidate_id'] ?? null;
+    $participants_id = $input['participants_id'] ?? null;
     $poll_id = $input['poll_id'] ?? null;
 
-    if (!$user_id || !$candidate_id || !$poll_id) {
+    if (!$user_id || !$participants_id || !$poll_id) {
         echo json_encode(["success" => false, "message" => "Missing required fields"]);
         exit;
     }
@@ -32,7 +32,7 @@ try {
     $checkStmt = $conn->prepare("
         SELECT COUNT(*) 
         FROM votes v 
-        JOIN participants p ON v.candidate_id = p.id 
+        JOIN participants p ON v.participants_id = p.id 
         WHERE v.user_id = ? AND p.poll_id = ?
     ");
     $checkStmt->execute([$user_id, $poll_id]);
@@ -44,7 +44,7 @@ try {
 
     // Verify candidate exists and belongs to the correct poll
     $candidateStmt = $conn->prepare("SELECT id FROM participants WHERE id = ? AND poll_id = ?");
-    $candidateStmt->execute([$candidate_id, $poll_id]);
+    $candidateStmt->execute([$participants_id, $poll_id]);
     
     if (!$candidateStmt->fetch()) {
         echo json_encode(["success" => false, "message" => "Invalid candidate or poll"]);
@@ -56,12 +56,12 @@ try {
 
     try {
         // Insert the vote
-        $voteStmt = $conn->prepare("INSERT INTO votes (user_id, candidate_id, created_at) VALUES (?, ?, datetime('now'))");
-        $voteStmt->execute([$user_id, $candidate_id]);
+        $voteStmt = $conn->prepare("INSERT INTO votes (user_id, participants_id, created_at) VALUES (?, ?, datetime('now'))");
+        $voteStmt->execute([$user_id, $participants_id]);
 
         // Increment candidate vote count (if candidates table has votes column)
         $updateStmt = $conn->prepare("UPDATE participants SET votes = votes + 1 WHERE id = ?");
-        $updateStmt->execute([$candidate_id]);
+        $updateStmt->execute([$participants_id]);
 
         // Commit transaction
         $conn->commit();
