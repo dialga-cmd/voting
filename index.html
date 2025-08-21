@@ -372,10 +372,10 @@ document.addEventListener("DOMContentLoaded", async () => {
         <div class="border border-gray-200 rounded-lg p-6 hover:shadow-md transition">
           <h3 class="font-bold text-lg text-gray-800 mb-2">${poll.title}</h3>
           <p class="text-sm text-gray-600 mb-4">${poll.start_date} → ${poll.end_date}</p>
-          <button onclick="loadPoll(${poll.id}, '${poll.title}', '${poll.start_date}', '${poll.end_date}')" 
+          <button onclick="handleViewAndVote(${poll.id}, '${poll.title}', '${poll.start_date}', '${poll.end_date}')" 
             class="gradient-bg text-white px-4 py-2 rounded-lg hover:opacity-90 transition">
             View & Vote
-          </button>
+            </button>
         </div>
       `);
     });
@@ -554,6 +554,23 @@ function initializeEventListeners() {
                 alert('Login failed. Please check your connection and try again.');
             }
         });
+    }
+
+    // ================= VIEW AND VOTE HANDLER =================
+    async function handleViewAndVote(pollId, title, start, end) {
+    // Check login state
+    let meRes = await fetch("backend/me.php");
+    let me = await meRes.json();
+    let isLoggedIn = me.success && me.username;
+
+    if (!isLoggedIn) {
+        // Open login modal if not logged in
+        document.getElementById("login-modal").classList.remove("hidden");
+        return;
+    }
+
+    // If logged in → continue to load poll
+    loadPoll(pollId, title, start, end);
     }
 
     // ================= REGISTER FORM =================
