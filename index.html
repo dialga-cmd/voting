@@ -791,28 +791,210 @@
             }
         }
 
-        // ================= LOGOUT HANDLER =================
-        async function handleLogout() {
-            console.log('Logout clicked');
-            try {
-                await fetch('backend/logout.php', { method: 'POST' });
-            } catch (error) {
-                console.error('Logout error:', error);
+        // ================= LOGIN HANDLER =================
+        async function handleLogin(e) {
+            e.preventDefault();
+            console.log('Login form submitted');
+            
+            const username = document.getElementById('login-username').value.trim();
+            const password = document.getElementById('login-password').value.trim();
+
+            if (!username || !password) {
+                alert('Please fill in all fields');
+                return;
             }
+
+            try {
+                let res = await fetch('backend/login.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+
+                let data = await res.json();
+                console.log('Login response:', data);
+                
+                if (data.success) {
+                    // Store user data properly
+                    userState.isLoggedIn = true;
+                    userState.username = data.username;
+                    userState.userId = parseInt(data.id); // Make sure it's a number
+                    userState.role = data.role;
+                    
+                    console.log('User logged in:', userState);
+                    
+                    updateUIAfterLogin();
+                    document.getElementById('login-modal').classList.add('hidden');
+                    document.getElementById('login-form').reset();
+                    
+                    // If user was trying to vote, reload the poll
+                    if (userState.selectedPollId) {
+                        const pollTitle = document.getElementById('poll-title').textContent;
+                        const pollDates = document.getElementById('poll-dates').textContent;
+                        const [start, end] = pollDates.split(' → ');
+                        handleViewAndVote(userState.selectedPollId, pollTitle, start, end);
+                    }
+                } else {
+                    alert(data.message || 'Invalid username or password.');
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                alert('Login failed. Please check your connection and try again.');
+            }
+        }
+
+        // ================= REGISTER HANDLER =================
+        async function handleRegister(e) {
+            e.preventDefault();
+            console.log('Register form submitted');
             
-            // Reset user state
-            userState.isLoggedIn = false;
-            userState.username = '';
-            userState.userId = null;
-            userState.hasVoted = false;
-            userState.votedCandidate = '';
-            userState.selectedPollId = null;
+            const username = document.getElementById('reg-username').value.trim();
+            const password = document.getElementById('reg-password').value.trim();
+            const confirmPassword = document.getElementById('reg-confirm-password').value.trim();
+
+            if (!username || !password || !confirmPassword) {
+                alert('Please fill in all fields');
+                return;
+            }
+
+            if (password !== confirmPassword) {
+                alert('Passwords do not match!');
+                return;
+            }
+
+            if (password.length < 6) {
+                alert('Password must be at least 6 characters long');
+                return;
+            }
+
+            try {
+                let res = await fetch('backend/register.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+
+                let data = await res.json();
+                console.log('Register response:', data);
+                
+                if (data.success) {
+                    // Store user data properly after auto-login
+                    userState.isLoggedIn = true;
+                    userState.username = data.username;
+                    userState.userId = parseInt(data.id); // Make sure it's a number
+                    userState.role = data.role;
+                    
+                    console.log('User registered and logged in:', userState);
+                    
+                    updateUIAfterLogin();
+                    document.getElementById('register-modal').classList.add('hidden');
+                    document.getElementById('register-form').reset();
+                    
+                    // If user was trying to vote, reload the poll
+                    if (userState.selectedPollId) {
+                        const pollTitle = document.getElementById('poll-title').textContent;
+                        const pollDates = document.getElementById('poll-dates').textContent;
+                        const [start, end] = pollDates.split(' → ');
+                        handleViewAndVote(userState.selectedPollId, pollTitle, start, end);
+                    }
+                } else {
+                    alert(data.message || 'Registration failed.');
+                }
+            } catch (error) {
+                console.error('Register error:', error);
+                alert('Registration failed. Please check your connection and try again.');
+            }
+        }
+
+        // ================= SESSION CHECK =================
+        async function checkLoginState() {
+            console.log('Checking login state...');
+            try {
+                let res = await fetch('backend/me.php');
+                let data = await res.json();
+                console.log('Session check response:', data);
+
+                if (data.success) {
+                    userState.isLoggedIn = true;
+                    userState.username = data.username;
+                    userState.userId = parseInt(data.id); // Make sure it's a number
+                    userState.role = data.role;
+                    
+                    console.log('User session found:', userState);
+                    updateUIAfterLogin();
+                } else {
+                    console.log('No active session');
+                    updateUIAfterLogout();
+                }
+            } catch (err) {
+                console.error("Session check error:", err);
+                updateUIAfterLogout();
+            }
+        }
+
+        // ================= VOTE SUBMISSION HANDLER =================
+        async function handleVoteSubmission() {
+            console.log('Vote submission started');
+            console.log('User state:', userState);
+            console.log('Selected candidate ID:', userState.selectedCandidateId);
+            console.log('Selected poll ID:', userState.selectedPollId);
             
-            updateUIAfterLogout();
-            
-            // Reset the voting interface
-            document.getElementById('voting-interface').classList.add('hidden');
-            document.getElementById('login-required').classList.remove('hidden');
+            if (!userState.selectedCandidateId || !userState.selectedPollId) {
+                alert('Please select a candidate first.');
+                return;
+            }
+
+            if (!userState.isLoggedIn || !userState.userId) {
+                console.log('User not logged in or missing user ID');
+                document.getElementById('login-required-modal').classList.remove('hidden');
+                return;
+            }
+
+            if (userState.hasVoted) {
+                alert('You have already voted in this election.');
+                return;
+            }
+
+            try {
+                const voteData = {
+                    user_id: userState.userId,
+                    participant_id: parseInt(userState.selectedCandidateId),
+                    poll_id: parseInt(userState.selectedPollId)
+                };
+                
+                console.log('Sending vote data:', voteData);
+
+                const response = await fetch('backend/submit_vote.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(voteData)
+                });
+
+                const data = await response.json();
+                console.log('Vote submission response:', data);
+
+                if (data.success) {
+                    // Update user state
+                    userState.hasVoted = true;
+                    userState.votedCandidate = userState.selectedCandidateName;
+
+                    // Show success modal
+                    document.getElementById('vote-confirmation-modal').classList.remove('hidden');
+
+                    // Hide voting interface and show already voted message
+                    document.getElementById('candidates-container').style.display = 'none';
+                    document.getElementById('selected-candidate').classList.add('hidden');
+                    document.getElementById('already-voted').classList.remove('hidden');
+                    document.getElementById('voted-candidate').textContent = userState.votedCandidate;
+
+                } else {
+                    console.error('Vote submission failed:', data.message);
+                    alert(data.message || 'Failed to submit vote. Please try again.');
+                }
+            } catch (error) {
+                console.error('Vote submission error:', error);
+                alert('Failed to submit vote. Please check your connection and try again.');
+            }
         }
 
         // ================= VOTE SELECTION HANDLER =================
