@@ -1,87 +1,130 @@
 <?php
-require_once "config.php";
 header('Content-Type: application/json');
-header('Access-Control-Allow-Origin: *');
-header('Access-Control-Allow-Methods: POST, GET, OPTIONS');
-header('Access-Control-Allow-Headers: Content-Type');
+require_once __DIR__ . '/config.php';
 
-if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-    exit(0);
-}
-
-session_start();
+$input = json_decode(file_get_contents("php://input"), true);
+$action = $_GET['action'] ?? '';
 
 try {
-    $input = json_decode(file_get_contents("php://input"), true);
-    $user_id = $input['user_id'] ?? null;
-    $participants_id = $input['participants_id'] ?? null;
-    $poll_id = $input['poll_id'] ?? null;
+    if ($action === 'submit') {
+        $userId = $input['user_id'] ?? null;
+        $pollId = $input['poll_id'] ?? null;
+        $participantId = $input['participant_id'] ?? null;
 
-    if (!$user_id || !$participants_id || !$poll_id) {
-        echo json_encode(["success" => false, "message" => "Missing required fields"]);
-        exit;
-    }
+        if (!$userId || !$pollId || !$participantId) {
+            echo json_encode(['success' => false, 'message' => 'Missing required fields']);
+            exit;
+        }
 
-    // Verify user is logged in
-    if (!isset($_SESSION['user']) || $_SESSION['user']['id'] != $user_id) {
-        echo json_encode(["success" => false, "message" => "User not authenticated"]);
-        exit;
-    }
+        // Check if user already voted in this poll
+        $stmt = $conn->prepare("SELECT id FROM votes WHERE user_id = ? AND poll_id = ?");
+        $stmt->execute([$userId, $pollId]);
+        if ($stmt->fetch()) {
+            echo json_encode(['success' => false, 'message' => 'You have already voted in this poll']);
+            exit;
+        }
 
-    // Check if user has already voted in this poll
-    $checkStmt = $conn->prepare("
-        SELECT COUNT(*) 
-        FROM votes v 
-        JOIN participants p ON v.participants_id = p.id 
-        WHERE v.user_id = ? AND p.poll_id = ?
-    ");
-    $checkStmt->execute([$user_id, $poll_id]);
-    
-    if ($checkStmt->fetchColumn() > 0) {
-        echo json_encode(["success" => false, "message" => "You have already voted in this poll"]);
-        exit;
-    }
+        // Verify that the participant belongs to this poll
+        $stmt = $conn->prepare("SELECT name FROM participants WHERE id = ? AND poll_id = ?");
+        $stmt->execute([$participantId, $pollId]);
+        $participant = $stmt->fetch();
+        if (!$participant) {
+            echo json_encode(['success' => false, 'message' => 'Invalid candidate selection']);
+            exit;
+        }
 
-    // Verify candidate exists and belongs to the correct poll
-    $candidateStmt = $conn->prepare("SELECT id FROM participants WHERE id = ? AND poll_id = ?");
-    $candidateStmt->execute([$participants_id, $poll_id]);
-    
-    if (!$candidateStmt->fetch()) {
-        echo json_encode(["success" => false, "message" => "Invalid candidate or poll"]);
-        exit;
-    }
-
-    // Begin transaction
-    $conn->beginTransaction();
-
-    try {
         // Insert the vote
-        $voteStmt = $conn->prepare("INSERT INTO votes (user_id, participants_id, created_at) VALUES (?, ?, datetime('now'))");
-        $voteStmt->execute([$user_id, $participants_id]);
-
-        // Increment candidate vote count (if candidates table has votes column)
-        $updateStmt = $conn->prepare("UPDATE participants SET votes = votes + 1 WHERE id = ?");
-        $updateStmt->execute([$participants_id]);
-
-        // Commit transaction
-        $conn->commit();
+        $stmt = $conn->prepare("INSERT INTO votes (user_id, poll_id, participant_id) VALUES (?, ?, ?)");
+        $stmt->execute([$userId, $pollId, $participantId]);
 
         echo json_encode([
-            "success" => true, 
-            "message" => "Vote submitted successfully"
+            'success' => true, 
+            'message' => 'Vote submitted successfully',
+            'voted_for' => $participant['name']
         ]);
-
-    } catch (Exception $e) {
-        // Rollback transaction on error
-        $conn->rollBack();
-        throw $e;
+        exit;
     }
 
+    if ($action === 'check') {
+        $userId = $input['user_id'] ?? null;
+        $pollId = $input['poll_id'] ?? null;
+
+        if (!$userId || !$pollId) {
+            echo json_encode(['success' => false, 'message' => 'Missing required fields']);
+            exit;
+        }
+
+        // Check if user has voted
+        $stmt = $conn->prepare("
+            SELECT v.id, p.name as voted_candidate 
+            FROM votes v 
+            JOIN participants p ON v.participant_id = p.id 
+            WHERE v.user_id = ? AND v.poll_id = ?
+        ");
+        $stmt->execute([$userId, $pollId]);
+        $vote = $stmt->fetch();
+
+        if ($vote) {
+            echo json_encode([
+                'success' => true,
+                'hasVoted' => true,
+                'votedCandidate' => $vote['voted_candidate']
+            ]);
+        } else {
+            echo json_encode([
+                'success' => true,
+                'hasVoted' => false
+            ]);
+        }
+        exit;
+    }
+
+    if ($action === 'count') {
+        // Get total vote count
+        $stmt = $conn->prepare("SELECT COUNT(*) as total FROM votes");
+        $stmt->execute();
+        $result = $stmt->fetch();
+
+        echo json_encode([
+            'success' => true,
+            'total' => $result['total']
+        ]);
+        exit;
+    }
+
+    if ($action === 'results') {
+        $pollId = $_GET['poll_id'] ?? null;
+        
+        if (!$pollId) {
+            echo json_encode(['success' => false, 'message' => 'Poll ID required']);
+            exit;
+        }
+
+        $stmt = $conn->prepare("
+            SELECT p.name, COUNT(v.id) as vote_count
+            FROM participants p
+            LEFT JOIN votes v ON p.id = v.participant_id
+            WHERE p.poll_id = ?
+            GROUP BY p.id, p.name
+            ORDER BY vote_count DESC
+        ");
+        $stmt->execute([$pollId]);
+        $results = $stmt->fetchAll();
+
+        echo json_encode([
+            'success' => true,
+            'results' => $results
+        ]);
+        exit;
+    }
+
+    echo json_encode(['success' => false, 'message' => 'Invalid action']);
+
+} catch (PDOException $e) {
+    error_log("Database error in votes.php: " . $e->getMessage());
+    echo json_encode(['success' => false, 'message' => 'Database error occurred']);
 } catch (Exception $e) {
-    error_log("Submit vote error: " . $e->getMessage());
-    echo json_encode([
-        "success" => false, 
-        "message" => "Failed to submit vote: " . $e->getMessage()
-    ]);
+    error_log("Error in votes.php: " . $e->getMessage());
+    echo json_encode(['success' => false, 'message' => 'An error occurred']);
 }
 ?>
