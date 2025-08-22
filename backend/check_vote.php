@@ -25,7 +25,7 @@ try {
     $stmt = $conn->prepare("
         SELECT v.*, p.name as candidate_name 
         FROM votes v 
-        JOIN participants p ON v.participants_id = p.id 
+        JOIN participants p ON v.participant_id = p.id 
         WHERE v.user_id = ? AND p.poll_id = ?
     ");
     $stmt->execute([$user_id, $poll_id]);

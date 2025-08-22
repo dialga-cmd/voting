@@ -58,7 +58,16 @@ try {
         exit;
     }
 
-    // Insert vote with proper error handling
+    // Verify participant exists and belongs to the poll
+    $participantStmt = $conn->prepare("SELECT id FROM participants WHERE id = ? AND poll_id = ?");
+    $participantStmt->execute([$participant_id, $poll_id]);
+    
+    if (!$participantStmt->fetch()) {
+        echo json_encode(["success" => false, "message" => "Invalid participant or poll"]);
+        exit;
+    }
+
+    // Insert vote - using participant_id (singular) to match the expected column name
     $voteStmt = $conn->prepare("INSERT INTO votes (user_id, participant_id, created_at) VALUES (?, ?, datetime('now'))");
     if (!$voteStmt->execute([$user_id, $participant_id])) {
         throw new Exception("Failed to insert vote record");
