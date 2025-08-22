@@ -8,7 +8,7 @@ try {
     // Enforce foreign key constraints
     $conn->exec("PRAGMA foreign_keys = ON;");
 
-    // Create tables
+    // Create tables with consistent naming
     $conn->exec("
     CREATE TABLE IF NOT EXISTS polls (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -51,6 +51,41 @@ try {
     );
     ");
 
+    // Check if we need to migrate the votes table
+    $result = $conn->query("PRAGMA table_info(votes)");
+    $columns = $result->fetchAll(PDO::FETCH_ASSOC);
+    $hasParticipantsId = false;
+    $hasParticipantId = false;
+    
+    foreach ($columns as $column) {
+        if ($column['name'] === 'participants_id') {
+            $hasParticipantsId = true;
+        }
+        if ($column['name'] === 'participant_id') {
+            $hasParticipantId = true;
+        }
+    }
+
+    // If we have the old column name, migrate it
+    if ($hasParticipantsId && !$hasParticipantId) {
+        $conn->exec("
+            CREATE TABLE votes_new (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id INTEGER,
+                participant_id INTEGER,
+                created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE,
+                FOREIGN KEY(participant_id) REFERENCES participants(id) ON DELETE CASCADE
+            );
+            
+            INSERT INTO votes_new (id, user_id, participant_id, created_at)
+            SELECT id, user_id, participants_id, created_at FROM votes;
+            
+            DROP TABLE votes;
+            ALTER TABLE votes_new RENAME TO votes;
+        ");
+    }
+
     // Insert default poll if none exists
     $stmt = $conn->query("SELECT COUNT(*) FROM polls");
     if ($stmt->fetchColumn() == 0) {
@@ -64,10 +99,10 @@ try {
     $stmt = $conn->query("SELECT COUNT(*) FROM participants");
     if ($stmt->fetchColumn() == 0) {
         $conn->exec("
-            INSERT INTO participants (name, poll_id) VALUES
-            ('John Smith', 1),
-            ('Maria Johnson', 1),
-            ('Alex Davis', 1);
+            INSERT INTO participants (name, email, poll_id) VALUES
+            ('John Smith', 'john@example.com', 1),
+            ('Maria Johnson', 'maria@example.com', 1),
+            ('Alex Davis', 'alex@example.com', 1);
         ");
     }
 
@@ -83,3 +118,4 @@ try {
     error_log("Database error: " . $e->getMessage());
     die(json_encode(["success" => false, "message" => "Database connection failed"]));
 }
+?>

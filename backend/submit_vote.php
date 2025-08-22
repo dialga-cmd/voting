@@ -51,7 +51,7 @@ try {
         exit;
     }
 
-    // Insert vote
+    // Insert vote - using participant_id (singular) to match the expected column name
     $voteStmt = $conn->prepare("INSERT INTO votes (user_id, participant_id, created_at) VALUES (?, ?, datetime('now'))");
     $voteStmt->execute([$user_id, $participant_id]);
 
