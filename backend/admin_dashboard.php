@@ -188,7 +188,7 @@ if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== tru
 }
 
 // Handle admin logout
-if (isset($_GET['logout'])) {
+if (isset($_GET['logout']) || isset($_POST['logout']) || (isset($_GET['logout']) && $_GET['logout'] == '1')) {
     session_destroy();
     header('Location: ' . $_SERVER['PHP_SELF']);
     exit;
@@ -324,12 +324,9 @@ try {
   <a href="#" class="nav-link active" data-section="dashboard"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
   <a href="#" class="nav-link" data-section="polls"><i class="fas fa-poll"></i> Manage Polls</a>
   <a href="#" class="nav-link" data-section="participants"><i class="fas fa-users"></i> Participants</a>
-  <a href="#" class="nav-link" data-section="council"><i class="fas fa-user-tie"></i> Council</a>
   <a href="#" class="nav-link" data-section="results"><i class="fas fa-chart-bar"></i> Results</a>
   <a href="#" class="nav-link" data-section="analytics"><i class="fas fa-analytics"></i> Analytics</a>
-  <form action="?logout=1" method="get" style="margin-top:32px">
-    <button class="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</button>
-  </form>
+  <button type="button" class="logout-btn" onclick="handleAdminLogout()" style="margin-top:32px; width: 100%;"><i class="fas fa-sign-out-alt"></i> Logout</button>
 </aside>
 
 <main>
@@ -351,13 +348,6 @@ try {
           <div class="text-gray-600">Participants</div>
         </div>
         <i class="fas fa-users" style="font-size:2.1em;color:#10b981;"></i>
-      </div>
-      <div class="stat-card">
-        <div>
-          <div style="font-size:1.7em;font-weight:700;" id="totalCouncilCount"><?php echo $totalCouncil; ?></div>
-          <div class="text-gray-600">Council Members</div>
-        </div>
-        <i class="fas fa-user-tie" style="font-size:2.1em;color:#06b6d4;"></i>
       </div>
       <div class="stat-card">
         <div>
@@ -441,33 +431,6 @@ try {
       </form>
       <div id="participantsList">
         <p style="text-align: center; color: #666; padding: 20px;">Select a poll to view participants...</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- Council Section -->
-  <section id="council" class="section">
-    <div class="panel animate-fade-in">
-      <div class="panel-header"><i class="fas fa-user-tie"></i> Student Council Management</div>
-      <div id="council-messages"></div>
-      <form id="addCouncilForm">
-        <div class="form-row">
-          <input type="text" name="name" required placeholder="Council Member Name">
-          <input type="text" name="position" required placeholder="Position (e.g., President, Secretary)">
-          <button type="submit" class="action-btn">Add Member</button>
-        </div>
-      </form>
-      <div style="overflow-x:auto;">
-        <table>
-          <thead>
-            <tr>
-              <th>ID</th><th>Name</th><th>Position</th><th>Actions</th>
-            </tr>
-          </thead>
-          <tbody id="councilBody">
-            <tr><td colspan="4" style="text-align: center; padding: 20px;">Loading...</td></tr>
-          </tbody>
-        </table>
       </div>
     </div>
   </section>
@@ -1176,6 +1139,13 @@ document.addEventListener('keydown', function(e) {
     }
   }
 });
+
+// Admin logout function
+function handleAdminLogout() {
+  if (confirm('Are you sure you want to logout?')) {
+    window.location.href = '?logout=1';
+  }
+}
 
 console.log('VoteEasy Admin Dashboard loaded successfully!');
 console.log('All data now loaded from real APIs');
