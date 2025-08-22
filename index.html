@@ -485,8 +485,8 @@
         // ================= CHECK IF USER ALREADY VOTED =================
         async function checkIfAlreadyVoted(pollId) {
             try {
-                // Use the votes API to check if user has voted
-                const data = await apiCall('votes.php?action=check', {
+                // Use check_vote.php or submit_vote.php to check if user has voted
+                const data = await apiCall('check_vote.php', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ 
@@ -842,32 +842,66 @@
             }
         }
 
-        // ================= VOTE SELECTION HANDLER =================
-        function handleVoteSelection(e) {
-            if (e.target.classList.contains("vote-btn")) {
-                if (userState.hasVoted) {
-                    alert('You have already voted in this election.');
-                    return;
-                }
+        // ================= VOTE SUBMISSION HANDLER =================
+        async function handleVoteSubmission() {
+            console.log('Vote submission started');
+            console.log('User state:', userState);
+            
+            if (!userState.selectedCandidateId || !userState.selectedPollId) {
+                alert('Please select a candidate first.');
+                return;
+            }
 
-                const candidateId = e.target.getAttribute("data-candidate-id");
-                const candidateName = e.target.getAttribute("data-candidate-name");
+            if (!userState.isLoggedIn || !userState.userId) {
+                console.log('User not logged in or missing user ID');
+                document.getElementById('login-required-modal').classList.remove('hidden');
+                return;
+            }
 
-                // Remove previous selection
-                document.querySelectorAll('.candidate-card').forEach(card => {
-                    card.classList.remove('candidate-selected');
+            if (userState.hasVoted) {
+                alert('You have already voted in this election.');
+                return;
+            }
+
+            try {
+                const voteData = {
+                    user_id: userState.userId,
+                    participant_id: parseInt(userState.selectedCandidateId),
+                    poll_id: parseInt(userState.selectedPollId)
+                };
+                
+                console.log('Sending vote data:', voteData);
+
+                // Use submit_vote.php instead of votes.php
+                const data = await apiCall('submit_vote.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(voteData)
                 });
 
-                // Highlight selected candidate
-                e.target.closest('.candidate-card').classList.add('candidate-selected');
+                console.log('Vote submission response:', data);
 
-                // Show selected candidate details
-                document.getElementById("selected-candidate-name").textContent = candidateName;
-                document.getElementById("selected-candidate").classList.remove("hidden");
+                if (data.success) {
+                    // Update user state
+                    userState.hasVoted = true;
+                    userState.votedCandidate = userState.selectedCandidateName;
 
-                // Store selection
-                userState.selectedCandidateId = candidateId;
-                userState.selectedCandidateName = candidateName;
+                    // Show success modal
+                    document.getElementById('vote-confirmation-modal').classList.remove('hidden');
+
+                    // Hide voting interface and show already voted message
+                    document.getElementById('candidates-container').style.display = 'none';
+                    document.getElementById('selected-candidate').classList.add('hidden');
+                    document.getElementById('already-voted').classList.remove('hidden');
+                    document.getElementById('voted-candidate').textContent = userState.votedCandidate;
+
+                } else {
+                    console.error('Vote submission failed:', data.message);
+                    alert(data.message || 'Failed to submit vote. Please try again.');
+                }
+            } catch (error) {
+                console.error('Vote submission error:', error);
+                alert('Failed to submit vote. Please check your connection and try again.');
             }
         }
 
