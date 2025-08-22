@@ -32,7 +32,14 @@ try {
             "username" => $user["username"],
             "role" => $user["role"]
         ];
-        echo json_encode(["success" => true, "username" => $user["username"]]);
+        
+        // Return user data including ID
+        echo json_encode([
+            "success" => true, 
+            "username" => $user["username"],
+            "id" => $user["id"],
+            "role" => $user["role"]
+        ]);
     } else {
         echo json_encode(["success" => false, "message" => "Invalid username or password"]);
     }

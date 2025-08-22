@@ -49,7 +49,13 @@ try {
         "role" => "user"
     ];
 
-    echo json_encode(["success" => true, "username" => $username]);
+    // Return user data including ID
+    echo json_encode([
+        "success" => true, 
+        "username" => $username,
+        "id" => $userId,
+        "role" => "user"
+    ]);
 } catch (Exception $e) {
     error_log("Register error: " . $e->getMessage());
     echo json_encode(["success" => false, "message" => "Registration failed. Please try again."]);
