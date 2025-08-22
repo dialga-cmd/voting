@@ -1,23 +1,26 @@
 <?php
 require_once __DIR__ . '/config.php';
-$db = $conn;
 header('Content-Type: application/json');
+header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
+header('Access-Control-Allow-Headers: Content-Type');
+
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    http_response_code(200);
+    exit(0);
+}
 
 $action = $_GET['action'] ?? $_POST['action'] ?? '';
 
-switch ($action) {
-    case 'list':
-        try {
-            // Fetch all polls, newest first
-            $stmt = $db->query("SELECT id, title, start_date, end_date FROM polls ORDER BY start_date DESC");
-            echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
-        } catch (Exception $e) {
-            echo json_encode(["status" => "error", "message" => $e->getMessage()]);
-        }
-        break;
+try {
+    switch ($action) {
+        case 'list':
+            $stmt = $conn->query("SELECT id, title, start_date, end_date FROM polls ORDER BY id DESC");
+            $polls = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            echo json_encode($polls);
+            break;
 
-    case 'create':
-        try {
+        case 'create':
             $title = trim($_POST['title'] ?? '');
             $start = $_POST['start_date'] ?? '';
             $end = $_POST['end_date'] ?? '';
@@ -27,11 +30,11 @@ switch ($action) {
                 exit;
             }
             
-            $stmt = $db->prepare("INSERT INTO polls (title, start_date, end_date) VALUES (?, ?, ?)");
+            $stmt = $conn->prepare("INSERT INTO polls (title, start_date, end_date) VALUES (?, ?, ?)");
             $success = $stmt->execute([$title, $start, $end]);
             
             if ($success) {
-                $pollId = $db->lastInsertId();
+                $pollId = $conn->lastInsertId();
                 echo json_encode([
                     "status" => "success", 
                     "message" => "Poll created successfully",
@@ -40,13 +43,9 @@ switch ($action) {
             } else {
                 echo json_encode(["status" => "error", "message" => "Failed to create poll"]);
             }
-        } catch (Exception $e) {
-            echo json_encode(["status" => "error", "message" => $e->getMessage()]);
-        }
-        break;
+            break;
 
-    case 'delete':
-        try {
+        case 'delete':
             $id = $_POST['id'] ?? 0;
             
             if (!$id) {
@@ -54,53 +53,38 @@ switch ($action) {
                 exit;
             }
 
-            // Begin transaction to handle cascading deletes
-            $db->beginTransaction();
-
+            $conn->beginTransaction();
             try {
-                // Delete votes first
-                $db->prepare("DELETE FROM votes WHERE participants_id IN (SELECT id FROM participants WHERE poll_id = ?)")->execute([$id]);
+                // Delete votes first (cascade through participants)
+                $conn->prepare("DELETE FROM votes WHERE participant_id IN (SELECT id FROM participants WHERE poll_id = ?)")->execute([$id]);
                 
                 // Delete participants
-                $db->prepare("DELETE FROM participants WHERE poll_id = ?")->execute([$id]);
-                
-                // Delete candidates (if any)
-                $db->prepare("DELETE FROM candidates WHERE poll_id = ?")->execute([$id]);
+                $conn->prepare("DELETE FROM participants WHERE poll_id = ?")->execute([$id]);
                 
                 // Delete poll
-                $stmt = $db->prepare("DELETE FROM polls WHERE id = ?");
+                $stmt = $conn->prepare("DELETE FROM polls WHERE id = ?");
                 $success = $stmt->execute([$id]);
 
                 if ($success && $stmt->rowCount() > 0) {
-                    $db->commit();
+                    $conn->commit();
                     echo json_encode(["status" => "success", "message" => "Poll deleted successfully"]);
                 } else {
-                    $db->rollBack();
-                    echo json_encode(["status" => "error", "message" => "Poll not found or already deleted"]);
+                    $conn->rollBack();
+                    echo json_encode(["status" => "error", "message" => "Poll not found"]);
                 }
-
             } catch (Exception $e) {
-                $db->rollBack();
+                $conn->rollBack();
                 throw $e;
             }
+            break;
 
-        } catch (Exception $e) {
-            echo json_encode(["status" => "error", "message" => $e->getMessage()]);
-        }
-        break;
+        case 'count':
+            $stmt = $conn->query("SELECT COUNT(*) as total FROM polls");
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            echo json_encode(["total" => (int)$result['total']]);
+            break;
 
-    case 'count':
-        try {
-            $stmt = $db->query("SELECT COUNT(*) FROM polls");
-            $count = $stmt->fetchColumn();
-            echo json_encode(["total" => $count]);
-        } catch (Exception $e) {
-            echo json_encode(["status" => "error", "message" => $e->getMessage()]);
-        }
-        break;
-
-    case 'get':
-        try {
+        case 'get':
             $id = $_GET['id'] ?? 0;
             
             if (!$id) {
@@ -108,7 +92,7 @@ switch ($action) {
                 exit;
             }
 
-            $stmt = $db->prepare("SELECT * FROM polls WHERE id = ?");
+            $stmt = $conn->prepare("SELECT * FROM polls WHERE id = ?");
             $stmt->execute([$id]);
             $poll = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -117,11 +101,13 @@ switch ($action) {
             } else {
                 echo json_encode(["status" => "error", "message" => "Poll not found"]);
             }
-        } catch (Exception $e) {
-            echo json_encode(["status" => "error", "message" => $e->getMessage()]);
-        }
-        break;
+            break;
 
-    default:
-        echo json_encode(["status" => "error", "message" => "Invalid action: " . $action]);
+        default:
+            echo json_encode(["status" => "error", "message" => "Invalid action: " . $action]);
+    }
+} catch (Exception $e) {
+    error_log("Poll.php error: " . $e->getMessage());
+    echo json_encode(["status" => "error", "message" => "Server error: " . $e->getMessage()]);
 }
+?>
