@@ -72,7 +72,7 @@
                     <a href="#" class="hover:text-purple-200 transition">Elections</a>
                     <a href="result.html" class="hover:text-purple-200 transition">Results</a>
                     <a href="about.html" class="hover:text-purple-200 transition">About</a>
-                    <a href="admin.php" class="hover:text-purple-200 transition font-semibold">Admin</a>
+                    <a href="backend/admin_dashboard.php" class="hover:text-purple-200 transition font-semibold">Admin</a>
                 </nav>
 
                 <div class="flex items-center space-x-4">
@@ -92,7 +92,7 @@
             <a href="#" class="block py-2 hover:text-purple-200 transition">Elections</a>
             <a href="result.html" class="block py-2 hover:text-purple-200 transition">Results</a>
             <a href="about.html" class="block py-2 hover:text-purple-200 transition">About</a>
-            <a href="admin.php" class="block py-2 hover:text-purple-200 transition font-semibold">Admin</a>
+            <a href="backend/admin_dashboard.php" class="block py-2 hover:text-purple-200 transition font-semibold">Admin</a>
         </div>
     </header>
 
@@ -368,8 +368,22 @@
             userId: null,
             hasVoted: false,
             votedCandidate: '',
-            selectedPollId: null
+            selectedPollId: null,
+            selectedCandidateId: null,
+            selectedCandidateName: ''
         };
+
+        // Utility function for API calls (same as admin dashboard)
+        async function apiCall(url, options = {}) {
+            try {
+                const response = await fetch(`backend/${url}`, options);
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                return await response.json();
+            } catch (error) {
+                console.error('API call failed:', error);
+                throw error;
+            }
+        }
 
         // Initialize everything when DOM loads
         document.addEventListener('DOMContentLoaded', function() {
@@ -383,15 +397,18 @@
         async function checkLoginState() {
             console.log('Checking login state...');
             try {
-                let res = await fetch('backend/me.php');
-                let data = await res.json();
+                const data = await apiCall('auth.php?action=session');
 
                 if (data.success) {
                     userState.isLoggedIn = true;
                     userState.username = data.username;
-                    userState.userId = data.id;
+                    userState.userId = parseInt(data.id);
+                    userState.role = data.role;
+                    
+                    console.log('User session found:', userState);
                     updateUIAfterLogin();
                 } else {
+                    console.log('No active session');
                     updateUIAfterLogout();
                 }
             } catch (err) {
@@ -403,8 +420,7 @@
         // ================= LOAD ELECTIONS =================
         async function loadElections() {
             try {
-                const pollRes = await fetch("backend/poll.php?action=list");
-                const polls = await pollRes.json();
+                const polls = await apiCall("poll.php?action=list");
 
                 const electionsContainer = document.getElementById("elections-container");
                 electionsContainer.innerHTML = "";
@@ -469,8 +485,8 @@
         // ================= CHECK IF USER ALREADY VOTED =================
         async function checkIfAlreadyVoted(pollId) {
             try {
-                // Check if user has already voted in this poll
-                const response = await fetch('backend/check_vote.php', {
+                // Use the votes API to check if user has voted
+                const data = await apiCall('votes.php?action=check', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ 
@@ -478,8 +494,6 @@
                         poll_id: pollId 
                     })
                 });
-                
-                const data = await response.json();
                 
                 if (data.hasVoted) {
                     userState.hasVoted = true;
@@ -506,8 +520,7 @@
         // ================= LOAD POLL CANDIDATES =================
         async function loadPollCandidates(pollId) {
             try {
-                const response = await fetch(`backend/participants.php?action=list&poll_id=${pollId}`);
-                const participants = await response.json();
+                const participants = await apiCall(`participants.php?action=list&poll_id=${pollId}`);
 
                 const container = document.getElementById("candidates-container");
                 container.innerHTML = "";
@@ -699,126 +712,19 @@
             }
 
             try {
-                let res = await fetch('backend/login.php', {
+                const data = await apiCall('auth.php?action=login', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ username, password })
                 });
-
-                let data = await res.json();
-                console.log('Login response:', data);
                 
-                if (data.success) {
-                    userState.isLoggedIn = true;
-                    userState.username = data.username;
-                    userState.userId = data.id || null;
-                    updateUIAfterLogin();
-                    document.getElementById('login-modal').classList.add('hidden');
-                    document.getElementById('login-form').reset();
-                    
-                    // If user was trying to vote, reload the poll
-                    if (userState.selectedPollId) {
-                        const pollTitle = document.getElementById('poll-title').textContent;
-                        const pollDates = document.getElementById('poll-dates').textContent;
-                        const [start, end] = pollDates.split(' → ');
-                        handleViewAndVote(userState.selectedPollId, pollTitle, start, end);
-                    }
-                } else {
-                    alert(data.message || 'Invalid username or password.');
-                }
-            } catch (error) {
-                console.error('Login error:', error);
-                alert('Login failed. Please check your connection and try again.');
-            }
-        }
-
-        // ================= REGISTER HANDLER =================
-        async function handleRegister(e) {
-            e.preventDefault();
-            console.log('Register form submitted');
-            
-            const username = document.getElementById('reg-username').value.trim();
-            const password = document.getElementById('reg-password').value.trim();
-            const confirmPassword = document.getElementById('reg-confirm-password').value.trim();
-
-            if (!username || !password || !confirmPassword) {
-                alert('Please fill in all fields');
-                return;
-            }
-
-            if (password !== confirmPassword) {
-                alert('Passwords do not match!');
-                return;
-            }
-
-            if (password.length < 6) {
-                alert('Password must be at least 6 characters long');
-                return;
-            }
-
-            try {
-                let res = await fetch('backend/register.php', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username, password })
-                });
-
-                let data = await res.json();
-                console.log('Register response:', data);
-                
-                if (data.success) {
-                    // Auto-login after registration
-                    userState.isLoggedIn = true;
-                    userState.username = data.username;
-                    userState.userId = data.id || null;
-                    updateUIAfterLogin();
-                    document.getElementById('register-modal').classList.add('hidden');
-                    document.getElementById('register-form').reset();
-                    
-                    // If user was trying to vote, reload the poll
-                    if (userState.selectedPollId) {
-                        const pollTitle = document.getElementById('poll-title').textContent;
-                        const pollDates = document.getElementById('poll-dates').textContent;
-                        const [start, end] = pollDates.split(' → ');
-                        handleViewAndVote(userState.selectedPollId, pollTitle, start, end);
-                    }
-                } else {
-                    alert(data.message || 'Registration failed.');
-                }
-            } catch (error) {
-                console.error('Register error:', error);
-                alert('Registration failed. Please check your connection and try again.');
-            }
-        }
-
-        // ================= LOGIN HANDLER =================
-        async function handleLogin(e) {
-            e.preventDefault();
-            console.log('Login form submitted');
-            
-            const username = document.getElementById('login-username').value.trim();
-            const password = document.getElementById('login-password').value.trim();
-
-            if (!username || !password) {
-                alert('Please fill in all fields');
-                return;
-            }
-
-            try {
-                let res = await fetch('backend/login.php', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username, password })
-                });
-
-                let data = await res.json();
                 console.log('Login response:', data);
                 
                 if (data.success) {
                     // Store user data properly
                     userState.isLoggedIn = true;
                     userState.username = data.username;
-                    userState.userId = parseInt(data.id); // Make sure it's a number
+                    userState.userId = parseInt(data.id);
                     userState.role = data.role;
                     
                     console.log('User logged in:', userState);
@@ -868,20 +774,19 @@
             }
 
             try {
-                let res = await fetch('backend/register.php', {
+                const data = await apiCall('auth.php?action=register', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ username, password })
                 });
-
-                let data = await res.json();
+                
                 console.log('Register response:', data);
                 
                 if (data.success) {
                     // Store user data properly after auto-login
                     userState.isLoggedIn = true;
                     userState.username = data.username;
-                    userState.userId = parseInt(data.id); // Make sure it's a number
+                    userState.userId = parseInt(data.id);
                     userState.role = data.role;
                     
                     console.log('User registered and logged in:', userState);
@@ -906,94 +811,34 @@
             }
         }
 
-        // ================= SESSION CHECK =================
-        async function checkLoginState() {
-            console.log('Checking login state...');
+        // ================= LOGOUT HANDLER =================
+        async function handleLogout() {
             try {
-                let res = await fetch('backend/me.php');
-                let data = await res.json();
-                console.log('Session check response:', data);
-
-                if (data.success) {
-                    userState.isLoggedIn = true;
-                    userState.username = data.username;
-                    userState.userId = parseInt(data.id); // Make sure it's a number
-                    userState.role = data.role;
-                    
-                    console.log('User session found:', userState);
-                    updateUIAfterLogin();
-                } else {
-                    console.log('No active session');
-                    updateUIAfterLogout();
-                }
-            } catch (err) {
-                console.error("Session check error:", err);
-                updateUIAfterLogout();
-            }
-        }
-
-        // ================= VOTE SUBMISSION HANDLER =================
-        async function handleVoteSubmission() {
-            console.log('Vote submission started');
-            console.log('User state:', userState);
-            console.log('Selected candidate ID:', userState.selectedCandidateId);
-            console.log('Selected poll ID:', userState.selectedPollId);
-            
-            if (!userState.selectedCandidateId || !userState.selectedPollId) {
-                alert('Please select a candidate first.');
-                return;
-            }
-
-            if (!userState.isLoggedIn || !userState.userId) {
-                console.log('User not logged in or missing user ID');
-                document.getElementById('login-required-modal').classList.remove('hidden');
-                return;
-            }
-
-            if (userState.hasVoted) {
-                alert('You have already voted in this election.');
-                return;
-            }
-
-            try {
-                const voteData = {
-                    user_id: userState.userId,
-                    participant_id: parseInt(userState.selectedCandidateId),
-                    poll_id: parseInt(userState.selectedPollId)
+                await apiCall('auth.php?action=logout', { method: 'POST' });
+                
+                // Reset user state
+                userState = {
+                    isLoggedIn: false,
+                    username: '',
+                    userId: null,
+                    hasVoted: false,
+                    votedCandidate: '',
+                    selectedPollId: null,
+                    selectedCandidateId: null,
+                    selectedCandidateName: ''
                 };
                 
-                console.log('Sending vote data:', voteData);
-
-                const response = await fetch('backend/submit_vote.php', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(voteData)
-                });
-
-                const data = await response.json();
-                console.log('Vote submission response:', data);
-
-                if (data.success) {
-                    // Update user state
-                    userState.hasVoted = true;
-                    userState.votedCandidate = userState.selectedCandidateName;
-
-                    // Show success modal
-                    document.getElementById('vote-confirmation-modal').classList.remove('hidden');
-
-                    // Hide voting interface and show already voted message
-                    document.getElementById('candidates-container').style.display = 'none';
-                    document.getElementById('selected-candidate').classList.add('hidden');
-                    document.getElementById('already-voted').classList.remove('hidden');
-                    document.getElementById('voted-candidate').textContent = userState.votedCandidate;
-
-                } else {
-                    console.error('Vote submission failed:', data.message);
-                    alert(data.message || 'Failed to submit vote. Please try again.');
-                }
+                updateUIAfterLogout();
+                
+                // Reset voting interface
+                document.getElementById('voting-interface').classList.add('hidden');
+                document.getElementById('login-required').classList.remove('hidden');
+                
             } catch (error) {
-                console.error('Vote submission error:', error);
-                alert('Failed to submit vote. Please check your connection and try again.');
+                console.error('Logout error:', error);
+                // Force logout on client side even if server request fails
+                userState.isLoggedIn = false;
+                updateUIAfterLogout();
             }
         }
 
@@ -1028,12 +873,16 @@
 
         // ================= VOTE SUBMISSION HANDLER =================
         async function handleVoteSubmission() {
+            console.log('Vote submission started');
+            console.log('User state:', userState);
+            
             if (!userState.selectedCandidateId || !userState.selectedPollId) {
                 alert('Please select a candidate first.');
                 return;
             }
 
-            if (!userState.isLoggedIn) {
+            if (!userState.isLoggedIn || !userState.userId) {
+                console.log('User not logged in or missing user ID');
                 document.getElementById('login-required-modal').classList.remove('hidden');
                 return;
             }
@@ -1044,17 +893,21 @@
             }
 
             try {
-                const response = await fetch('backend/submit_vote.php', {
+                const voteData = {
+                    user_id: userState.userId,
+                    participant_id: parseInt(userState.selectedCandidateId),
+                    poll_id: parseInt(userState.selectedPollId)
+                };
+                
+                console.log('Sending vote data:', voteData);
+
+                const data = await apiCall('votes.php?action=submit', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        user_id: userState.userId,
-                        participant_id: userState.selectedCandidateId,
-                        poll_id: userState.selectedPollId
-                    })
+                    body: JSON.stringify(voteData)
                 });
 
-                const data = await response.json();
+                console.log('Vote submission response:', data);
 
                 if (data.success) {
                     // Update user state
@@ -1071,6 +924,7 @@
                     document.getElementById('voted-candidate').textContent = userState.votedCandidate;
 
                 } else {
+                    console.error('Vote submission failed:', data.message);
                     alert(data.message || 'Failed to submit vote. Please try again.');
                 }
             } catch (error) {
@@ -1098,35 +952,7 @@
 
         // Make handleViewAndVote globally accessible
         window.handleViewAndVote = handleViewAndVote;
-                // ================= LOGIN REQUIRED MODAL =================
-        function showLoginRequiredModal() {
-            const modal = document.getElementById("login-required-modal");
-            if (modal) {
-                modal.classList.remove("hidden");
-            } else {
-                alert("You must log in first to vote.");
-            }
-        }
-
-        function closeLoginRequiredModal() {
-            document.getElementById("login-required-modal")?.classList.add("hidden");
-        }
-
-        document.getElementById("close-login-required-modal")?.addEventListener("click", closeLoginRequiredModal);
     </script>
 
-    <!-- Login Required Modal -->
-    <div id="login-required-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
-        <div class="bg-white rounded-xl shadow-xl w-full max-w-md p-8 text-center">
-            <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                <i class="fas fa-exclamation text-red-500 text-2xl"></i>
-            </div>
-            <h3 class="text-xl font-bold text-gray-800 mb-4">Login Required</h3>
-            <p class="text-gray-600 mb-6">You must log in before you can view and vote in elections.</p>
-            <button id="close-login-required-modal" class="gradient-bg text-white px-6 py-2 rounded-lg font-medium hover:opacity-90 transition">
-                OK
-            </button>
-        </div>
-    </div>
 </body>
 </html>
