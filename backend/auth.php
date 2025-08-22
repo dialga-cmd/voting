@@ -1,11 +1,16 @@
 <?php
 session_start();
 header('Content-Type: application/json');
+header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Methods: POST, GET, OPTIONS');
+header('Access-Control-Allow-Headers: Content-Type');
 
-// Include the config file which should have database connection
-require_once __DIR__ . '/config.php';
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    exit(0);
+}
 
-// Get input and action
+require_once 'config.php'; // This provides $conn, not $pdo
+
 $input = json_decode(file_get_contents("php://input"), true);
 $action = $_GET['action'] ?? '';
 
@@ -15,7 +20,12 @@ try {
         $password = trim($input['password'] ?? '');
 
         if (!$username || !$password) {
-            echo json_encode(['success' => false, 'message' => 'Missing username or password']);
+            echo json_encode(['success' => false, 'message' => 'Missing fields']);
+            exit;
+        }
+
+        if (strlen($username) < 3) {
+            echo json_encode(['success' => false, 'message' => 'Username must be at least 3 characters long']);
             exit;
         }
 
@@ -24,7 +34,7 @@ try {
             exit;
         }
 
-        // Check if username already exists
+        // Check if username exists - use $conn from config.php
         $stmt = $conn->prepare("SELECT id FROM users WHERE username = ?");
         $stmt->execute([$username]);
         if ($stmt->fetch()) {
@@ -32,25 +42,31 @@ try {
             exit;
         }
 
-        // Insert new user
-        $hash = password_hash($password, PASSWORD_DEFAULT);
-        $stmt = $conn->prepare("INSERT INTO users (username, password, role, created_at) VALUES (?, ?, 'user', NOW())");
-        $stmt->execute([$username, $hash]);
-        
-        $userId = $conn->lastInsertId();
+        // Insert new user with SQLite datetime function
+        $hash = password_hash($password, PASSWORD_BCRYPT);
+        $stmt = $conn->prepare("INSERT INTO users (username, password, role, created_at) VALUES (?, ?, 'user', datetime('now'))");
+        $success = $stmt->execute([$username, $hash]);
 
-        // Auto-login after registration
-        $_SESSION['user_id'] = $userId;
-        $_SESSION['username'] = $username;
-        $_SESSION['role'] = 'user';
+        if ($success) {
+            $userId = $conn->lastInsertId();
+            
+            // Set up session for auto-login
+            $_SESSION['user'] = [
+                'id' => $userId,
+                'username' => $username,
+                'role' => 'user'
+            ];
 
-        echo json_encode([
-            'success' => true, 
-            'message' => 'Registration successful',
-            'id' => $userId,
-            'username' => $username,
-            'role' => 'user'
-        ]);
+            echo json_encode([
+                'success' => true, 
+                'message' => 'Registration successful',
+                'id' => (int)$userId,
+                'username' => $username,
+                'role' => 'user'
+            ]);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Registration failed']);
+        }
         exit;
     }
 
@@ -59,7 +75,7 @@ try {
         $password = trim($input['password'] ?? '');
 
         if (!$username || !$password) {
-            echo json_encode(['success' => false, 'message' => 'Missing username or password']);
+            echo json_encode(['success' => false, 'message' => 'Username and password required']);
             exit;
         }
 
@@ -68,33 +84,21 @@ try {
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($user && password_verify($password, $user['password'])) {
-            $_SESSION['user_id'] = $user['id'];
-            $_SESSION['username'] = $user['username'];
-            $_SESSION['role'] = $user['role'];
-
+            $_SESSION['user'] = [
+                'id' => $user['id'],
+                'username' => $user['username'],
+                'role' => $user['role']
+            ];
+            
             echo json_encode([
                 'success' => true,
                 'message' => 'Login successful',
-                'id' => $user['id'],
+                'id' => (int)$user['id'],
                 'username' => $user['username'],
                 'role' => $user['role']
             ]);
         } else {
-            echo json_encode(['success' => false, 'message' => 'Invalid username or password']);
-        }
-        exit;
-    }
-
-    if ($action === 'session') {
-        if (isset($_SESSION['user_id'])) {
-            echo json_encode([
-                'success' => true,
-                'id' => $_SESSION['user_id'],
-                'username' => $_SESSION['username'],
-                'role' => $_SESSION['role'] ?? 'user'
-            ]);
-        } else {
-            echo json_encode(['success' => false, 'message' => 'No active session']);
+            echo json_encode(['success' => false, 'message' => 'Invalid credentials']);
         }
         exit;
     }
@@ -105,14 +109,27 @@ try {
         exit;
     }
 
-    // Invalid action
+    if ($action === 'session') {
+        if (isset($_SESSION['user']) && is_array($_SESSION['user'])) {
+            echo json_encode([
+                'success' => true,
+                'id' => $_SESSION['user']['id'],
+                'username' => $_SESSION['user']['username'],
+                'role' => $_SESSION['user']['role']
+            ]);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Not logged in']);
+        }
+        exit;
+    }
+
     echo json_encode(['success' => false, 'message' => 'Invalid action']);
 
 } catch (PDOException $e) {
-    error_log("Database error in auth.php: " . $e->getMessage());
+    error_log("Auth.php PDO error: " . $e->getMessage());
     echo json_encode(['success' => false, 'message' => 'Database error occurred']);
 } catch (Exception $e) {
-    error_log("Error in auth.php: " . $e->getMessage());
-    echo json_encode(['success' => false, 'message' => 'An error occurred']);
+    error_log("Auth.php error: " . $e->getMessage());
+    echo json_encode(['success' => false, 'message' => 'Server error occurred']);
 }
 ?>
