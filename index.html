@@ -373,12 +373,20 @@
             selectedCandidateName: ''
         };
 
-        // Utility function for API calls (same as admin dashboard)
+        // Utility function for API calls
         async function apiCall(url, options = {}) {
             try {
+                console.log('API Call:', url, options);
                 const response = await fetch(`backend/${url}`, options);
-                if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                return await response.json();
+                console.log('Response status:', response.status);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                console.log('Response data:', data);
+                return data;
             } catch (error) {
                 console.error('API call failed:', error);
                 throw error;
@@ -419,13 +427,15 @@
 
         // ================= LOAD ELECTIONS =================
         async function loadElections() {
+            console.log('Loading elections...');
             try {
                 const polls = await apiCall("poll.php?action=list");
+                console.log('Loaded polls:', polls);
 
                 const electionsContainer = document.getElementById("elections-container");
                 electionsContainer.innerHTML = "";
 
-                if (polls.length === 0) {
+                if (!polls || polls.length === 0) {
                     electionsContainer.innerHTML = '<p class="text-gray-500 text-center col-span-3">No active elections at the moment.</p>';
                     return;
                 }
@@ -433,9 +443,9 @@
                 polls.forEach(poll => {
                     electionsContainer.insertAdjacentHTML("beforeend", `
                         <div class="border border-gray-200 rounded-lg p-6 hover:shadow-md transition">
-                            <h3 class="font-bold text-lg text-gray-800 mb-2">${poll.title}</h3>
-                            <p class="text-sm text-gray-600 mb-4">${poll.start_date} → ${poll.end_date}</p>
-                            <button onclick="handleViewAndVote(${poll.id}, '${poll.title}', '${poll.start_date}', '${poll.end_date}')" 
+                            <h3 class="font-bold text-lg text-gray-800 mb-2">${poll.title || 'Unnamed Poll'}</h3>
+                            <p class="text-sm text-gray-600 mb-4">${poll.start_date || 'No date'} → ${poll.end_date || 'No end date'}</p>
+                            <button onclick="handleViewAndVote(${poll.id}, '${poll.title || 'Poll'}', '${poll.start_date || ''}', '${poll.end_date || ''}')" 
                                 class="gradient-bg text-white px-4 py-2 rounded-lg hover:opacity-90 transition">
                                 View & Vote
                             </button>
@@ -485,7 +495,6 @@
         // ================= CHECK IF USER ALREADY VOTED =================
         async function checkIfAlreadyVoted(pollId) {
             try {
-                // Use check_vote.php or submit_vote.php to check if user has voted
                 const data = await apiCall('check_vote.php', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -842,66 +851,32 @@
             }
         }
 
-        // ================= VOTE SUBMISSION HANDLER =================
-        async function handleVoteSubmission() {
-            console.log('Vote submission started');
-            console.log('User state:', userState);
-            
-            if (!userState.selectedCandidateId || !userState.selectedPollId) {
-                alert('Please select a candidate first.');
-                return;
-            }
+        // ================= VOTE SELECTION HANDLER =================
+        function handleVoteSelection(e) {
+            if (e.target.classList.contains("vote-btn")) {
+                if (userState.hasVoted) {
+                    alert('You have already voted in this election.');
+                    return;
+                }
 
-            if (!userState.isLoggedIn || !userState.userId) {
-                console.log('User not logged in or missing user ID');
-                document.getElementById('login-required-modal').classList.remove('hidden');
-                return;
-            }
+                const candidateId = e.target.getAttribute("data-candidate-id");
+                const candidateName = e.target.getAttribute("data-candidate-name");
 
-            if (userState.hasVoted) {
-                alert('You have already voted in this election.');
-                return;
-            }
-
-            try {
-                const voteData = {
-                    user_id: userState.userId,
-                    participant_id: parseInt(userState.selectedCandidateId),
-                    poll_id: parseInt(userState.selectedPollId)
-                };
-                
-                console.log('Sending vote data:', voteData);
-
-                // Use submit_vote.php instead of votes.php
-                const data = await apiCall('submit_vote.php', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(voteData)
+                // Remove previous selection
+                document.querySelectorAll('.candidate-card').forEach(card => {
+                    card.classList.remove('candidate-selected');
                 });
 
-                console.log('Vote submission response:', data);
+                // Highlight selected candidate
+                e.target.closest('.candidate-card').classList.add('candidate-selected');
 
-                if (data.success) {
-                    // Update user state
-                    userState.hasVoted = true;
-                    userState.votedCandidate = userState.selectedCandidateName;
+                // Show selected candidate details
+                document.getElementById("selected-candidate-name").textContent = candidateName;
+                document.getElementById("selected-candidate").classList.remove("hidden");
 
-                    // Show success modal
-                    document.getElementById('vote-confirmation-modal').classList.remove('hidden');
-
-                    // Hide voting interface and show already voted message
-                    document.getElementById('candidates-container').style.display = 'none';
-                    document.getElementById('selected-candidate').classList.add('hidden');
-                    document.getElementById('already-voted').classList.remove('hidden');
-                    document.getElementById('voted-candidate').textContent = userState.votedCandidate;
-
-                } else {
-                    console.error('Vote submission failed:', data.message);
-                    alert(data.message || 'Failed to submit vote. Please try again.');
-                }
-            } catch (error) {
-                console.error('Vote submission error:', error);
-                alert('Failed to submit vote. Please check your connection and try again.');
+                // Store selection
+                userState.selectedCandidateId = candidateId;
+                userState.selectedCandidateName = candidateName;
             }
         }
 
@@ -935,7 +910,8 @@
                 
                 console.log('Sending vote data:', voteData);
 
-                const data = await apiCall('votes.php?action=submit', {
+                // Use submit_vote.php
+                const data = await apiCall('submit_vote.php', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(voteData)
