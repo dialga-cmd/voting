@@ -14,7 +14,7 @@ session_start();
 try {
     $input = json_decode(file_get_contents("php://input"), true);
     $user_id = $input['user_id'] ?? null;
-    $participant_id = $input['candidate_id'] ?? null; // renamed but still received from frontend
+    $participant_id = $input['participant_id'] ?? null;
     $poll_id = $input['poll_id'] ?? null;
 
     if (!$user_id || !$participant_id || !$poll_id) {
