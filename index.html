@@ -232,7 +232,7 @@
                 </div>
             </div>
             
-            <div id="results-container" class="space-y-6">
+            <div id="results-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <div class="text-center py-8">
                     <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto mb-4"></div>
                     <p class="text-gray-600">Loading results...</p>
@@ -595,161 +595,55 @@
             const pollFilter = document.getElementById('results-poll-filter');
             
             try {
-                // First, load all polls for the filter dropdown
-                const polls = await apiCall('poll.php?action=list');
-                
-                // Update filter dropdown
+                const response = await apiCall('results.php?action=completed');
+                const polls = response || [];
+
+                // Update dropdown
                 pollFilter.innerHTML = '<option value="">All Polls</option>';
                 polls.forEach(poll => {
                     pollFilter.innerHTML += `<option value="${poll.id}">${poll.title}</option>`;
                 });
 
-                // Get selected poll filter
+                // Filter
                 const selectedPollId = pollFilter.value;
-
-                // Load results for each poll (or just selected one)
                 const pollsToShow = selectedPollId ? polls.filter(p => p.id == selectedPollId) : polls;
-                
+
                 if (pollsToShow.length === 0) {
                     resultsContainer.innerHTML = `
-                        <div class="text-center py-12">
-                            <div class="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                                <i class="fas fa-chart-bar text-gray-400 text-3xl"></i>
-                            </div>
-                            <h3 class="text-xl font-bold text-gray-700 mb-4">No Results Available</h3>
-                            <p class="text-gray-500">There are no poll results to display at the moment.</p>
-                        </div>
-                    `;
+                        <div class="col-span-full text-center py-12">
+                            <i class="fas fa-chart-bar text-gray-400 text-3xl mb-4"></i>
+                            <h3 class="text-xl font-bold text-gray-700">No Results Available</h3>
+                        </div>`;
                     return;
                 }
 
-                // Load results for each poll
-                const resultsHTML = await Promise.all(pollsToShow.map(async poll => {
-                    try {
-                        // Load participants for this poll
-                        const participants = await apiCall(`participants.php?action=list&poll_id=${poll.id}`);
-                        
-                        if (participants.length === 0) {
-                            return `
-                                <div class="bg-white rounded-lg shadow-md p-6 border border-gray-200">
-                                    <div class="flex items-center justify-between mb-4">
-                                        <h3 class="text-xl font-bold text-gray-800">${poll.title}</h3>
-                                        <span class="text-sm text-gray-500">${poll.start_date} → ${poll.end_date}</span>
-                                    </div>
-                                    <div class="text-center py-8">
-                                        <i class="fas fa-users-slash text-gray-400 text-3xl mb-4"></i>
-                                        <p class="text-gray-500">No candidates in this poll</p>
-                                    </div>
-                                </div>
-                            `;
-                        }
-
-                        // For demonstration, we'll simulate vote counts
-                        // In a real system, you'd get actual vote counts from a votes table
-                        const participantsWithVotes = participants.map(participant => ({
-                            ...participant,
-                            voteCount: Math.floor(Math.random() * 100), // Simulated votes
-                        }));
-
-                        // Sort by vote count (highest first)
-                        participantsWithVotes.sort((a, b) => b.voteCount - a.voteCount);
-
-                        // Calculate total votes
-                        const totalVotes = participantsWithVotes.reduce((sum, p) => sum + p.voteCount, 0);
-
-                        // Generate results HTML
-                        const candidateRows = participantsWithVotes.map((participant, index) => {
-                            const percentage = totalVotes > 0 ? Math.round((participant.voteCount / totalVotes) * 100) : 0;
-                            const initials = participant.name.split(" ").map(n => n[0]).join("").toUpperCase();
-                            
-                            return `
-                                <div class="flex items-center justify-between p-4 border border-gray-200 rounded-lg ${index === 0 ? 'bg-green-50 border-green-200' : 'bg-gray-50'}">
-                                    <div class="flex items-center">
-                                        <div class="w-10 h-10 rounded-full ${index === 0 ? 'bg-green-100 text-green-700' : 'bg-gray-200 text-gray-700'} flex items-center justify-center font-bold text-sm mr-4">
-                                            ${index === 0 ? '<i class="fas fa-crown"></i>' : initials}
-                                        </div>
-                                        <div>
-                                            <h4 class="font-bold text-gray-800">${participant.name}</h4>
-                                            <p class="text-sm text-gray-600">${participant.voteCount} votes (${percentage}%)</p>
-                                        </div>
-                                    </div>
-                                    <div class="flex items-center space-x-4">
-                                        <div class="w-24 bg-gray-200 rounded-full h-3">
-                                            <div class="bg-gradient-to-r ${index === 0 ? 'from-green-400 to-green-600' : 'from-purple-400 to-purple-600'} h-3 rounded-full transition-all duration-500" style="width: ${percentage}%"></div>
-                                        </div>
-                                        <span class="text-lg font-bold ${index === 0 ? 'text-green-600' : 'text-gray-600'}">${percentage}%</span>
-                                    </div>
-                                </div>
-                            `;
-                        }).join('');
-
+                resultsContainer.innerHTML = pollsToShow.map(poll => {
+                    const candidateRows = poll.options.map((opt, idx) => {
+                        const percentage = poll.total_votes > 0 
+                            ? Math.round((opt.votes / poll.total_votes) * 100) : 0;
                         return `
-                            <div class="bg-white rounded-lg shadow-md p-6 border border-gray-200">
-                                <div class="flex items-center justify-between mb-6">
-                                    <div>
-                                        <h3 class="text-xl font-bold text-gray-800">${poll.title}</h3>
-                                        <p class="text-sm text-gray-600">${poll.start_date} → ${poll.end_date}</p>
-                                    </div>
-                                    <div class="text-right">
-                                        <div class="text-2xl font-bold text-gray-800">${totalVotes}</div>
-                                        <div class="text-sm text-gray-500">Total Votes</div>
-                                    </div>
+                            <div class="flex items-center justify-between p-3 border rounded-lg ${idx===0?'bg-green-50':'bg-gray-50'}">
+                                <div>
+                                    <h4 class="font-bold">${opt.option_text}</h4>
+                                    <p class="text-sm text-gray-600">${opt.votes} votes (${percentage}%)</p>
                                 </div>
-                                
-                                <div class="space-y-3 mb-6">
-                                    ${candidateRows}
+                                <div class="w-24 bg-gray-200 rounded-full h-3">
+                                    <div class="bg-gradient-to-r ${idx===0?'from-green-400 to-green-600':'from-purple-400 to-purple-600'} h-3 rounded-full" style="width:${percentage}%"></div>
                                 </div>
+                            </div>`;
+                    }).join('');
 
-                                ${totalVotes > 0 ? `
-                                    <div class="text-center py-4">
-                                        <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                                            <i class="fas fa-info-circle text-yellow-600 mr-2"></i>
-                                            <span class="text-yellow-800">This is demo data. In a production system, these would be real vote counts.</span>
-                                        </div>
-                                    </div>
-                                ` : ''}
-                                
-                                <div class="flex items-center justify-between pt-4 border-t border-gray-200">
-                                    <div class="flex items-center text-sm text-gray-600">
-                                        <i class="fas fa-users mr-2"></i>
-                                        ${participantsWithVotes.length} candidates
-                                    </div>
-                                    <button onclick="exportPollResults(${poll.id}, '${poll.title}')" class="text-purple-600 hover:text-purple-800 text-sm font-medium">
-                                        <i class="fas fa-download mr-1"></i>Export Results
-                                    </button>
-                                </div>
-                            </div>
-                        `;
-                    } catch (error) {
-                        console.error(`Error loading results for poll ${poll.id}:`, error);
-                        return `
-                            <div class="bg-white rounded-lg shadow-md p-6 border border-gray-200">
-                                <h3 class="text-xl font-bold text-gray-800 mb-4">${poll.title}</h3>
-                                <div class="text-center py-8">
-                                    <i class="fas fa-exclamation-triangle text-red-400 text-3xl mb-4"></i>
-                                    <p class="text-red-500">Error loading results for this poll</p>
-                                </div>
-                            </div>
-                        `;
-                    }
-                }));
-
-                resultsContainer.innerHTML = resultsHTML.join('');
-
+                    return `
+                        <div class="bg-white rounded-lg shadow-md p-4 border">
+                            <h3 class="font-bold text-lg mb-2">${poll.title}</h3>
+                            <p class="text-sm text-gray-500 mb-4">${poll.start_date} → ${poll.end_date}</p>
+                            <div class="space-y-2">${candidateRows}</div>
+                            <div class="mt-4 text-right text-sm text-gray-500">Total Votes: ${poll.total_votes}</div>
+                        </div>`;
+                }).join('');
             } catch (error) {
                 console.error('Error loading election results:', error);
-                resultsContainer.innerHTML = `
-                    <div class="text-center py-12">
-                        <div class="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                            <i class="fas fa-exclamation-triangle text-red-500 text-3xl"></i>
-                        </div>
-                        <h3 class="text-xl font-bold text-gray-700 mb-4">Error Loading Results</h3>
-                        <p class="text-gray-500">Failed to load election results. Please try again later.</p>
-                        <button onclick="loadElectionResults()" class="mt-4 bg-red-100 text-red-700 px-4 py-2 rounded-lg hover:bg-red-200 transition">
-                            <i class="fas fa-retry mr-2"></i>Try Again
-                        </button>
-                    </div>
-                `;
+                resultsContainer.innerHTML = `<p class="col-span-full text-red-500 text-center">Failed to load results.</p>`;
             }
         }
 
