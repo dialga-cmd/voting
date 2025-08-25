@@ -12,6 +12,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 
 $action = $_GET['action'] ?? $_POST['action'] ?? '';
 
+if ($action === 'list') {
+    try {
+        $today = date("Y-m-d");
+
+        // Only show active polls
+        $stmt = $conn->prepare("
+            SELECT * FROM polls
+            WHERE date(start_date) <= :today
+              AND date(end_date) >= :today
+            ORDER BY start_date DESC
+        ");
+        $stmt->execute([":today" => $today]);
+        $polls = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        echo json_encode($polls);
+    } catch (PDOException $e) {
+        echo json_encode(["error" => $e->getMessage()]);
+    }
+    exit;
+}
+
 try {
     switch ($action) {
         case 'list':

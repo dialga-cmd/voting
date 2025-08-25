@@ -42,6 +42,20 @@ try {
                 echo json_encode(["status" => "error", "message" => "Poll ID is required"]);
                 exit;
             }
+            // Before inserting a vote, check if poll is still active
+            $pollCheck = $conn->prepare("
+                SELECT 1 FROM polls p
+                JOIN participants pa ON pa.poll_id = p.id
+                WHERE pa.id = :participant_id
+                AND date(p.start_date) <= date('now')
+                AND date(p.end_date) >= date('now')
+            ");
+            $pollCheck->execute([":participant_id" => $participant_id]);
+
+            if (!$pollCheck->fetch()) {
+                echo json_encode(["success" => false, "message" => "This poll is closed."]);
+                exit;
+            }
 
             // Get vote results for a specific poll
             $stmt = $conn->prepare("

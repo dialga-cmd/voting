@@ -200,7 +200,6 @@ require_once __DIR__ . '/config.php';
 try {
     $totalPolls = $conn->query("SELECT COUNT(*) FROM polls")->fetchColumn();
     $totalParticipants = $conn->query("SELECT COUNT(*) FROM participants")->fetchColumn();
-    $totalCouncil = $conn->query("SELECT COUNT(*) FROM student_council")->fetchColumn();
     $totalVotes = $conn->query("SELECT COUNT(*) FROM votes")->fetchColumn();
 } catch (Exception $e) {
     $totalPolls = 0;
@@ -343,7 +342,7 @@ try {
         <i class="fas fa-poll" style="font-size:2.1em;color:#6366f1;"></i>
       </div>
       <div class="stat-card">
-        <div>
+        <div
           <div style="font-size:1.7em;font-weight:700;" id="totalParticipantsCount"><?php echo $totalParticipants; ?></div>
           <div class="text-gray-600">Participants</div>
         </div>

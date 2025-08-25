@@ -181,19 +181,15 @@
         <section class="mb-12">
             <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">System Overview</h2>
             <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-                <div class="bg-white rounded-lg shadow-md p-6 text-center">
+                <div class="bg-white rounded-lg shadow-md p-6 text-center justify-center place-items-center">
                     <div class="text-3xl font-bold text-purple-600 mb-2" id="total-polls">0</div>
                     <div class="text-gray-600">Active Polls</div>
                 </div>
-                <div class="bg-white rounded-lg shadow-md p-6 text-center">
+                <div class="bg-white rounded-lg shadow-md p-6 text-center justify-center place-items-center">
                     <div class="text-3xl font-bold text-green-600 mb-2" id="total-participants">0</div>
                     <div class="text-gray-600">Total Participants</div>
                 </div>
-                <div class="bg-white rounded-lg shadow-md p-6 text-center">
-                    <div class="text-3xl font-bold text-blue-600 mb-2" id="total-council">0</div>
-                    <div class="text-gray-600">Council Members</div>
-                </div>
-                <div class="bg-white rounded-lg shadow-md p-6 text-center">
+                <div class="bg-white rounded-lg shadow-md p-6 text-center justify-center place-items-center">
                     <div class="text-3xl font-bold text-orange-600 mb-2" id="total-votes">0</div>
                     <div class="text-gray-600">Total Votes</div>
                 </div>
@@ -1012,6 +1008,31 @@
             } catch (error) {
                 console.error('Register error:', error);
                 alert('Registration failed. Please check your connection and try again.');
+            }
+        }
+
+        // ================= SYSTEM STATS =================
+        async function loadSystemStats() {
+            try {
+                // Call backend APIs in parallel
+                const [polls, votes, participants] = await Promise.all([
+                    apiCall('poll.php?action=list'),
+                    apiCall('votes.php?action=count'),
+                    apiCall('participants.php?action=count')
+                ]);
+
+                // Update DOM
+                document.getElementById('total-polls').textContent = polls.length || 0;
+                document.getElementById('total-votes').textContent = votes.total || 0;
+                document.getElementById('total-participants').textContent = participants.total || 0;
+
+            } catch (error) {
+                console.error('Failed to load system stats:', error);
+
+                // fallback values
+                document.getElementById('total-polls').textContent = '0';
+                document.getElementById('total-votes').textContent = '0';
+                document.getElementById('total-participants').textContent = '0';
             }
         }
 
