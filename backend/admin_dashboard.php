@@ -337,12 +337,12 @@ try {
       <div class="stat-card">
         <div>
           <div style="font-size:1.7em;font-weight:700;" id="totalPollsCount"><?php echo $totalPolls; ?></div>
-          <div class="text-gray-600">Active Polls</div>
+          <div class="text-gray-600"></div>
         </div>
         <i class="fas fa-poll" style="font-size:2.1em;color:#6366f1;"></i>
       </div>
       <div class="stat-card">
-        <div
+        <div>
           <div style="font-size:1.7em;font-weight:700;" id="totalParticipantsCount"><?php echo $totalParticipants; ?></div>
           <div class="text-gray-600">Participants</div>
         </div>
