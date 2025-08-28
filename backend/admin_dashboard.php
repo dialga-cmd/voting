@@ -650,9 +650,6 @@ async function loadPolls() {
         <td>${poll.participantCount}</td>
         <td>${poll.voteCount}</td>
         <td>
-          <button onclick="editPoll(${poll.id})" class="edit-btn" title="Edit Poll">
-            <i class="fas fa-edit"></i>
-          </button>
           <button onclick="deletePoll(${poll.id})" class="delete-btn" title="Delete Poll">
             <i class="fas fa-trash-alt"></i>
           </button>
@@ -686,11 +683,6 @@ async function deletePoll(id) {
   } catch (error) {
     showMessage('polls-messages', 'Failed to delete poll: ' + error.message);
   }
-}
-
-function editPoll(id) {
-  // Future enhancement: open edit modal
-  alert('Edit functionality coming soon!');
 }
 
 document.getElementById('createPollForm').addEventListener('submit', async function(e) {
@@ -792,9 +784,6 @@ async function loadParticipants() {
                 <td><strong>${part.name}</strong></td>
                 <td>${part.email || '<em>No email</em>'}</td>
                 <td>
-                  <button onclick="editParticipant(${part.id})" class="edit-btn" title="Edit Participant">
-                    <i class="fas fa-edit"></i>
-                  </button>
                   <button onclick="deleteParticipant(${part.id})" class="delete-btn" title="Remove Participant">
                     <i class="fas fa-trash-alt"></i>
                   </button>
@@ -811,11 +800,6 @@ async function loadParticipants() {
     box.innerHTML = '<p style="text-align: center; color: #e34d4d; padding: 20px;">Failed to load participants</p>';
     showMessage('participants-messages', 'Failed to load participants: ' + error.message);
   }
-}
-
-function editParticipant(id) {
-  // Future enhancement: open edit modal
-  alert('Edit functionality coming soon!');
 }
 
 document.getElementById('pollSelect').addEventListener('change', function() {
